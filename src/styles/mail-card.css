@@ -1,0 +1,233 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Mail Card Component — ChatGPT / Claude / Copilot Style Email Card
+   ═══════════════════════════════════════════════════════════════════ */
+
+.mail-card {
+  margin: 14px 0;
+  border-radius: 12px;
+  border: 1px solid var(--border-light, #e2e8f0);
+  background: var(--bg-primary, #ffffff);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+[data-theme="dark"] .mail-card {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: #18181b;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.mail-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .mail-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Header Toolbar ─────────────────────────────────────────────── */
+
+.mail-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border-bottom: 1px solid #edf2f7;
+  gap: 10px;
+}
+
+[data-theme="dark"] .mail-card-header {
+  background: #202024;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.mail-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+
+.mail-badge-icon {
+  font-size: 14px;
+}
+
+.mail-badge-text {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+[data-theme="dark"] .mail-badge-text {
+  color: #a1a1aa;
+}
+
+.mail-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mail-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+[data-theme="dark"] .mail-action-btn {
+  background: #27272a;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #e4e4e7;
+}
+
+.mail-action-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+[data-theme="dark"] .mail-action-btn:hover {
+  background: #3f3f46;
+  color: #ffffff;
+}
+
+.mail-action-btn.primary {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+
+.mail-action-btn.primary:hover {
+  background: #1e293b;
+  border-color: #1e293b;
+}
+
+[data-theme="dark"] .mail-action-btn.primary {
+  background: #f4f4f5;
+  color: #09090b;
+  border-color: #f4f4f5;
+}
+
+[data-theme="dark"] .mail-action-btn.primary:hover {
+  background: #ffffff;
+}
+
+.mail-action-btn.copied {
+  color: #059669 !important;
+  background: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+}
+
+/* ── Meta Fields ────────────────────────────────────────────────── */
+
+.mail-card-meta {
+  padding: 12px 16px 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mail-meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12.5px;
+}
+
+.mail-meta-key {
+  font-weight: 600;
+  color: #64748b;
+  min-width: 46px;
+  user-select: none;
+}
+
+[data-theme="dark"] .mail-meta-key {
+  color: #71717a;
+}
+
+.mail-recipient-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+[data-theme="dark"] .mail-recipient-tag {
+  background: #27272a;
+  color: #f4f4f5;
+}
+
+.mail-subject-text {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 13.5px;
+}
+
+[data-theme="dark"] .mail-subject-text {
+  color: #fafafa;
+}
+
+.mail-card-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 4px 16px 0 16px;
+}
+
+[data-theme="dark"] .mail-card-divider {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Body ───────────────────────────────────────────────────────── */
+
+.mail-card-body {
+  padding: 14px 16px 16px 16px;
+  font-family: inherit;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #334155;
+}
+
+[data-theme="dark"] .mail-card-body {
+  color: #d4d4d8;
+}
+
+.mail-paragraph {
+  margin: 0 0 10px 0;
+}
+
+.mail-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+/* ── RTL Support ────────────────────────────────────────────────── */
+
+.mail-card.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.mail-card.rtl .mail-card-header {
+  flex-direction: row-reverse;
+}
+
+.mail-card.rtl .mail-meta-row {
+  flex-direction: row;
+}

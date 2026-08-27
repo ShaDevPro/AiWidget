@@ -473,6 +473,56 @@ class App implements SettingsHost, ShellHost {
   initGlobalLinkHandler(): void {
     document.addEventListener('click', async (e) => {
       const target = e.target as HTMLElement;
+
+      // 1. Mail Card Copy Action
+      const copyMailBtn = target.closest('[data-copy-mail]') as HTMLElement;
+      if (copyMailBtn) {
+        e.stopPropagation();
+        const rawEncoded = copyMailBtn.getAttribute('data-copy-mail') || '';
+        const rawMail = decodeURIComponent(rawEncoded);
+        try {
+          await navigator.clipboard.writeText(rawMail);
+          const labelEl = copyMailBtn.querySelector('.mail-btn-label');
+          if (labelEl) labelEl.textContent = t('mail.copied');
+          copyMailBtn.classList.add('copied');
+          setTimeout(() => {
+            if (labelEl) labelEl.textContent = t('mail.copyMail');
+            copyMailBtn.classList.remove('copied');
+          }, 2000);
+          this.toast(t('mail.copied'), 'success');
+        } catch {
+          this.toast(t('common.error'), 'error');
+        }
+        return;
+      }
+
+      // 2. Mail Card Open Client Action (mailto:)
+      const openMailBtn = target.closest('[data-open-mail]') as HTMLElement;
+      if (openMailBtn) {
+        e.stopPropagation();
+        const to = decodeURIComponent(openMailBtn.getAttribute('data-open-mail') || '');
+        const subject = decodeURIComponent(openMailBtn.getAttribute('data-mail-subject') || '');
+        const body = decodeURIComponent(openMailBtn.getAttribute('data-mail-body') || '');
+
+        let cleanTo = to;
+        const emailMatch = to.match(/<([^>]+)>/);
+        if (emailMatch) {
+          cleanTo = emailMatch[1];
+        }
+
+        const mailtoUrl = `mailto:${cleanTo}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        try {
+          const { open: openBrowser } = await import('@tauri-apps/api/shell');
+          await openBrowser(mailtoUrl);
+          this.toast(t('mail.openingClient'), 'info');
+        } catch (err) {
+          console.error('Failed to open mailto URL:', err);
+          this.toast(t('common.error'), 'error');
+        }
+        return;
+      }
+
+      // 3. Global external link opener via Tauri Shell
       const link = target.closest('a') as HTMLAnchorElement | null;
       if (link) {
         const href = link.getAttribute('href') || link.href;

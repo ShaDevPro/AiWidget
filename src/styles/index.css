@@ -23,3 +23,5 @@
 @import "./mermaid.css";
 @import "./user-messages.css";
 @import "katex/dist/katex.min.css";
+
+@import "./mail-card.css";

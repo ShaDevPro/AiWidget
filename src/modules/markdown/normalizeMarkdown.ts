@@ -1,6 +1,8 @@
 /**
  * normalizeAssistantMarkdown — Clean common LLM artifacts before render.
  */
+import { MailCardRenderer } from '../mail/MailCardRenderer';
+
 export function normalizeAssistantMarkdown(text: string): string {
   let out = text;
 
@@ -28,6 +30,23 @@ export function ensureMermaidFences(text: string): string {
   return before ? `${before}\n\n\`\`\`mermaid\n${diagram}\n\`\`\`` : `\`\`\`mermaid\n${diagram}\n\`\`\``;
 }
 
+/** If the model wrote a bare email, wrap it in email fence for MailCardRenderer. */
+export function ensureEmailFences(text: string): string {
+  if (/```\s*(?:email|mail)/i.test(text)) return text;
+
+  const emailStart = text.search(/^\s*(?:Objet|Subject|الموضوع|Objet du mail)\s*[:：\-]\s*.+/im);
+  if (emailStart < 0) return text;
+
+  const before = text.slice(0, emailStart).trimEnd();
+  const potentialEmail = text.slice(emailStart).trim();
+
+  if (MailCardRenderer.isEmailText(potentialEmail)) {
+    return before ? `${before}\n\n\`\`\`email\n${potentialEmail}\n\`\`\`` : `\`\`\`email\n${potentialEmail}\n\`\`\``;
+  }
+
+  return text;
+}
+
 export function prepareAssistantMarkdown(text: string): string {
-  return ensureMermaidFences(normalizeAssistantMarkdown(text));
+  return ensureEmailFences(ensureMermaidFences(normalizeAssistantMarkdown(text)));
 }
