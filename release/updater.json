@@ -1,0 +1,11 @@
+{
+  "version": "1.0.1",
+  "notes": "Version officielle initiale de AI Widget v1.0.1 - Intelligence Artificielle Locale & Securisee.",
+  "pub_date": "2026-08-27T11:00:00Z",
+  "platforms": {
+    "windows-x86_64": {
+      "signature": "",
+      "url": "https://github.com/ShaDevPro/AiWidget/releases/download/v1.0.1/AI-Widget-Setup.exe"
+    }
+  }
+}
