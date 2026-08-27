@@ -5,7 +5,7 @@ use std::io::Read;
 use std::path::PathBuf;
 use chrono::Utc;
 
-const INTEGRITY_ENDPOINT: &str = "https://raw.githubusercontent.com/ShaDevPro/AiWidget/main/release/integrity.json";
+const INTEGRITY_ENDPOINT: &str = "https://raw.githubusercontent.com/ShaDevPro/AiWidget-Site/main/integrity.json";
 const CURRENT_VERSION: &str = "1.0.1";
 const GRACE_PERIOD_DAYS: i64 = 14;
 
