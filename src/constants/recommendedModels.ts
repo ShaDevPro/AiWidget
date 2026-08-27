@@ -1,0 +1,133 @@
+export interface RecommendedModel {
+  name: string;
+  tag: string;
+  size: string;
+  ram: string;
+  descFr: string;
+  descEn: string;
+  descAr: string;
+  category: 'ultralight' | 'balanced' | 'reasoning';
+}
+
+export const RECOMMENDED_MODELS: RecommendedModel[] = [
+  {
+    name: 'qwen2.5:1.5b',
+    tag: '⭐ Recommandé (Office 8GB)',
+    size: '986 MB',
+    ram: '~1.5 Go RAM',
+    category: 'ultralight',
+    descFr: 'Le meilleur compromis vitesse/intelligence pour Core i3. Excellent en FR, EN, AR.',
+    descEn: 'Best speed/intelligence balance for Core i3 office PCs. Excellent in FR, EN, AR.',
+    descAr: 'أفضل توازن بين السرعة والذكاء لمعالجات Core i3. ممتاز بالفرنسية والإنجليزية والعربية.',
+  },
+  {
+    name: 'qwen2.5:0.5b',
+    tag: '⚡ Ultra Rapide (Core i3)',
+    size: '398 MB',
+    ram: '~0.8 Go RAM',
+    category: 'ultralight',
+    descFr: 'Ultra léger et réactif. Zéro ralentissement même sur les configurations d’entrée de gamme.',
+    descEn: 'Ultra lightweight & responsive. Zero lag on low-end hardware.',
+    descAr: 'فائق الخفة وسريع جداً. لا يسبب أي بطء حتى على الأجهزة الضعيفة.',
+  },
+  {
+    name: 'llama3.2:1b',
+    tag: '🦙 Meta AI Compact',
+    size: '1.3 GB',
+    ram: '~1.8 Go RAM',
+    category: 'ultralight',
+    descFr: 'Modèle officiel compact de Meta. Très fluide en inférence CPU.',
+    descEn: 'Meta official compact AI. Smooth on CPU inference.',
+    descAr: 'النموذج المصغر الرسمي من Meta. أداء سلس على المعالج.',
+  },
+  {
+    name: 'deepseek-r1:1.5b',
+    tag: '🧠 Raisonnement & Logique',
+    size: '1.1 GB',
+    ram: '~1.6 Go RAM',
+    category: 'reasoning',
+    descFr: 'Raisonnement pas à pas (DeepSeek-R1) ultra léger pour calculs et logique.',
+    descEn: 'Step-by-step reasoning (DeepSeek-R1) lightweight model for logic & math.',
+    descAr: 'تفكير تحليلي خطوة بخطوة خفيف للمنطق والرياضيات.',
+  },
+  {
+    name: 'smollm2:1.7b',
+    tag: '🚀 Léger & Polyvalent',
+    size: '1.0 GB',
+    ram: '~1.5 Go RAM',
+    category: 'ultralight',
+    descFr: 'Conçu par HuggingFace, optimisé pour les réponses rapides au quotidien.',
+    descEn: 'Engineered by HuggingFace for fast daily assistance.',
+    descAr: 'مطور من HuggingFace للإجابات اليومية السريعة.',
+  },
+  {
+    name: 'llama3.2:3b',
+    tag: '🏆 Qualité Supérieure',
+    size: '2.0 GB',
+    ram: '~2.8 Go RAM',
+    category: 'balanced',
+    descFr: 'Excellente qualité rédactionnelle. Idéal si vous souhaitez des analyses plus détaillées.',
+    descEn: 'High quality text generation. Great for in-depth analysis on 8 GB RAM.',
+    descAr: 'جودة توليد نصوص عالية. ممتاز للتحليلات المفصلة على ذاكرة 8 جيجابايت.',
+  },
+  {
+    name: 'qwen2.5:3b',
+    tag: '🌐 Polyglotte & Code',
+    size: '2.0 GB',
+    ram: '~2.8 Go RAM',
+    category: 'balanced',
+    descFr: 'Très fort pour le code, les maths et la maîtrise du français et de l’arabe.',
+    descEn: 'Remarkable for coding, math, and multilingual mastery.',
+    descAr: 'ممتاز للبرمجة والرياضيات واللغة العربية والفرنسية.',
+  },
+  {
+    name: 'gemma2:2b',
+    tag: '🔷 Google DeepMind',
+    size: '1.6 GB',
+    ram: '~2.4 Go RAM',
+    category: 'balanced',
+    descFr: 'Modèle compact haute précision conçu par Google.',
+    descEn: 'High-precision compact model by Google.',
+    descAr: 'نموذج مدمج عالي الدقة من Google.',
+  },
+  {
+    name: 'phi-3.5:mini',
+    tag: '🔬 Microsoft Research',
+    size: '2.2 GB',
+    ram: '~3.0 Go RAM',
+    category: 'balanced',
+    descFr: 'Capacités de raisonnement avancées de Microsoft.',
+    descEn: 'Advanced reasoning capabilities from Microsoft.',
+    descAr: 'قدرات استدلال متقدمة من Microsoft.',
+  },
+  {
+    name: 'mistral:7b',
+    tag: '🇫🇷 Référence 7B',
+    size: '4.1 GB',
+    ram: '~4.8 Go RAM',
+    category: 'balanced',
+    descFr: 'Modèle de référence Mistral. Limite haute recommandée pour 8 Go de RAM.',
+    descEn: 'Mistral reference model. Upper recommended limit for 8 GB RAM.',
+    descAr: 'نموذج ميسترال المرجعي. الحد الأعلى الموصى به لذاكرة 8 جيجابايت.',
+  },
+  {
+    name: 'moondream:latest',
+    tag: '👁️ Vision (images)',
+    size: '~1.7 GB',
+    ram: '~2.5 Go RAM',
+    category: 'balanced',
+    descFr: 'Modèle vision compact — comprend les photos et captures d’écran directement (Ollama).',
+    descEn: 'Compact vision model — understands photos and screenshots directly (Ollama).',
+    descAr: 'نموذج رؤية مدمج — يفهم الصور ولقطات الشاشة مباشرة (Ollama).',
+  },
+  {
+    name: 'llama3.2-vision:11b',
+    tag: '👁️ Vision avancée',
+    size: '~7.8 GB',
+    ram: '~10 Go RAM',
+    category: 'reasoning',
+    descFr: 'Vision Meta haute qualité — analyse d’images détaillée (GPU recommandé).',
+    descEn: 'High-quality Meta vision — detailed image analysis (GPU recommended).',
+    descAr: 'رؤية Meta عالية الجودة — تحليل صور مفصل (يفضل GPU).',
+  },
+];

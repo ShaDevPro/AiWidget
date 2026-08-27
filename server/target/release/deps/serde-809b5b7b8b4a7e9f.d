@@ -1,0 +1,14 @@
+C:\Users\SLIMCAD\Desktop\AiWidget\server\target\release\deps\serde-809b5b7b8b4a7e9f.d: C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\lib.rs C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\integer128.rs C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\mod.rs C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\de.rs C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\ser.rs C:\Users\SLIMCAD\Desktop\AiWidget\server\target\release\build\serde-0837dacc00c39645\out/private.rs
+
+C:\Users\SLIMCAD\Desktop\AiWidget\server\target\release\deps\libserde-809b5b7b8b4a7e9f.rlib: C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\lib.rs C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\integer128.rs C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\mod.rs C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\de.rs C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\ser.rs C:\Users\SLIMCAD\Desktop\AiWidget\server\target\release\build\serde-0837dacc00c39645\out/private.rs
+
+C:\Users\SLIMCAD\Desktop\AiWidget\server\target\release\deps\libserde-809b5b7b8b4a7e9f.rmeta: C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\lib.rs C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\integer128.rs C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\mod.rs C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\de.rs C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\ser.rs C:\Users\SLIMCAD\Desktop\AiWidget\server\target\release\build\serde-0837dacc00c39645\out/private.rs
+
+C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\lib.rs:
+C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\integer128.rs:
+C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\mod.rs:
+C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\de.rs:
+C:\Users\SLIMCAD\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\ser.rs:
+C:\Users\SLIMCAD\Desktop\AiWidget\server\target\release\build\serde-0837dacc00c39645\out/private.rs:
+
+# env-dep:OUT_DIR=C:\\Users\\SLIMCAD\\Desktop\\AiWidget\\server\\target\\release\\build\\serde-0837dacc00c39645\\out

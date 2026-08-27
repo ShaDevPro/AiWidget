@@ -1,0 +1,74 @@
+/* Web source citations (ChatGPT-style chips) */
+.web-sources-bar {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md, 8px);
+  background: rgba(14, 165, 233, 0.06);
+  border: 1px solid rgba(14, 165, 233, 0.18);
+}
+
+.web-sources-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+
+.web-sources-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.web-source-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 220px;
+  padding: 4px 10px 4px 6px;
+  border-radius: 999px;
+  background: var(--bg-primary, #fff);
+  border: 1px solid var(--border-light, rgba(0, 0, 0, 0.1));
+  font-size: 11px;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.web-source-chip:hover {
+  background: var(--bg-hover);
+  border-color: rgba(14, 165, 233, 0.35);
+}
+
+.web-source-num {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(14, 165, 233, 0.15);
+  color: #0284c7;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.web-source-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.message-bubble .katex-display {
+  margin: 10px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.message-bubble .katex {
+  font-size: 1.05em;
+}
