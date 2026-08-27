@@ -1,3 +1,4 @@
+import { MailCardRenderer } from './modules/mail/MailCardRenderer';
 import { marked } from 'marked';
 import hljs from 'highlight.js';
 import katex from 'katex';
@@ -21,6 +22,14 @@ renderer.code = (code: string, infostring: string | undefined): string => {
     const trimmed = code.trim();
     if (!trimmed) return '';
     return renderMermaidBlock(trimmed);
+  }
+
+  // Intercept email/correspondence and render as interactive Mail Card
+  if (MailCardRenderer.isEmailText(code)) {
+    const parsed = MailCardRenderer.parseEmail(code);
+    if (parsed) {
+      return MailCardRenderer.renderMailCard(parsed);
+    }
   }
 
   const trimmedCode = code.trim();
