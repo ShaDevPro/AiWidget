@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/tauri';
-import type { LicenseStatus } from '../types';
+import type { LicenseStatus, IntegrityStatus } from '../types';
 
 export const licenseApi = {
   getHardwareId: (): Promise<string> => invoke<string>('get_hardware_id'),
@@ -9,4 +9,6 @@ export const licenseApi = {
   deactivateLicense: (): Promise<void> => invoke<void>('deactivate_license'),
   generateLicenseKeyAdmin: (tier: string, hwid: string): Promise<string> =>
     invoke<string>('generate_license_key_admin', { tier, hwid }),
+  verifyAppIntegrity: (activeLicenseKey?: string): Promise<IntegrityStatus> =>
+    invoke<IntegrityStatus>('verify_app_integrity', { activeLicenseKey }),
 };

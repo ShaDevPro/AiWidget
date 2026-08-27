@@ -253,3 +253,12 @@ export interface MessageSearchResult {
   conversation_title: string;
   snippet: string;
 }
+
+export interface IntegrityStatus {
+  is_genuine: boolean;
+  status_code: string;
+  message: string;
+  last_verified_at?: string | null;
+  binary_sha256: string;
+  channel: string;
+}

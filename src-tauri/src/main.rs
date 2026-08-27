@@ -25,7 +25,10 @@ mod quota_service;
 pub mod enterprise_policy;
 pub mod license_engine;
 pub mod security_engine;
+pub mod integrity_verifier;
 pub mod core;
+
+use integrity_verifier::{IntegrityVerifier, IntegrityStatus};
 
 // ── Command modules ───────────────────────────────────────────────
 mod commands;
@@ -81,6 +84,11 @@ pub struct AppState {
     pub llama_engine: Arc<LlamaEngine>,
     pub active_profile: Mutex<Option<commands::profile::ProfilePublic>>,
     pub generation_controller: GenerationController,
+}
+
+#[tauri::command]
+async fn verify_app_integrity(active_license_key: Option<String>) -> IntegrityStatus {
+    IntegrityVerifier::verify(active_license_key).await
 }
 
 // ── Entry point ───────────────────────────────────────────────────
@@ -213,12 +221,13 @@ fn main() {
             set_user_quota_limit,
             // ── Enterprise Policy & Lockdown ──────────────────────
             get_enterprise_policy,
-            // ── Cryptographic License System ─────────────────────
+            // ── Cryptographic License & Integrity System ────────
             get_hardware_id,
             get_license_status,
             activate_license_key,
             deactivate_license,
             generate_license_key_admin,
+            verify_app_integrity,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
