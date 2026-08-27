@@ -750,5 +750,32 @@
     "openMail": "Ouvrir dans Courrier",
     "openingClient": "Ouverture de votre messagerie...",
     "defaultSubject": "Message"
+  },
+  "tips": {
+    "menuItem": "Astuces & Meilleures Pratiques",
+    "modalTitle": "Astuces pour des Résultats Optimaux",
+    "modalSubtitle": "Guide pratique et modèles de prompts pour tirer le meilleur parti d'AI Widget",
+    "examplePrompt": "Exemple de prompt optimal :",
+    "copyPrompt": "Copier le prompt",
+    "copiedPrompt": "Prompt copié !",
+    "insertPrompt": "Insérer dans le chat",
+    "catCoursesTitle": "1. Cours Complets & Synthèses",
+    "catCoursesDesc": "Pour un cours universitaire ou une formation approfondie, procédez en 2 étapes : demandez d'abord le plan détaillé avec sommaire, puis faites développer chaque module séparément.",
+    "catCoursesPrompt": "Crée un plan de cours universitaire détaillé et structuré avec sommaire, objectifs pédagogiques et prérequis sur le thème : [Votre Sujet].",
+    "catDocsTitle": "2. Analyse Excel & Tableurs Multi-Onglets",
+    "catDocsDesc": "Glissez-déposez vos devis ou classeurs .xlsx. Demandez des tableaux comparatifs nets avec calculs de pourcentages et mise en exergue des écarts.",
+    "catDocsPrompt": "Analyse ce document et génère un tableau comparatif détaillé des totaux par catégorie sous forme de tableau Markdown avec analyse des écarts.",
+    "catMailTitle": "3. Rédaction d'E-mails & Courriers",
+    "catMailDesc": "Précisez l'objet et le destinataire. L'application génère une Carte d'E-mail interactive avec boutons de copie propre et d'ouverture en 1 clic dans votre messagerie.",
+    "catMailPrompt": "Rédige un e-mail professionnel et percutant pour [Destinataire] ayant pour objet : [Sujet]. Reste clair, courtois et direct.",
+    "catWebTitle": "4. Recherche Web Anti-Hallucination",
+    "catWebDesc": "Activez le bouton 🌐 Web pour les données en temps réel (cours des devises, météo, actualités). Chaque information est vérifiée et liée à sa source officielle.",
+    "catWebPrompt": "Cherche sur le web les dernières informations et cours actuels concernant [Sujet] avec citation des sources officielles.",
+    "catVoiceTitle": "5. Mode Vocal HD Mains Libres",
+    "catVoiceDesc": "Dictez vos requêtes au micro sans toucher au clavier. Activez la « Réponse vocale automatique » pour écouter les réponses avec les voix neuronales Edge TTS.",
+    "catVoicePrompt": "Explique-moi de façon claire et synthétique les concepts clés de [Sujet].",
+    "catMathTitle": "6. Formules Mathématiques & Diagrammes",
+    "catMathDesc": "AI Widget gère nativement le rendu LaTeX (KaTeX) pour les formules scientifiques et les diagrammes Mermaid pour modéliser vos architectures et algorithmes.",
+    "catMathPrompt": "Explique ce concept en intégrant un diagramme Mermaid (flowchart TD) et les formules mathématiques en notation LaTeX associées."
   }
 }
