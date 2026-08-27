@@ -217,6 +217,39 @@
   margin-bottom: 0;
 }
 
+.mail-card-body strong {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+[data-theme="dark"] .mail-card-body strong {
+  color: #fafafa;
+}
+
+.mail-bullet-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 4px 0;
+  padding-left: 6px;
+}
+
+.mail-bullet {
+  color: #64748b;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  user-select: none;
+}
+
+[data-theme="dark"] .mail-bullet {
+  color: #a1a1aa;
+}
+
+.mail-bullet-text {
+  flex: 1;
+}
+
 /* ── RTL Support ────────────────────────────────────────────────── */
 
 .mail-card.rtl {
@@ -230,4 +263,9 @@
 
 .mail-card.rtl .mail-meta-row {
   flex-direction: row;
+}
+
+.mail-card.rtl .mail-bullet-row {
+  padding-left: 0;
+  padding-right: 6px;
 }
