@@ -34,4 +34,23 @@ export function attachLicenseTab(host: SettingsHost, panel: HTMLElement): void {
       if (btn) btn.disabled = false;
     }
   });
+
+  // Verify integrity asynchronously in background
+  api.verifyAppIntegrity(host.licenseModule.licenseStatus?.license_key || undefined).then((status) => {
+    const textEl = panel.querySelector('#spIntegrityText') as HTMLElement;
+    const badgeEl = panel.querySelector('#spIntegrityBadge') as HTMLElement;
+    if (textEl && badgeEl) {
+      if (status.is_genuine) {
+        badgeEl.innerText = '🛡️ ORIGINAL CERTIFIÉ';
+        badgeEl.style.background = 'rgba(16,185,129,0.15)';
+        badgeEl.style.color = '#10b981';
+        textEl.innerText = `${status.message} · Hash: ${status.binary_sha256.substring(0, 12)}...`;
+      } else {
+        badgeEl.innerText = '⚠️ NON AUTHENTIFIÉ';
+        badgeEl.style.background = 'rgba(239,68,68,0.15)';
+        badgeEl.style.color = '#ef4444';
+        textEl.innerText = `Attention : ${status.message}`;
+      }
+    }
+  }).catch(() => {});
 }

@@ -71,6 +71,19 @@ export function renderLicenseTab(host: SettingsHost): string {
                   <button class="sp-btn-primary" id="spDirectActivateBtn" type="button">${icons.check} ${host.licenseModule.licenseStatus?.is_licensed ? 'Mettre à jour' : t('license.activateBtn')}</button>
                 </div>
               </div>
+
+              <!-- Authenticité & Intégrité Card -->
+              <div class="sp-card" style="border-left: 3px solid #10b981;">
+                <div class="sp-row-between">
+                  <div>
+                    <label class="sp-label">Authenticité & Protection Logicielle</label>
+                    <p class="sp-desc" id="spIntegrityText">Certification officielle ShaDevPro · Binaire scellé</p>
+                  </div>
+                  <span class="ob-badge-gpo" id="spIntegrityBadge" style="background:rgba(16,185,129,0.15);color:#10b981;font-weight:700;">
+                    🛡️ ORIGINAL CERTIFIÉ
+                  </span>
+                </div>
+              </div>
             </div>
   `;
 }

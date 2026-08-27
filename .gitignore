@@ -11,3 +11,5 @@ src-tauri/target
 *.part.json
 *.gguf
 *.bin
+release/*.exe
+release/*.msi
