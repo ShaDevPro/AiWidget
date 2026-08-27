@@ -1,0 +1,169 @@
+/* -- stats.css -- AI Widget Bottom Status Bar (expanded mode only) -- */
+
+/* ── STATS BAR — bottom of expanded widget ──────────────────────── */
+.stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 14px;
+  height: 26px;
+  min-height: 26px;
+  flex-shrink: 0;
+
+  background: var(--bg-secondary, #f8fafc);
+  border-top: 1px solid var(--border, #e2e8f0);
+
+  font-size: 11px;
+  color: var(--text-muted, #94a3b8);
+  user-select: none;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* ── Divider ─────────────────────────────────────────────── */
+.stats-divider {
+  width: 1px;
+  height: 12px;
+  background: var(--border, #e2e8f0);
+  flex-shrink: 0;
+  margin: 0 10px;
+}
+
+/* ── Item groups ─────────────────────────────────────────── */
+.stats-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* ── Clock ───────────────────────────────────────────────── */
+.stats-time {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  color: var(--text-primary, #1e293b);
+  letter-spacing: 0.02em;
+}
+
+.stats-sep {
+  color: var(--text-muted, #94a3b8);
+  margin: 0 2px;
+}
+
+.stats-date {
+  color: var(--text-secondary, #64748b);
+}
+
+/* ── Weather ─────────────────────────────────────────────── */
+.stats-weather-icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.stats-weather-temp {
+  font-weight: 500;
+  color: var(--text-primary, #1e293b);
+}
+
+.stats-weather-city {
+  color: var(--text-secondary, #64748b);
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stats-loading {
+  color: var(--text-muted, #94a3b8);
+  font-style: italic;
+}
+
+.stats-error {
+  color: var(--text-muted, #94a3b8);
+}
+
+/* ── System info ─────────────────────────────────────────── */
+.stats-sys-label {
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.stats-sys-value {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary, #1e293b);
+  font-weight: 500;
+}
+
+.stats-cpu-high {
+  color: #ef4444; /* red when CPU > 70% */
+}
+
+/* ── City search inline input ────────────────────────────── */
+.stats-weather-search {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stats-city-input {
+  height: 18px;
+  padding: 0 6px;
+  font-size: 11px;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--text-primary, #1e293b);
+  outline: none;
+  width: 130px;
+}
+
+.stats-city-input:focus {
+  border-color: var(--accent, #6366f1);
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.15);
+}
+
+.stats-city-ok {
+  height: 18px;
+  padding: 0 6px;
+  font-size: 11px;
+  border: 1px solid var(--accent, #6366f1);
+  border-radius: 4px;
+  background: var(--accent, #6366f1);
+  color: #fff;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.stats-city-ok:hover { opacity: 0.85; }
+
+/* ── Clickable weather zone ──────────────────────────────── */
+.stats-clickable {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 0 3px;
+  transition: background 0.15s;
+}
+
+.stats-clickable:hover {
+  background: rgba(99,102,241,0.08);
+}
+
+.stats-weather-edit {
+  font-size: 10px;
+  color: var(--text-muted, #94a3b8);
+  margin-left: 2px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.stats-clickable:hover .stats-weather-edit {
+  opacity: 1;
+}
+
+/* Push remaining space so items group left */
+.stats-bar::after {
+  content: '';
+  flex: 1;
+}

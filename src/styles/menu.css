@@ -1,0 +1,131 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Footer Menu (Hamburger dropdown for Contact, Feedback, Privacy, Terms)
+   Light theme only. Modular CSS.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.footer-menu-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 2px;
+}
+
+.footer-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 9px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  color: #4f46e5;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.footer-menu-trigger:hover,
+.footer-menu-trigger.active {
+  background: rgba(99, 102, 241, 0.14);
+  border-color: #6366f1;
+  color: #3730a3;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.12);
+}
+
+.footer-menu-icon {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.footer-menu-label {
+  flex: 1;
+  text-align: left;
+}
+
+body.rtl .footer-menu-label {
+  text-align: right;
+}
+
+.footer-menu-arrow {
+  font-size: 10px;
+  color: #818cf8;
+  transition: transform 0.15s ease;
+}
+
+.footer-menu-trigger.active .footer-menu-arrow {
+  transform: rotate(180deg);
+}
+
+/* ── Popover dropdown opening upwards ────────────────────────────── */
+.footer-menu-popover {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1.5px solid #e0e7ff;
+  border-radius: 14px;
+  box-shadow: 0 14px 40px rgba(79, 70, 229, 0.22), 0 2px 10px rgba(0, 0, 0, 0.08);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px) scale(0.97);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 500;
+}
+
+.footer-menu-popover.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.footer-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #374151;
+  text-align: left;
+  transition: all 0.12s ease;
+  width: 100%;
+}
+
+body.rtl .footer-menu-item {
+  text-align: right;
+}
+
+.footer-menu-item:hover {
+  background: #f5f3ff;
+  color: #4f46e5;
+}
+
+.footer-menu-item-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.footer-menu-item-text {
+  flex: 1;
+}
+
+.footer-menu-divider {
+  height: 1px;
+  background: #f0f0f8;
+  margin: 3px 4px;
+}

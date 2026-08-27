@@ -1,0 +1,164 @@
+/* -- compact.css -- AI Widget Styles -- */
+/* ==========================================================================
+   MODE COMPACT (COMPACT BAR)
+   ========================================================================== */
+body.widget-shell.mode-compact {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.compact-widget {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.compact-titlebar {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px 0 10px;
+  border-bottom: 1px solid var(--border);
+  -webkit-app-region: drag;
+  gap: 8px;
+}
+
+body.rtl .compact-titlebar {
+  padding: 0 10px 0 6px;
+}
+
+.compact-body {
+  padding: 10px 12px 14px;
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.compact-input-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 4px 6px 4px 14px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition);
+}
+
+body.rtl .compact-input-row {
+  padding: 4px 14px 4px 6px;
+}
+
+.compact-input-row:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.compact-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 6px 0;
+  font-size: 12px;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.compact-send-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--text-on-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition);
+}
+
+.compact-send-btn:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+.compact-send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.compact-send-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+.compact-stats-bar {
+  height: 22px;
+  min-height: 22px;
+  font-size: 10px;
+  border-top: 1px solid var(--border);
+  padding: 0 8px;
+}
+
+.compact-stats-bar .stats-item {
+  font-size: 10px;
+}
+
+.tb-btn.web-toggle-btn.active {
+  color: var(--accent);
+  background: var(--accent-light);
+}
+
+.bubble-web-dot {
+  position: absolute;
+  top: 4px;
+  inset-inline-end: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent-glow);
+  pointer-events: none;
+}
+
+.bubble-web-dot.active {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* ==========================================================================
+   RESIZE HANDLE
+   ========================================================================== */
+.resize-handle {
+  position: absolute;
+  inset-inline-end: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
+  cursor: nwse-resize;
+  z-index: 10;
+  opacity: 0.55;
+  background: radial-gradient(circle at 70% 70%, var(--accent) 1.2px, transparent 1.6px) 0 0 / 4px 4px;
+  transition: opacity 0.15s ease;
+}
+
+body.rtl .resize-handle {
+  cursor: nesw-resize;
+  inset-inline-end: auto;
+  inset-inline-start: 0;
+  background: radial-gradient(circle at 30% 70%, var(--accent) 1.2px, transparent 1.6px) 0 0 / 4px 4px;
+}
+
+.resize-handle:hover {
+  opacity: 1;
+}
