@@ -750,5 +750,32 @@
     "openMail": "Open in Mail app",
     "openingClient": "Opening email client...",
     "defaultSubject": "Message"
+  },
+  "tips": {
+    "menuItem": "Pro Tips & Best Practices",
+    "modalTitle": "Tips for Optimal Results",
+    "modalSubtitle": "Practical guide and prompt templates to get the most out of AI Widget",
+    "examplePrompt": "Optimal prompt example:",
+    "copyPrompt": "Copy prompt",
+    "copiedPrompt": "Prompt copied!",
+    "insertPrompt": "Insert in chat",
+    "catCoursesTitle": "1. Comprehensive Courses & Summaries",
+    "catCoursesDesc": "For university-level courses or in-depth training, use the 2-step method: first ask for a structured syllabus with table of contents, then develop each module individually.",
+    "catCoursesPrompt": "Create a comprehensive, structured university syllabus with table of contents, learning objectives, and prerequisites on the topic: [Your Topic].",
+    "catDocsTitle": "2. Multi-Sheet Excel & Document Analysis",
+    "catDocsDesc": "Drag & drop your .xlsx workbooks or financial quotes. Request neat comparative Markdown tables with percentage calculations and highlighted variances.",
+    "catDocsPrompt": "Analyze this document and generate a detailed comparative table of totals by category in Markdown format with variance insights.",
+    "catMailTitle": "3. One-Click Professional Email Drafting",
+    "catMailDesc": "Specify recipient and subject. AI Widget automatically renders an interactive Email Card with clean clipboard copy and direct one-click mail client dispatch.",
+    "catMailPrompt": "Draft a professional, compelling email for [Recipient] regarding subject: [Subject]. Keep the tone concise, polite, and action-oriented.",
+    "catWebTitle": "4. Anti-Hallucination Web Research",
+    "catWebDesc": "Toggle the 🌐 Web button for real-time live facts (exchange rates, weather, current news). Every fact is validated with direct clickable sources.",
+    "catWebPrompt": "Search the web for the latest updates and current rates regarding [Subject] with official credible sources cited.",
+    "catVoiceTitle": "5. Hands-Free HD Voice Mode",
+    "catVoiceDesc": "Dictate your prompts naturally using your microphone. Enable 'Auto voice reply' in voice settings to listen to AI responses via neural Edge TTS voices.",
+    "catVoicePrompt": "Explain the core concepts and mechanics of [Subject] clearly and concisely.",
+    "catMathTitle": "6. Scientific LaTeX & Mermaid Diagrams",
+    "catMathDesc": "AI Widget natively renders LaTeX (KaTeX) mathematical formulas and interactive Mermaid visual flowcharts to model architectures and algorithms.",
+    "catMathPrompt": "Explain this concept by including an interactive Mermaid visual diagram (flowchart TD) and associated mathematical formulas in LaTeX."
   }
 }

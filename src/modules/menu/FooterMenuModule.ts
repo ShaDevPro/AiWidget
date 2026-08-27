@@ -6,6 +6,7 @@
 import { t } from '../../i18n';
 import { contactModule } from '../contact/ContactModule';
 import { legalModule } from '../legal/LegalModule';
+import { tipsModule } from '../tips/TipsModule';
 
 export class FooterMenuModule {
   private container: HTMLElement | null = null;
@@ -22,6 +23,11 @@ export class FooterMenuModule {
           <span class="footer-menu-arrow">▾</span>
         </button>
         <div class="footer-menu-popover" id="footerMenuPopover">
+          <button class="footer-menu-item" id="fmTips">
+            <span class="footer-menu-item-icon">💡</span>
+            <span class="footer-menu-item-text">${t('tips.menuItem')}</span>
+          </button>
+          <div class="footer-menu-divider"></div>
           ${isAdmin && isProMode ? `
             <button class="footer-menu-item" id="fmLicense">
               <span class="footer-menu-item-icon">🔑</span>
@@ -55,6 +61,12 @@ export class FooterMenuModule {
     trigger?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.toggle();
+    });
+
+    container.querySelector('#fmTips')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.close();
+      tipsModule.open();
     });
 
     container.querySelector('#fmLicense')?.addEventListener('click', (e) => {
