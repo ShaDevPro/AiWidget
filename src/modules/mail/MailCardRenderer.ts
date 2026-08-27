@@ -106,6 +106,55 @@ export class MailCardRenderer {
   }
 
   /**
+   * Nettoie les astérisques et balises markdown pour le texte brut (copie / mailto).
+   */
+  static cleanMarkdownForRaw(text: string): string {
+    return text
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/__([^_]+)__/g, '$1')
+      .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '$1')
+      .replace(/^\s*[\*•]\s+/gm, '- ');
+  }
+
+  /**
+   * Formate le markdown inline (gras, italique) en HTML sécurisé.
+   */
+  static formatInline(text: string): string {
+    let out = escapeText(text);
+    // Gras **texte** ou __texte__
+    out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    out = out.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+    // Italique *texte*
+    out = out.replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '<em>$1</em>');
+    return out;
+  }
+
+  /**
+   * Formate le corps de l'email avec paragraphes et listes à puces soignées.
+   */
+  static formatMailBody(raw: string): string {
+    const paragraphs = raw.split(/\n\n+/);
+
+    return paragraphs
+      .map((p) => {
+        const lines = p.split('\n');
+
+        // Formate chaque ligne avec détection des puces
+        const formattedLines = lines.map((l) => {
+          const trimmed = l.trim();
+          if (/^[\*\-•]\s+/.test(trimmed)) {
+            const content = trimmed.replace(/^[\*\-•]\s+/, '');
+            return `<div class="mail-bullet-row"><span class="mail-bullet">•</span><span class="mail-bullet-text">${this.formatInline(content)}</span></div>`;
+          }
+          return this.formatInline(l);
+        });
+
+        return `<p class="mail-paragraph">${formattedLines.join('<br>')}</p>`;
+      })
+      .join('');
+  }
+
+  /**
    * Rendu HTML de la carte d'e-mail interactive avec typographie premium & boutons d'action.
    */
   static renderMailCard(parsed: ParsedEmail): string {
@@ -113,25 +162,29 @@ export class MailCardRenderer {
     const rawSubject = parsed.subject || t('mail.defaultSubject', { defaultValue: 'Message' });
     const rawBody = parsed.body || '';
 
+    // Texte épuré pour le presse-papier et mailto (sans astérisques **)
+    const cleanSubject = this.cleanMarkdownForRaw(rawSubject);
+    const cleanTo = this.cleanMarkdownForRaw(rawTo);
+    const cleanBody = this.cleanMarkdownForRaw(rawBody);
+
     const fullMailText = [
-      rawSubject ? `${t('mail.subject')} ${rawSubject}` : '',
-      rawTo ? `${t('mail.to')} ${rawTo}` : '',
+      cleanSubject ? `${t('mail.subject')} ${cleanSubject}` : '',
+      cleanTo ? `${t('mail.to')} ${cleanTo}` : '',
       '',
-      rawBody,
+      cleanBody,
     ]
-      .filter((s, idx) => idx !== 2 || (rawSubject || rawTo))
+      .filter((s, idx) => idx !== 2 || (cleanSubject || cleanTo))
       .join('\n')
       .trim();
 
     const encodedCopy = encodeURIComponent(fullMailText);
-    const encodedTo = encodeURIComponent(rawTo);
-    const encodedSubject = encodeURIComponent(rawSubject);
-    const encodedBody = encodeURIComponent(rawBody);
+    const encodedTo = encodeURIComponent(cleanTo);
+    const encodedSubject = encodeURIComponent(cleanSubject);
+    const encodedBody = encodeURIComponent(cleanBody);
 
-    // Formater le corps avec des paragraphes propres (pas de police monospace)
-    const formattedBody = escapeText(rawBody)
-      .replace(/\n\n+/g, '</p><p class="mail-paragraph">')
-      .replace(/\n/g, '<br>');
+    // Formater le corps avec du HTML riche (balises <strong> au lieu de **)
+    const formattedBody = this.formatMailBody(rawBody);
+    const formattedSubject = this.formatInline(rawSubject);
 
     const rtlClass = isRTL() ? 'rtl' : '';
 
@@ -159,13 +212,13 @@ export class MailCardRenderer {
             ${rawTo ? `
               <div class="mail-meta-row">
                 <span class="mail-meta-key">${t('mail.to')}</span>
-                <span class="mail-meta-val mail-recipient-tag">${escapeText(rawTo)}</span>
+                <span class="mail-meta-val mail-recipient-tag">${escapeText(cleanTo)}</span>
               </div>
             ` : ''}
             ${rawSubject ? `
               <div class="mail-meta-row">
                 <span class="mail-meta-key">${t('mail.subject')}</span>
-                <span class="mail-meta-val mail-subject-text">${escapeText(rawSubject)}</span>
+                <span class="mail-meta-val mail-subject-text">${formattedSubject}</span>
               </div>
             ` : ''}
           </div>
@@ -174,7 +227,7 @@ export class MailCardRenderer {
         <div class="mail-card-divider"></div>
 
         <div class="mail-card-body">
-          <p class="mail-paragraph">${formattedBody}</p>
+          ${formattedBody}
         </div>
       </div>
     `;
