@@ -469,7 +469,29 @@ class App implements SettingsHost, ShellHost {
     );
   }
 
+  
+  initGlobalLinkHandler(): void {
+    document.addEventListener('click', async (e) => {
+      const target = e.target as HTMLElement;
+      const link = target.closest('a') as HTMLAnchorElement | null;
+      if (link) {
+        const href = link.getAttribute('href') || link.href;
+        if (href && (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:'))) {
+          e.preventDefault();
+          e.stopPropagation();
+          try {
+            const { open: openBrowser } = await import('@tauri-apps/api/shell');
+            await openBrowser(href);
+          } catch (err) {
+            console.error('Failed to open external link in browser:', href, err);
+          }
+        }
+      }
+    });
+  }
+
   initGlobalShortcuts(): void {
+    this.initGlobalLinkHandler();
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         if (this.settingsOpen) {

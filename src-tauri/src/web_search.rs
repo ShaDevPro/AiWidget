@@ -6,6 +6,55 @@ use std::time::Duration;
 pub struct WebSearchEngine;
 
 impl WebSearchEngine {
+    /// Checks if the query is asking about the assistant's own identity or capabilities (no web search needed)
+    pub fn is_self_identity_query(query: &str) -> bool {
+        let l = query.to_lowercase();
+        let identity_keywords = [
+            "qui es-tu",
+            "qui es tu",
+            "qui t'a conçu",
+            "qui t'a concu",
+            "qui t'a créé",
+            "qui t'a cree",
+            "qui a créé",
+            "qui a cree",
+            "qui a conçu",
+            "qui a concu",
+            "qui est le fondateur",
+            "fondateur de sha",
+            "fondateur de widget",
+            "fondateur d'ai widget",
+            "qui est hadj ahmed",
+            "tes fonctionnalités",
+            "tes fonctionnalites",
+            "quelles sont tes fonctions",
+            "quelles sont tes fonctionnalités",
+            "quelles sont tes fonctionnalites",
+            "que sais-tu faire",
+            "que peux-tu faire",
+            "comment tu fonctionnes",
+            "présente-toi",
+            "presente-toi",
+            "parle moi de toi",
+            "parle-moi de toi",
+            "parle de toi",
+            "who are you",
+            "who made you",
+            "who created you",
+            "who is the founder",
+            "what are your features",
+            "what can you do",
+            "من أنت",
+            "من انت",
+            "من صنعك",
+            "من طورك",
+            "من هو المؤسس",
+            "ما هي ميزاتك",
+            "ماذا تستطيع ان تفعل",
+        ];
+        identity_keywords.iter().any(|k| l.contains(k))
+    }
+
     /// Reconstructs the true contextual search query in multi-turn conversations
     pub fn resolve_contextual_query(messages: &[crate::models::ChatMessage]) -> Option<String> {
         let user_msgs: Vec<&crate::models::ChatMessage> =
@@ -177,7 +226,13 @@ impl WebSearchEngine {
         // Remove quotes and punctuation noise
         let cleaned: String = text
             .chars()
-            .map(|c| if c == '"' || c == '\'' || c == '?' || c == '!' || c == ':' || c == ';' || c == '(' || c == ')' { ' ' } else { c })
+            .map(|c| {
+                if c == '"' || c == '\'' || c == '?' || c == '!' || c == ':' || c == ';' || c == '(' || c == ')' {
+                    ' '
+                } else {
+                    c
+                }
+            })
             .collect();
 
         let words: Vec<&str> = cleaned.split_whitespace().collect();
@@ -205,6 +260,11 @@ impl WebSearchEngine {
 
     /// Performs search and fetches real-time web context
     pub async fn search(query: &str, max_results: usize) -> Result<Vec<WebSearchResult>> {
+        // Skip web search for questions about AI Widget's own identity/features
+        if Self::is_self_identity_query(query) {
+            return Ok(Vec::new());
+        }
+
         let client = reqwest::Client::builder()
             .timeout(Duration::from_secs(6))
             .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
@@ -345,6 +405,8 @@ impl WebSearchEngine {
                     "Frais"
                 };
 
+                let search_url = format!("https://www.google.com/search?q=meteo+{}", name);
+
                 return Ok(Some(WebSearchResult {
                     title: format!("Météo et Températures officielles en direct : {} ({})", name, country),
                     snippet: format!(
@@ -353,7 +415,7 @@ impl WebSearchEngine {
                         summary.max_today, summary.min_today,
                         summary.max_tomorrow, summary.min_tomorrow, weather_desc
                     ),
-                    url: format!("https://api.met.no/weatherapi/locationforecast/2.0/compact?lat={}&lon={}", lat, lon),
+                    url: search_url,
                 }));
             }
         }
@@ -390,7 +452,96 @@ impl WebSearchEngine {
         Ok(None)
     }
 
-    /// Fast HTML snippet extraction from DuckDuckGo HTML output
+    /// Percent-decodes a URL encoded string (e.g. uddg redirect links)
+    fn url_decode(input: &str) -> String {
+        let mut bytes = Vec::with_capacity(input.len());
+        let input_bytes = input.as_bytes();
+        let mut i = 0;
+        while i < input_bytes.len() {
+            if input_bytes[i] == b'%' && i + 2 < input_bytes.len() {
+                let hex_slice = &input_bytes[i + 1..i + 3];
+                if let Ok(hex_str) = std::str::from_utf8(hex_slice) {
+                    if let Ok(byte) = u8::from_str_radix(hex_str, 16) {
+                        bytes.push(byte);
+                        i += 3;
+                        continue;
+                    }
+                }
+            } else if input_bytes[i] == b'+' {
+                bytes.push(b' ');
+                i += 1;
+                continue;
+            }
+            bytes.push(input_bytes[i]);
+            i += 1;
+        }
+        String::from_utf8_lossy(&bytes).to_string()
+    }
+
+    /// Extracts and decodes the real destination URL from DuckDuckGo HTML chunk
+    fn extract_real_url(part: &str) -> String {
+        // 1. Look for href on class="result__a"
+        if let Some(a_pos) = part.find("class=\"result__a\"") {
+            let before = &part[..a_pos];
+            let after = &part[a_pos..];
+
+            // Search href in the surrounding anchor tag
+            let tag_snippet = if let Some(tag_start) = before.rfind("<a") {
+                if let Some(tag_end) = after.find('>') {
+                    &part[tag_start..a_pos + tag_end]
+                } else {
+                    ""
+                }
+            } else {
+                ""
+            };
+
+            if let Some(href_start) = tag_snippet.find("href=\"") {
+                let href_val = &tag_snippet[href_start + 6..];
+                if let Some(href_end) = href_val.find('"') {
+                    let raw_href = &href_val[..href_end];
+
+                    // Decode uddg redirect parameter
+                    if let Some(uddg_pos) = raw_href.find("uddg=") {
+                        let target_encoded = &raw_href[uddg_pos + 5..];
+                        let end_pos = target_encoded.find('&').unwrap_or(target_encoded.len());
+                        let decoded = Self::url_decode(&target_encoded[..end_pos]);
+                        if decoded.starts_with("http://") || decoded.starts_with("https://") {
+                            return decoded;
+                        }
+                    }
+
+                    if raw_href.starts_with("http://") || raw_href.starts_with("https://") {
+                        return raw_href.to_string();
+                    }
+                    if raw_href.starts_with("//") {
+                        return format!("https:{}", raw_href);
+                    }
+                }
+            }
+        }
+
+        // 2. Fallback: extract domain/path from class="result__url"
+        if let Some(url_start) = part.find("class=\"result__url\"") {
+            let rest = &part[url_start..];
+            if let Some(tag_end) = rest.find('>') {
+                let content = &rest[tag_end + 1..];
+                let end_pos = content.find("</a>").or_else(|| content.find("</div>")).unwrap_or(content.len().min(200));
+                let raw_domain = Self::strip_html_tags(&content[..end_pos]).trim().to_string();
+                let clean = raw_domain.replace(' ', "").replace('›', "/");
+                if clean.contains('.') {
+                    if clean.starts_with("http://") || clean.starts_with("https://") {
+                        return clean;
+                    }
+                    return format!("https://{}", clean);
+                }
+            }
+        }
+
+        String::new()
+    }
+
+    /// Fast HTML snippet extraction from DuckDuckGo HTML output with valid real URLs
     fn parse_duckduckgo_html(html: &str, max_results: usize) -> Vec<WebSearchResult> {
         let mut results = Vec::new();
         let parts: Vec<&str> = html.split("class=\"result results_links").collect();
@@ -427,25 +578,14 @@ impl WebSearchEngine {
                 String::new()
             };
 
-            // Extract URL
-            let url = if let Some(url_start) = part.find("class=\"result__url\"") {
-                let rest = &part[url_start..];
-                if let Some(tag_end) = rest.find('>') {
-                    let content = &rest[tag_end + 1..];
-                    let end_pos = content.find("</a>").or_else(|| content.find("</div>")).unwrap_or(content.len().min(200));
-                    Self::strip_html_tags(&content[..end_pos]).trim().to_string()
-                } else {
-                    String::new()
-                }
-            } else {
-                String::new()
-            };
+            // Extract Real Destination URL
+            let url = Self::extract_real_url(part);
 
-            if !title.is_empty() || !snippet.is_empty() {
+            if (!title.is_empty() || !snippet.is_empty()) && !url.is_empty() {
                 results.push(WebSearchResult {
-                    title: if title.is_empty() { "Résultat Web".to_string() } else { title },
+                    title: if title.is_empty() { "Source Web".to_string() } else { title },
                     snippet: snippet.trim().to_string(),
-                    url: url.trim().to_string(),
+                    url,
                 });
             }
         }
