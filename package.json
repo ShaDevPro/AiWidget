@@ -11,7 +11,9 @@
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
-    "tauri:icon": "tauri icon public/icon.png"
+    "tauri:icon": "tauri icon public/icon.png",
+    "release:copy": "node scripts/copy-release.mjs",
+    "release:build": "npm run build && npm run tauri:build && npm run release:copy"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.5.3",
