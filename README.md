@@ -1,362 +1,166 @@
-# AI Widget — Assistant IA Desktop Premium pour Windows
+# AI Widget — 100% Local & Privacy-First AI Copilot for Windows
 
 <div align="center">
 
-**Un widget desktop Windows élégant, performant et privé, propulsé par un LLM open source exécuté localement.**
+<img src="public/logo.png" alt="AI Widget Logo" width="100" />
 
-*Construit avec Tauri + TypeScript + SQLite + Ollama*
+### The ultra-lightweight (<8.6 MB), 100% offline AI desktop assistant built with Rust & Tauri.
 
-[![Tauri](https://img.shields.io/badge/Tauri-1.6-FFC131?logo=tauri&logoColor=fff&style=flat-square)]()
-[![Rust](https://img.shields.io/badge/Rust-1.70%2B-DEA584?logo=rust&logoColor=fff&style=flat-square)]()
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178C6?logo=typescript&logoColor=fff&style=flat-square)]()
-[![SQLite](https://img.shields.io/badge/SQLite-bundled-003B57?logo=sqlite&style=flat-square)]()
-[![Ollama](https://img.shields.io/badge/Ollama-compatible-000000?logo=ollama&style=flat-square)]()
-[![Languages](https://img.shields.io/badge/Lang-EN%20%7C%20FR%20%7C%20AR-6366f1?style=flat-square)]()
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/agpl-3.0)
+[![Tauri](https://img.shields.io/badge/Tauri-1.6-FFC131?logo=tauri&logoColor=fff&style=flat-square)](https://tauri.app)
+[![Rust](https://img.shields.io/badge/Rust-1.70%2B-DEA584?logo=rust&logoColor=fff&style=flat-square)](https://www.rust-lang.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178C6?logo=typescript&logoColor=fff&style=flat-square)](https://www.typescriptlang.org)
+[![RAM Usage](https://img.shields.io/badge/RAM_Usage-%3C_80_MB-success?style=flat-square)]()
+[![Privacy](https://img.shields.io/badge/Privacy-100%25_Offline-9cf?style=flat-square)]()
+[![Platform](https://img.shields.io/badge/Platform-Windows_10_%7C_11-0078D6?logo=windows&style=flat-square)]()
+[![Languages](https://img.shields.io/badge/i18n-FR_%7C_EN_%7C_AR_(RTL)-6366f1?style=flat-square)]()
+
+[**Official Website**](https://shadevpro.github.io/AiWidget-Site/) · [**Download Releases**](https://github.com/ShaDevPro/AiWidget-Site/releases/tag/v1.1.0) · [**Report Bug**](https://github.com/ShaDevPro/AiWidget/issues) · [**Enterprise PRO**](mailto:contact@shadevpro.com)
 
 </div>
 
 ---
 
-## ✨ Fonctionnalités
+## 💡 Why AI Widget?
 
-### 🔒 **100% Local & Privé**
-- Toutes les conversations sont stockées **sur votre machine** (SQLite)
-- Le LLM s'exécute **localement** via Ollama — **aucun appel externe**, aucune donnée envoyée
-- Base de données chiffrée implicitement par emplacement : `%LOCALAPPDATA%\AIWidget\aiwidget.db`
+Typical desktop AI wrappers are bloated **Electron apps (>150 MB downloads, 500 MB+ RAM)** or cloud assistants (like *Microsoft Copilot*) that send all your keystrokes, confidential files, and screen context to remote servers.
 
-### 🧠 **LLM Open Source Local**
-- Compatible avec **Ollama** : LLaMA 3, Mistral, Gemma 2, Qwen, Phi, CodeLlama, etc.
-- **Streaming des réponses** en temps réel (token par token)
-- Gestion de plusieurs modèles installés avec taille visible
-- Téléchargement de modèles directement depuis l'interface
-
-### 💬 **Conversations Persistantes**
-- Historique complet, recherches instantanées
-- Groupement temporel (Aujourd'hui / Hier / 7 derniers jours / Plus ancien)
-- Titres générés automatiquement depuis le premier message
-
-### 🌍 **Multilingue (EN / FR / AR)**
-- Interface **entièrement traduite** dans les 3 langues
-- **Support RTL complet** pour l'arabe (disposition, texte, boutons)
-- Basculement rapide depuis la barre latérale sans redémarrage
-- Prompts système du LLM adaptés à chaque langue
-
-### 🎨 **Interface Premium Windows 11**
-- Design **Fluent/Mica-inspired**, thème sombre par défaut + thème clair
-- Responsive, animations fluides, icônes SVG vectorielles
-- Rendu Markdown complet des réponses (code, listes, titres, citations)
-- Copie rapide des réponses, bulles utilisateur/assistant distinctes
-
-### ⚙️ **Paramètres & Contrôle**
-- **Température** (aléatoire : 0 → 1)
-- **Longueur max** des réponses (256 → 8192 tokens)
-- Modèle par défaut, URL Ollama personnalisable
-- Test de connexion à Ollama en un clic
-
-### ⚡ **Performance (Tauri)**
-- **~20 Mo d'installateur** (vs ~200 Mo pour Electron)
-- **~80 Mo de RAM** au repos (vs ~300-500 Mo Electron)
-- Runtime natif Rust, consommation CPU minimale
+**AI Widget** is engineered from scratch in **Rust + Tauri**:
+* 🚀 **Weighs only 8.6 MB** (Installer) and consumes **< 80 MB of RAM**.
+* 🛡️ **Zero-Knowledge Privacy:** 100% of prompts, Excel sheets, and documents stay strictly on your local PC.
+* ⚡ **All-In-One Multimodal:** Integrates local LLM chat, **Fooocus SDXL photorealistic image generation**, financial spreadsheet analysis, interactive course generation, screen snipping, and Whisper voice chat into a discreet desktop overlay.
 
 ---
 
-## 🚀 Installation Rapide
+## 📊 Market Comparison
 
-### Prérequis obligatoires
-
-| Outil | Version minimum | Téléchargement |
-|-------|-----------------|----------------|
-| **Node.js** | v20+ LTS | https://nodejs.org/fr/download |
-| **Rust** | 1.70+ | https://rustup.rs/ |
-| **Ollama** | 0.1.30+ | https://ollama.com/download/windows |
-| **WebView2** | Inclus (Win10/11) | Déjà présent sur Windows récent |
-
-> Sous Windows, Rust nécessite **Visual Studio Build Tools** (C++). L'installeur rustup vous guidera.
-
----
-
-### 1. Installer Ollama (obligatoire pour le LLM local)
-
-1. Téléchargez et installez **Ollama pour Windows** : https://ollama.com/download/windows
-2. Lancez Ollama : il démarre automatiquement en arrière-plan sur le port `11434`
-3. Vérifiez l'installation avec un modèle test :
-
-```powershell
-ollama pull llama3.1:8b
-ollama run llama3.1:8b "Bonjour!"
-```
-
-#### Modèles recommandés (par RAM disponible)
-
-| RAM | Modèle recommandé | Commande |
-|-----|-------------------|----------|
-| **8 Go** | Gemma 2 2B / Phi 3 | `ollama pull gemma2:2b` |
-| **16 Go** | LLaMA 3.1 8B / Mistral 7B | `ollama pull llama3.1:8b` |
-| **32 Go+** | LLaMA 3.1 70B (Q4) | `ollama pull llama3.1:70b` |
-
-> ⚠️ Ollama doit **tourner en fond** quand vous utilisez AI Widget. Vérifiez l'icône dans la zone de notification.
+| Feature | **AI Widget** | **LM Studio** | **Jan.ai** | **AnythingLLM** | **Microsoft Copilot** |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Form Factor** | 🟢 **Floating Widget / Bar** | 🔴 Window only | 🔴 Window only | 🟡 Partial overlay | 🟢 Sidebar |
+| **Binary Size & RAM** | 🟢 **8.6 MB / < 80 MB RAM** | 🟡 400 MB RAM | 🔴 450 MB RAM | 🔴 500 MB+ RAM | 🔴 Heavy Webview |
+| **Privacy & Offline** | 🟢 **100% Local** | 🟢 100% Local | 🟢 100% Local | 🟢 100% Local | 🔴 **Cloud-tracked** |
+| **Fooocus SDXL Studio** | 🟢 **Built-in (Juggernaut XL)**| 🔴 No | 🔴 No | 🔴 No | 🟡 DALL-E (Paid Cloud) |
+| **Excel (.xlsx) Table Parser**| 🟢 **Native Extraction** | 🔴 No | 🔴 No | 🟡 Text only | 🟡 Cloud limited |
+| **Interactive Course Studio**| 🟢 **Curriculum & Quiz** | 🔴 No | 🔴 No | 🔴 No | 🔴 No |
+| **1-Click Screen Snipper** | 🟢 **`Ctrl+Shift+S` + OCR** | 🔴 No | 🔴 No | 🔴 No | 🟢 Cloud Vision |
+| **Whisper Voice + Neural TTS**| 🟢 **Real-time Local** | 🔴 No | 🔴 No | 🔴 No | 🟢 Cloud |
 
 ---
 
-### 2. Cloner & installer AI Widget
+## ✨ Key Features
 
-```powershell
-# Aller dans le dossier de projet
-cd "C:\Users\VOTRE_NOM\Desktop\AiWidget"
+### 🧠 1. Local LLM Power (Ollama & Llama.cpp)
+* Run state-of-the-art open-weights models: **Qwen 2.5**, **Gemma 2**, **Mistral**, **Llama 3.2**, **DeepSeek Coder**, and **Phi-3**.
+* Real-time token streaming with syntax-highlighted code blocks, copy buttons, and LaTeX math formulas ($\KaTeX$).
+* Render interactive **Mermaid.js** flowcharts, architecture diagrams, and sequence maps directly in chat.
 
-# Installer les dépendances npm (TypeScript, Tauri, i18n, Marked)
+### 🎨 2. Dual-Engine Image Studio (Fooocus SDXL + SD 1.5)
+* **Fooocus SDXL (Juggernaut XL v8 - 6.6 GB):** Ultra-photorealistic 1024x1024 generations with cinematic lighting, portrait enhancement, and automatic prompt translation.
+* **Rapid SD 1.5 (1.5 GB):** Fast generation for lower VRAM and entry-level laptops.
+* **Smart CPU VAE Tiling Fallback:** Zero Out-of-Memory (OOM) crashes even on 4 GB GPUs or shared VRAM.
+
+### 📊 3. Spreadsheet & Document Financial Intelligence
+* Drag-and-drop `.xlsx`, `.xls`, `.docx`, `.pdf`, or scanned images.
+* Automatically extracts structured tables, calculates tax/totals, sums invoice lines, and summarizes multi-page contracts.
+
+### 🎓 4. Interactive Course & Education Studio
+* Dedicated pedagogical engine to generate structured curriculums, step-by-step lessons, real-world examples, and interactive quizzes.
+* Export generated courses in 1 click to formatted **Microsoft Word (.docx)** or **Markdown**.
+
+### 📸 5. Screen Snipper & Visual Intelligence
+* Hit **`Ctrl + Shift + S`** or click the camera button `[📸]` to capture any screen zone, application error, or browser window.
+* Automatically parses text via OCR / Vision models and attaches the screenshot for instant debugging.
+* Seamlessly supports **`Win + Shift + S`** followed by **`Ctrl + V`** pasting.
+
+### 🎙️ 6. Whisper Voice Chat & Neural TTS
+* Hands-free continuous voice interaction powered by local **Whisper** speech recognition and high-fidelity neural text-to-speech.
+
+### 🌐 7. Anti-Hallucination Real-time Web Search
+* Intelligent local query router that fetches public facts, weather forecasts, and documentation with live source citations.
+
+### 🔐 8. Isolated Multi-Profiles & SQLite Encryption
+* Workspaces with personal passwords, isolated histories, and encrypted local databases.
+
+---
+
+## 🚀 Quick Start & Installation
+
+### Option 1: Direct Installer (Recommended)
+Download the latest official build from the [Releases Page](https://github.com/ShaDevPro/AiWidget-Site/releases/tag/v1.1.0):
+* 📦 **Standard Setup:** [`AI-Widget-Setup.exe`](https://github.com/ShaDevPro/AiWidget-Site/releases/download/v1.1.0/AI-Widget-Setup.exe) (8.6 MB)
+* 🏢 **Enterprise MSI:** [`AI-Widget-Setup.msi`](https://github.com/ShaDevPro/AiWidget-Site/releases/download/v1.1.0/AI-Widget-Setup.msi) (10.5 MB)
+* ⚡ **Portable Version:** [`AI-Widget-Portable.exe`](https://github.com/ShaDevPro/AiWidget-Site/releases/download/v1.1.0/AI-Widget-Portable.exe) (No installation required)
+
+### Option 2: Build from Source
+
+#### Prerequisites:
+* **Node.js** (v18+)
+* **Rust** & **Cargo** (1.70+)
+* **C++ Build Tools for Visual Studio**
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/ShaDevPro/AiWidget.git
+cd AiWidget
+
+# 2. Install frontend dependencies
 npm install
-```
 
----
-
-## 🎮 Mode Développement (Dev)
-
-```powershell
+# 3. Launch in development mode
 npm run tauri:dev
-```
 
-Cette commande :
-1. Démarre Vite en mode **HMR** sur `http://localhost:1420`
-2. Compile le backend Rust et ouvre la fenêtre native
-3. Permet le hot-reload du frontend et du backend
-
-> ✏️ Modifiez les fichiers dans `src/` (frontend) ou `src-tauri/src/` (Rust) — l'app se recharge automatiquement.
-
----
-
-## 🏗️ Build Production Windows
-
-### Installateur MSI + NSIS
-
-```powershell
-npm run tauri:build
-```
-
-**Production** : cette commande :
-1. Build le frontend (minifié, gzippé) → `dist/`
-2. Compile Rust en **release** (optimisé, pas de débogage)
-3. Génère **2 installateurs Windows** dans `src-tauri/target/release/bundle/` :
-   - `msi/AI Widget_1.0.0_x64_en-US.msi` (Installeur Windows Installer)
-   - `nsis/AI Widget_1.0.0_x64-setup.exe` (Installeur graphique classique)
-
-> 📦 Taille typique : **18-25 Mo** (selon le build WebView).
-
-### Exécutable portable (sans installateur)
-
-```powershell
-cd src-tauri/target/release
-./ai-widget.exe
-```
-
-Vous pouvez copier `ai-widget.exe` sur n'importe quelle machine Windows (WebView2 requis).
-
----
-
-## ⚙️ Configuration détaillée
-
-### URL d'Ollama personnalisée
-
-Si vous avez changé le port ou utilisez une instance distante :
-
-1. Ouvrez **Paramètres** (icône engrenage ⚙️)
-2. Modifiez **URL de base Ollama** (ex: `http://192.168.1.10:11434`)
-3. Cliquez sur **Tester la connexion**
-4. Enregistrez
-
-### Emplacement de la base de données
-
-Toutes les conversations et paramètres sont stockés dans :
-
-```
-%LOCALAPPDATA%\AIWidget\aiwidget.db
-```
-
-Exemple : `C:\Users\John\AppData\Local\AIWidget\aiwidget.db`
-
-- **Sauvegarde** : copiez simplement ce fichier
-- **Réinitialisation complète** : supprimez le fichier (l'app en recrée un vierge)
-
-### Schéma SQLite
-
-```sql
--- Conversations
-CREATE TABLE conversations (
-    id TEXT PRIMARY KEY,         -- UUID
-    title TEXT NOT NULL,         -- Titre de la conv
-    model TEXT NOT NULL,         -- Modèle utilisé
-    created_at TEXT,             -- ISO 8601
-    updated_at TEXT              -- ISO 8601
-);
-
--- Messages
-CREATE TABLE messages (
-    id TEXT PRIMARY KEY,
-    conversation_id TEXT FK,     -- CASCADE si conv supprimée
-    role TEXT NOT NULL,          -- user / assistant / system
-    content TEXT NOT NULL,       -- Contenu texte brut
-    created_at TEXT
-);
-
--- Paramètres (JSON sérialisé)
-CREATE TABLE settings (
-    key TEXT PRIMARY KEY,
-    value TEXT NOT NULL
-);
+# 4. Build optimized production release
+npm run release:build
 ```
 
 ---
 
-## 🛠️ Structure du Projet
+## 🏗️ Architecture & Technology Stack
 
-```
-AiWidget/
-├── src/                           # Frontend TypeScript
-│   ├── main.ts                    # Point d'entrée
-│   ├── App.ts                     # Classe principale UI (700 LoC)
-│   ├── styles.css                 # Design système Fluent (L:1000)
-│   ├── types.ts                   # Types TypeScript
-│   ├── utils.ts                   # Markdown + formatage dates
-│   ├── api/index.ts               # Wrapper invoke() Tauri
-│   ├── i18n/
-│   │   ├── index.ts               # Init i18next + direction RTL
-│   │   └── locales/
-│   │       ├── en.json            # 🇬🇧 Anglais
-│   │       ├── fr.json            # 🇫🇷 Français
-│   │       └── ar.json            # 🇸🇦 Arabe (RTL + prompts LLM)
-│   └── ui/icons.ts                # Lib SVG inline (24 icônes)
-│
-├── src-tauri/                     # Backend Rust
-│   ├── Cargo.toml                 # Crates: tauri, rusqlite, reqwest, tokio...
-│   ├── tauri.conf.json            # Config Tauri (icone, allowlist, fenêtre)
-│   ├── build.rs                   # Build script Tauri
-│   ├── icons/                     # 32x32, 128x128, @2x, .ico, .icns
-│   └── src/
-│       ├── main.rs                # #9 commandes Tauri + state
-│       ├── models.rs              # Structs serde (Conversation, Message...)
-│       ├── db.rs                  # SQLite rusqlite (bundled, no install)
-│       └── llm.rs                 # Client Ollama (HTTP, streaming SSE)
-│
-├── public/                        # Assets statiques
-│   ├── icon.png                   # 128x128
-│   └── favicon.png                # 32x32
-│
-├── package.json                   # Scripts npm
-├── tsconfig.json                  # TS strict
-├── vite.config.ts                 # Vite port 1420
-└── index.html                     # Entry HTML
+```mermaid
+flowchart TD
+    subgraph UI ["Frontend (Vite + TypeScript)"]
+        UI_Shell["WidgetShell (Bubble / Compact / Expanded)"]
+        UI_Chat["Streaming Markdown & LaTeX / Mermaid"]
+        UI_Studio["Fooocus Image Studio & Course Studio"]
+        UI_Snip["ScreenSnipper & Document OCR Zone"]
+    end
+
+    subgraph Backend ["Backend (Rust + Tauri 1.6)"]
+        IPC["Tauri IPC Command Bridge"]
+        DB["Encrypted SQLite Database (Conversations & Profiles)"]
+        RAG["Spreadsheet & PDF Stream Parsers"]
+        TTS["Whisper & Neural TTS Pipeline"]
+    end
+
+    subgraph Engines ["Local AI Engines"]
+        OLLAMA["Local LLMs (Ollama / Llama.cpp)"]
+        SD["Stable Diffusion cpp (SDXL Juggernaut v8)"]
+    end
+
+    UI --> IPC --> Backend
+    Backend --> DB & RAG & TTS
+    Backend --> Engines
 ```
 
 ---
 
-## 📡 Commandes Tauri exposées (Invoke)
+## 🌍 Multilingual Support (i18n)
 
-| Commande Rust | Rôle |
-|---|---|
-| `get_conversations` | Liste des conversations (triées par date) |
-| `create_conversation(title, model)` | Nouvelle conversation |
-| `delete_conversation(id)` | Supprime + messages liés |
-| `get_messages(conv_id)` | Messages d'une conversation |
-| `save_message({conv_id, role, content})` | Persiste un message |
-| `get_settings()` → `AppSettings` | Récupère la config JSON |
-| `save_settings(settings)` | Sauvegarde la config |
-| `list_models(base_url?)` | Liste les modèles Ollama |
-| `pull_model(model, base_url?)` | Télécharge un modèle (stream) |
-| `check_ollama_connection(url?)` | Test de connexion booléen |
-| `generate_response(model, msgs, T, N, window)` | Chat **streaming** via event `chat-token` |
-
-### Événements frontend émis par Rust
-
-```typescript
-// Nouveau token de streaming
-await listen('chat-token', ({ payload }) => {
-  payload.content; // morceau de réponse
-  payload.done;    // true quand terminé
-});
-
-// Progression du téléchargement d'un modèle
-await listen('model-pull-progress', ({ payload }) => {
-  // payload.status + payload.completed / payload.total
-});
-```
+AI Widget natively supports complete bidirectional internationalization:
+* 🇫🇷 **Français** (Interface & prompts adaptés)
+* 🇬🇧 **English** (Full UI & documentation)
+* 🇸🇦 **العربية** (Complete RTL layout, fonts, and Arabic LLM system directives)
 
 ---
 
-## 🌐 Support RTL (Arabe)
+## 📜 License & Commercial Inquiries
 
-Le support arabe est **natif** :
+### Open-Source Community License:
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPLv3)**. See the [LICENSE](LICENSE) file for details.
 
-- `document.documentElement.dir = "rtl"` appliqué au switch de langue
-- `body.rtl` active les règles CSS : `flex-direction` inversées, `border-inline-start`, marges `inset-inline-*`
-- Tous les textes utilisent `text-align` héritée (suivent dir=rtl)
-- Bulles de chat inversées, panneau de paramètres s'ouvre à gauche
+### 🏢 Commercial & Enterprise Licensing (Dual-Licensing):
+If you wish to use AI Widget in a proprietary commercial environment without AGPLv3 copyleft obligations, or if your organization requires the **AI Widget Enterprise On-Premise Central Server** (with department quotas, active directory binding, and centralized GPU pools), please contact:
 
----
-
-## ❌ Dépannage (FAQ)
-
-### ❓ Le widget se lance mais "Non connecté à Ollama"
-
-- **Vérifiez Ollama est démarré** : icône bleue dans la barre système
-- **Testez manuellement** : ouvrez `http://localhost:11434/api/tags` dans le navigateur (doit renvoyer du JSON)
-- **Pare-feu Windows** : autorisez Ollama sur le réseau privé
-- **Port changé** : modifiez l'URL dans Paramètres (ex: `localhost:11435`)
-
-### ❓ Erreur "No models available"
-
-Aucun modèle n'est installé localement. Allez dans **Paramètres → section LLM** et entrez :
-`llama3.1:8b` puis bouton **Télécharger un modèle** — ou en CLI :
-
-```powershell
-ollama pull llama3.1:8b
-```
-
-### ❓ Le build échoue "WebView2 not found"
-
-Windows 7/8 : installez [WebView2 Runtime](https://developer.microsoft.com/fr-fr/microsoft-edge/webview2/)
-Windows 10+ : il est déjà inclus.
-
-### ❓ Build MSI échoue (WiX)
-
-Installez **WiX Toolset v3** via :
-```powershell
-dotnet tool install --global wix  # ou
-choco install wixtoolset
-```
-
-### ❓ Erreur Rust "link.exe not found"
-
-Relancez `rustup` et cochez **MSVC** + **Visual Studio Build Tools** lors de l'installation.
-
-### ❓ Supprimer toutes les données
-
-Fermez AI Widget et supprimez :
-```
-%LOCALAPPDATA%\AIWidget\
-```
-
----
-
-## 🔗 Références
-
-- **Tauri v1** : https://tauri.app/v1/guides/
-- **Ollama API** : https://github.com/ollama/ollama/blob/main/docs/api.md
-- **Ollama Library** : https://ollama.com/library
-- **i18next** : https://www.i18next.com/
-- **Rusqlite** : https://docs.rs/rusqlite/
-- **Marked.js** : https://marked.js.org/
-
----
-
-## 📄 Licence
-
-Projet fourni tel quel, à des fins éducatives / professionnelles.
-
----
-
-> 🎯 **Pour démarrer maintenant :**
-> ```powershell
-> npm install
-> npm run tauri:dev
-> ```
-> Puis dans l'interface → Paramètres → Vérifiez la connexion à Ollama, sélectionnez votre modèle, et parlez !
+📧 **Commercial Inquiries:** [contact@shadevpro.com](mailto:contact@shadevpro.com)  
+🌐 **Website:** [https://shadevpro.github.io/AiWidget-Site/](https://shadevpro.github.io/AiWidget-Site/)

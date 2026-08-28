@@ -1,9 +1,9 @@
 [package]
 name = "ai-widget"
 version = "1.1.0"
-description = "AI Widget - Premium Windows Desktop AI Assistant"
-authors = ["you"]
-license = "MIT"
+description = "AI Widget - Ultra-lightweight, 100% Local AI Desktop Copilot for Windows"
+authors = ["ShaDevPro"]
+license = "AGPL-3.0-only"
 edition = "2021"
 rust-version = "1.70"
 
