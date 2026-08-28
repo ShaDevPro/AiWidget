@@ -1,10 +1,13 @@
-# AI Widget — 100% Local & Privacy-First AI Copilot for Windows
-
 <div align="center">
 
-<img src="public/logo.png" alt="AI Widget Logo" width="100" />
+<img src="public/logo.png" alt="AI Widget Logo" width="110" style="border-radius: 18px;" />
 
-### The ultra-lightweight (<8.6 MB), 100% offline AI desktop assistant built with Rust & Tauri.
+# AI Widget
+
+### 100% Local & Privacy-First AI Copilot for Windows
+**The ultra-lightweight (<8.6 MB), offline desktop assistant built with Rust & Tauri.**
+
+<br/>
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/agpl-3.0)
 [![Tauri](https://img.shields.io/badge/Tauri-1.6-FFC131?logo=tauri&logoColor=fff&style=flat-square)](https://tauri.app)
@@ -14,6 +17,8 @@
 [![Privacy](https://img.shields.io/badge/Privacy-100%25_Offline-9cf?style=flat-square)]()
 [![Platform](https://img.shields.io/badge/Platform-Windows_10_%7C_11-0078D6?logo=windows&style=flat-square)]()
 [![Languages](https://img.shields.io/badge/i18n-FR_%7C_EN_%7C_AR_(RTL)-6366f1?style=flat-square)]()
+
+<br/>
 
 [**Official Website**](https://shadevpro.github.io/AiWidget-Site/) · [**Download Releases**](https://github.com/ShaDevPro/AiWidget-Site/releases/tag/v1.1.0) · [**Report Bug**](https://github.com/ShaDevPro/AiWidget/issues) · [**Enterprise PRO**](mailto:sha.dev.pro@gmail.com)
 
