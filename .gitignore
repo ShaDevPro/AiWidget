@@ -28,4 +28,5 @@ start-dashboard.bat
 scripts/create-private-repo.mjs
 scripts/sync-server-private-repo.mjs
 scripts/upload-github-release.mjs
+scripts/sync-all.mjs
 

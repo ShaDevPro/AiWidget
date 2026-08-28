@@ -13,7 +13,12 @@
     "tauri:build": "tauri build",
     "tauri:icon": "tauri icon public/icon.png",
     "release:copy": "node scripts/copy-release.mjs",
-    "release:build": "npm run build && npm run tauri:build && npm run release:copy"
+    "release:build": "npm run build && npm run tauri:build && npm run release:copy",
+    "release:upload": "node scripts/upload-github-release.mjs",
+    "release:all": "npm run release:build && npm run release:upload && npm run sync:all",
+    "sync:site": "node scripts/sync-site.mjs",
+    "sync:enterprise": "node scripts/sync-server-private-repo.mjs",
+    "sync:all": "node scripts/sync-all.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.5.3",
