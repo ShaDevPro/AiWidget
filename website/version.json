@@ -1,10 +1,10 @@
 {
-  "latest_version": "1.2.0",
-  "min_required_version": "1.2.0",
+  "latest_version": "1.1.0",
+  "min_required_version": "1.1.0",
   "mandatory": true,
-  "title": "Mise à jour majeure obligatoire requise (v1.2.0)",
-  "changelog": "Cette mise à jour de sécurité est obligatoire. Votre version 1.1.0 n'est plus autorisée à se connecter au réseau sécurisé.",
+  "title": "Mise à jour majeure AI Widget v1.1.0 (Obligatoire)",
+  "changelog": "Intégration du modèle Fooocus SDXL Juggernaut XL v8 (6.6 Go), double moteur SD 1.5 Rapide (1.5 Go), Studio de Cours & réparations vocales.",
   "download_url": "https://github.com/ShaDevPro/AiWidget-Site/releases/download/v1.1.0/AI-Widget-Setup.exe",
   "portable_url": "https://github.com/ShaDevPro/AiWidget-Site/releases/download/v1.1.0/AI-Widget-Portable.exe",
-  "published_at": "2026-08-28T19:55:00Z"
+  "published_at": "2026-08-28T19:30:00Z"
 }

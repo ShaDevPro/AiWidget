@@ -749,7 +749,8 @@
     "mandatoryTitle": "Mise à jour obligatoire requise",
     "mandatoryDesc": "Cette version est requise pour assurer la sécurité et le bon fonctionnement d'AI Widget. Votre version actuelle a été révoquée et ne peut plus être utilisée.",
     "updateNowBtn": "Mettre à jour et Relancer (Obligatoire)",
-    "retryBtn": "Réessayer la mise à jour"
+    "retryBtn": "Réessayer la mise à jour",
+    "quitAppBtn": "Quitter l'application"
   },
   "mail": {
     "cardTitle": "E-mail prêt à l'envoi",

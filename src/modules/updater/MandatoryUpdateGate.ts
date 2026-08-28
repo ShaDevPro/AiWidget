@@ -1,9 +1,11 @@
 /**
  * MandatoryUpdateGate — Bouclier infranchissable de verrouillage pour les mises à jour obligatoires.
  * Empêche toute utilisation de l'application tant que la mise à jour requise n'a pas été installée.
+ * 100% i18n (FR / EN / AR + RTL) avec option de fermeture sécurisée de l'application.
  */
 import { updaterApi, type VersionCheckResponse, type AppUpdateProgress } from '../../api/updater';
-import { t } from '../../i18n';
+import { t, isRTL } from '../../i18n';
+import { appWindow } from '@tauri-apps/api/window';
 
 export class MandatoryUpdateGate {
   private static instance: MandatoryUpdateGate | null = null;
@@ -64,9 +66,11 @@ export class MandatoryUpdateGate {
     const existing = document.getElementById('mandatory-update-shield');
     if (existing) existing.remove();
 
+    const rtl = isRTL();
     const shieldEl = document.createElement('div');
     shieldEl.id = 'mandatory-update-shield';
     shieldEl.className = 'mandatory-shield-overlay';
+    shieldEl.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     shieldEl.innerHTML = `
       <style>
         .mandatory-shield-overlay {
@@ -206,6 +210,12 @@ export class MandatoryUpdateGate {
           transition: width 0.2s ease-out;
         }
 
+        .shield-actions-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0.65rem;
+        }
+
         .btn-mandatory-update {
           width: 100%;
           padding: 0.85rem 1.25rem;
@@ -235,6 +245,29 @@ export class MandatoryUpdateGate {
           cursor: not-allowed;
           transform: none;
         }
+
+        .btn-quit-app {
+          width: 100%;
+          padding: 0.65rem 1rem;
+          background: rgba(255, 255, 255, 0.05);
+          color: #94a3b8;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 8px;
+          font-size: 0.85rem;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.4rem;
+          transition: all 0.2s ease;
+        }
+
+        .btn-quit-app:hover {
+          background: rgba(239, 68, 68, 0.15);
+          color: #fca5a5;
+          border-color: rgba(239, 68, 68, 0.3);
+        }
       </style>
 
       <div class="mandatory-shield-card">
@@ -254,7 +287,7 @@ export class MandatoryUpdateGate {
           </p>
 
           <div class="changelog-box">
-            <strong>${t('updater.whatsNew', { defaultValue: 'Détails de la mise à jour :' })}</strong>
+            <strong>${t('updater.whatsNew', { defaultValue: 'Nouveautés & Améliorations :' })}</strong>
             <p>${info.changelog || 'Mise à jour majeure de sécurité et intégration des nouveaux moteurs IA.'}</p>
           </div>
 
@@ -269,11 +302,15 @@ export class MandatoryUpdateGate {
             </div>
           </div>
 
-          <!-- Action Button -->
-          <div class="shield-actions">
+          <!-- Action Buttons -->
+          <div class="shield-actions-group">
             <button type="button" id="btnApplyMandatoryUpdate" class="btn-mandatory-update">
               <span>🚀</span>
               <span id="btnApplyMandatoryUpdateText">${t('updater.updateNowBtn', { defaultValue: 'Mettre à jour et Redémarrer (Obligatoire)' })}</span>
+            </button>
+            <button type="button" id="btnQuitApp" class="btn-quit-app">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <span>${t('updater.quitAppBtn', { defaultValue: "Quitter l'application" })}</span>
             </button>
           </div>
         </div>
@@ -293,6 +330,16 @@ export class MandatoryUpdateGate {
     };
     window.addEventListener('keydown', blockKeyHandler, true);
 
+    // Bouton Quitter
+    const quitBtn = shieldEl.querySelector('#btnQuitApp') as HTMLButtonElement | null;
+    quitBtn?.addEventListener('click', async () => {
+      try {
+        await appWindow.close();
+      } catch {
+        window.close();
+      }
+    });
+
     // Attachement du gestionnaire de mise à jour
     const btn = shieldEl.querySelector('#btnApplyMandatoryUpdate') as HTMLButtonElement | null;
     const btnText = shieldEl.querySelector('#btnApplyMandatoryUpdateText') as HTMLElement | null;
@@ -308,13 +355,20 @@ export class MandatoryUpdateGate {
       if (progressContainer) progressContainer.style.display = 'block';
 
       try {
+        // Re-vérifier l'URL en direct si besoin
+        let targetUrl = info.download_url;
+        try {
+          const fresh = await updaterApi.checkAppVersion();
+          if (fresh.download_url) targetUrl = fresh.download_url;
+        } catch (_) {}
+
         const unlisten = await updaterApi.onUpdateProgress((p: AppUpdateProgress) => {
           if (progressStatus) progressStatus.textContent = p.message;
           if (progressPct) progressPct.textContent = `${Math.round(p.percentage)}%`;
           if (progressFill) progressFill.style.width = `${Math.max(4, p.percentage)}%`;
         });
 
-        await updaterApi.installAppUpdate(info.download_url);
+        await updaterApi.installAppUpdate(targetUrl);
         unlisten();
       } catch (err: any) {
         console.error('Failed to apply update:', err);

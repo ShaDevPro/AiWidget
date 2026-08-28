@@ -749,7 +749,8 @@
     "mandatoryTitle": "Mandatory Update Required",
     "mandatoryDesc": "This version is strictly required for AI security and functionality. Your current version has been revoked and cannot be used anymore.",
     "updateNowBtn": "Update & Restart Now (Required)",
-    "retryBtn": "Retry Update"
+    "retryBtn": "Retry Update",
+    "quitAppBtn": "Quit Application"
   },
   "mail": {
     "cardTitle": "Ready to send email",

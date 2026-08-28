@@ -93,7 +93,7 @@ pub async fn check_app_version() -> Result<VersionCheckResponse, String> {
     let update_available = is_below_latest || is_below_min;
 
     let default_url = format!(
-        "https://github.com/ShaDevPro/AiWidget/releases/download/v{}/AI-Widget-Setup.exe",
+        "https://github.com/ShaDevPro/AiWidget-Site/releases/download/v{}/AI-Widget-Setup.exe",
         manifest.latest_version
     );
 
