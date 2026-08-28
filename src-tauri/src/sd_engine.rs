@@ -300,6 +300,8 @@ impl SDEngine {
             .arg("--steps").arg(st.to_string())
             .arg("-t").arg(threads.to_string())
             .arg("-s").arg(s.to_string())
+            .arg("--vae-tiling")
+            .arg("--vae-on-cpu")
             .arg("-o").arg(&output_file);
 
         if let Some(ref neg) = negative_prompt {
