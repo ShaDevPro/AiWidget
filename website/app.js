@@ -379,3 +379,23 @@ if (copyBtn && urlInput) {
     }
   });
 }
+
+// Telemetry download click tracking
+document.querySelectorAll('a[href*="releases/download"]').forEach(link => {
+  link.addEventListener('click', () => {
+    try {
+      const href = link.getAttribute('href') || '';
+      let type = 'exe';
+      if (href.endsWith('.msi')) type = 'msi';
+      else if (href.includes('Portable')) type = 'portable';
+
+      fetch('http://localhost:9090/api/telemetry/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type }),
+        mode: 'no-cors'
+      }).catch(() => {});
+    } catch (_) {}
+  });
+});
+

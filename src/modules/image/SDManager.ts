@@ -4,6 +4,7 @@
 import { imageApi } from '../../api/image';
 import type { SDStatus, ImageGenerationResult, SDDownloadProgress } from '../../types';
 import { FooocusEngine } from './FooocusEngine';
+import { telemetryService } from '../telemetry/TelemetryService';
 
 export class SDManager {
   private static instance: SDManager;
@@ -128,6 +129,7 @@ export class SDManager {
     try {
       const result = await imageApi.generateImage(finalPrompt, effectiveNegative, width, height, steps, undefined, modelName);
       result.prompt = prompt; // Préserve le prompt d'origine pour l'affichage
+      telemetryService.trackEvent(modelName?.includes('1.5') ? 'image_sd15' : 'image_sdxl');
       return result;
     } finally {
       if (timerInterval) clearInterval(timerInterval);

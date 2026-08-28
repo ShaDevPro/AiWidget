@@ -47,6 +47,7 @@ import type { SettingsHost } from './modules/settings/SettingsHost';
 import { WidgetShell } from './modules/shell/WidgetShell';
 import type { ShellHost } from './modules/shell/ShellHost';
 import { mandatoryUpdateGate } from './modules/updater/MandatoryUpdateGate';
+import { telemetryService } from './modules/telemetry/TelemetryService';
 
 export type { RecommendedModel };
 export { RECOMMENDED_MODELS };
@@ -324,6 +325,9 @@ class App implements SettingsHost, ShellHost {
 
     // ── Mandatory Update Gate: Surveillance et verrouillage strict ─
     mandatoryUpdateGate.startMonitoring();
+
+    // ── Telemetry & Usage Stats: Ping silencieux & métriques anonymes ─
+    telemetryService.init();
     await this.profileModule.init(
       async (profile) => {
         this.activeProfile = profile;

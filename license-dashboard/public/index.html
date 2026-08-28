@@ -530,6 +530,10 @@
         <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         <span>Modèles WhatsApp</span>
       </li>
+      <li class="nav-item" data-tab="telemetry">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        <span>Analytics Monde & Stats</span>
+      </li>
       <li class="nav-item" data-tab="crypto">
         <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         <span>Inspecteur sécurité</span>
@@ -902,6 +906,117 @@ Pour obtenir votre ID Machine afin de générer votre licence :
       </div>
     </div>
 
+    <!-- ──────────────── TAB : TÉLÉMÉTRIE & ANALYTICS ──────────────── -->
+    <div class="tab-pane" id="tab-telemetry">
+      <!-- KPIS TÉLÉMÉTRIE -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Utilisateurs Actifs (DAU / MAU)</div>
+          <div class="kpi-val" style="display:flex; align-items:baseline; gap:8px;">
+            <span id="telemDAU" style="color:#16a34a;">0</span>
+            <span style="font-size:13px; color:var(--text-secondary); font-weight:normal;">/ <span id="telemMAU">0</span> (30j)</span>
+          </div>
+          <div class="kpi-foot">Instances uniques connectées</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Téléchargements Totaux</div>
+          <div class="kpi-val" id="telemDownloads">0</div>
+          <div class="kpi-foot"><span id="telemDlExe">0</span> Setup • <span id="telemDlMsi">0</span> MSI • <span id="telemDlPort">0</span> Port.</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Images Générées (SDXL / SD 1.5)</div>
+          <div class="kpi-val" id="telemImages">0</div>
+          <div class="kpi-foot"><span id="telemImgSdxl">0</span> Fooocus XL • <span id="telemImgSd15">0</span> SD 1.5</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Volume Total de Prompts & Cours</div>
+          <div class="kpi-val" id="telemChats">0</div>
+          <div class="kpi-foot"><span id="telemCourses">0</span> Cours & Devis créés</div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS CARDS GRID -->
+      <div class="grid-2" style="margin-top:16px;">
+        <!-- GPU BREAKDOWN -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>
+              <span>Parc Matériel & GPU</span>
+            </h2>
+            <p class="card-sub">Répartition des cartes graphiques détectées.</p>
+          </div>
+          <div id="telemGpuList" style="display:flex; flex-direction:column; gap:10px; margin-top:8px;"></div>
+        </div>
+
+        <!-- MODELS BREAKDOWN -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg>
+              <span>Modèles LLM Préférés</span>
+            </h2>
+            <p class="card-sub">Utilisation des modèles de langage sur les postes.</p>
+          </div>
+          <div id="telemModelList" style="display:flex; flex-direction:column; gap:10px; margin-top:8px;"></div>
+        </div>
+
+        <!-- COUNTRIES & LANGUAGES -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span>Répartition Mondiale (Pays)</span>
+            </h2>
+            <p class="card-sub">Origine géographique des connexions.</p>
+          </div>
+          <div id="telemCountryList" style="display:flex; flex-direction:column; gap:10px; margin-top:8px;"></div>
+        </div>
+
+        <!-- VERSIONS DISTRIBUTION -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              <span>Adoption des Versions</span>
+            </h2>
+            <p class="card-sub">Conformité du parc logiciel installé.</p>
+          </div>
+          <div id="telemVersionList" style="display:flex; flex-direction:column; gap:10px; margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <!-- INSTANCES TABLE -->
+      <div class="table-container" style="margin-top:16px;">
+        <div style="padding:14px 16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <h3 style="font-size:13px; font-weight:600;">📡 Instances Actives Connectées (Anonymisées)</h3>
+            <p style="font-size:11.5px; color:var(--text-secondary);">Mise à jour en direct dès réception d'un ping silencieux.</p>
+          </div>
+          <button class="btn btn-secondary" onclick="loadTelemetryData()" style="width:auto; padding:4px 10px; font-size:11.5px;">
+            <span>Actualiser</span>
+          </button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Pays</th>
+              <th>Version</th>
+              <th>Édition</th>
+              <th>GPU / RAM</th>
+              <th>Modèle Actif</th>
+              <th>Chats / Images</th>
+              <th>Dernier Ping</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody id="telemInstancesTbody">
+            <tr><td colspan="8" style="text-align:center; color:var(--text-tertiary); padding:20px;">Chargement des données...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </main>
 
   <script>
@@ -921,6 +1036,7 @@ Pour obtenir votre ID Machine afin de générer votre licence :
         generator: ["Générateur de clés", "Émission de clés cryptographiques scellées par Hardware ID."],
         clients: ["Annuaire clients", "Registre complet de toutes les licences délivrées."],
         whatsapp: ["Modèles WhatsApp", "Réponses et modèles de livraison prêts à être copiés."],
+        telemetry: ["Analytics & Télémétrie Globale", "Suivi mondial en temps réel des utilisateurs, téléchargements, matériels et modèles IA."],
         crypto: ["Inspecteur sécurité", "Vérificateur de signature Ed25519 & HMAC-SHA256."]
       };
       if (titleMap[tabId]) {
@@ -1157,7 +1273,98 @@ Pour obtenir votre ID Machine afin de générer votre licence :
       }
     }
 
+    async function loadTelemetryData() {
+      try {
+        const res = await fetch('/api/telemetry/stats');
+        const data = await res.json();
+
+        // Update KPIs
+        if (document.getElementById('telemDAU')) document.getElementById('telemDAU').textContent = data.dau || 0;
+        if (document.getElementById('telemMAU')) document.getElementById('telemMAU').textContent = data.mau || 0;
+        if (document.getElementById('telemDownloads')) document.getElementById('telemDownloads').textContent = (data.downloads?.total || 0).toLocaleString();
+        if (document.getElementById('telemDlExe')) document.getElementById('telemDlExe').textContent = (data.downloads?.exe || 0).toLocaleString();
+        if (document.getElementById('telemDlMsi')) document.getElementById('telemDlMsi').textContent = (data.downloads?.msi || 0).toLocaleString();
+        if (document.getElementById('telemDlPort')) document.getElementById('telemDlPort').textContent = (data.downloads?.portable || 0).toLocaleString();
+        if (document.getElementById('telemImages')) document.getElementById('telemImages').textContent = (data.totalImages || 0).toLocaleString();
+        if (document.getElementById('telemImgSdxl')) document.getElementById('telemImgSdxl').textContent = (data.totalImagesSDXL || 0).toLocaleString();
+        if (document.getElementById('telemImgSd15')) document.getElementById('telemImgSd15').textContent = (data.totalImagesSD15 || 0).toLocaleString();
+        if (document.getElementById('telemChats')) document.getElementById('telemChats').textContent = (data.totalChats || 0).toLocaleString();
+        if (document.getElementById('telemCourses')) document.getElementById('telemCourses').textContent = (data.totalCourses || 0).toLocaleString();
+
+        // Render Bars Function
+        const renderBars = (containerId, countsObj, totalCount) => {
+          const container = document.getElementById(containerId);
+          if (!container) return;
+          container.innerHTML = '';
+          const entries = Object.entries(countsObj || {});
+          if (entries.length === 0) {
+            container.innerHTML = '<div style="color:var(--text-secondary); font-size:12px;">Aucune donnée enregistrée</div>';
+            return;
+          }
+          const tot = totalCount || entries.reduce((s, [, v]) => s + v, 0) || 1;
+          entries.sort((a, b) => b[1] - a[1]).forEach(([k, v]) => {
+            const pct = Math.round((v / tot) * 100);
+            container.innerHTML += `
+              <div style="display:flex; flex-direction:column; gap:3px;">
+                <div style="display:flex; justify-content:space-between; font-size:12px;">
+                  <span style="font-weight:500;">${k}</span>
+                  <span style="color:var(--text-secondary); font-size:11.5px;">${v} (${pct}%)</span>
+                </div>
+                <div style="height:6px; background:var(--surface-subtle); border-radius:3px; overflow:hidden;">
+                  <div style="height:100%; width:${pct}%; background:#18181b; border-radius:3px;"></div>
+                </div>
+              </div>
+            `;
+          });
+        };
+
+        renderBars('telemGpuList', data.gpuCounts, data.totalInstances);
+        renderBars('telemModelList', data.modelCounts, data.totalInstances);
+        renderBars('telemCountryList', data.countryCounts, data.totalInstances);
+        renderBars('telemVersionList', data.versionCounts, data.totalInstances);
+
+        // Render Instances Table
+        const tbody = document.getElementById('telemInstancesTbody');
+        if (tbody) {
+          if (!data.recentInstances || data.recentInstances.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--text-tertiary); padding:20px;">En attente de la première connexion...</td></tr>';
+          } else {
+            const now = Date.now();
+            tbody.innerHTML = data.recentInstances.map(inst => {
+              const isOnline = inst.last_ping_ts && (now - inst.last_ping_ts < 5 * 60 * 1000);
+              const chats = inst.counts?.total_chats || 0;
+              const imgs = (inst.counts?.total_images_sdxl || 0) + (inst.counts?.total_images_sd15 || 0);
+              const tierBadge = inst.tier === 'pro' 
+                ? '<span class="badge" style="background:#eff6ff; color:#1e40af; border-color:#dbeafe;">PRO</span>' 
+                : '<span class="badge">LITE</span>';
+              
+              return `
+                <tr>
+                  <td><strong>${inst.country_name || 'Algérie 🇩🇿'}</strong></td>
+                  <td><span class="badge">v${inst.version || '1.1.0'}</span></td>
+                  <td>${tierBadge}</td>
+                  <td style="font-size:12px;">${inst.gpu || 'Intel Graphics'} (${inst.ram_gb || 16} Go)</td>
+                  <td><span class="mono">${inst.active_llm || 'qwen2.5:1.5b'}</span></td>
+                  <td style="font-size:12px;">${chats} msg • ${imgs} img</td>
+                  <td style="font-size:11.5px; color:var(--text-secondary);">${inst.last_seen || '-'}</td>
+                  <td>
+                    ${isOnline 
+                      ? '<span class="badge badge-active"><span style="width:6px; height:6px; border-radius:50%; background:#16a34a; display:inline-block;"></span> En ligne</span>' 
+                      : '<span class="badge" style="color:var(--text-secondary);">Récent</span>'}
+                  </td>
+                </tr>
+              `;
+            }).join('');
+          }
+        }
+      } catch (err) {
+        console.error('Error loading telemetry:', err);
+      }
+    }
+
     loadData();
+    loadTelemetryData();
+    setInterval(loadTelemetryData, 10000);
   </script>
 </body>
 </html>

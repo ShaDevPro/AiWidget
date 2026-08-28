@@ -22,6 +22,7 @@ import type { ModalsManager } from '../modals/ModalsManager';
 import { isVisionModel } from '../../utils/visionModels';
 import { sdManager } from '../image/SDManager';
 import { ImageCardRenderer, generateImageCardId } from '../image/ImageCardRenderer';
+import { telemetryService } from '../telemetry/TelemetryService';
 
 export interface ChatControllerDeps {
   chatModule: ChatModule;
@@ -92,6 +93,8 @@ export class ChatController {
 
     const attachedDoc = this.deps.documentManager.getAttachedDocument();
     if (!text && !attachedDoc) return;
+
+    telemetryService.trackEvent('chat');
 
     if (this.deps.getCourseStudioEnabled?.() && this.deps.onTriggerCourseStudio && text) {
       this.deps.onTriggerCourseStudio(text);
