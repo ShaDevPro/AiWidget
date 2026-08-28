@@ -38,7 +38,7 @@ use commands::chat::generate_response;
 use commands::quota::{get_user_quota, set_user_quota_limit};
 use commands::policy::get_enterprise_policy;
 use commands::license::{get_hardware_id, get_license_status, activate_license_key, deactivate_license, generate_license_key_admin};
-use commands::image::{get_sd_status, download_sd, generate_image_sd};
+use commands::image::{get_sd_status, download_sd, generate_image_sd, open_sd_folder};
 use commands::conversations::{
     create_conversation, delete_conversation, delete_message, delete_messages_from, get_conversations, get_messages,
     save_message, search_messages, toggle_conversation_pin, update_conversation_title,
@@ -216,6 +216,7 @@ fn main() {
             get_sd_status,
             download_sd,
             generate_image_sd,
+            open_sd_folder,
             // ── Stats & weather ───────────────────────────────────
             commands::sysinfo::get_system_stats,
             commands::sysinfo::get_weather,

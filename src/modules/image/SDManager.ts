@@ -161,6 +161,14 @@ export class SDManager {
 
     return { isImage: false, cleanPrompt: '' };
   }
+
+  async openModelsFolder(): Promise<void> {
+    try {
+      await imageApi.openSDFolder();
+    } catch (err) {
+      console.error('Failed to open SD folder:', err);
+    }
+  }
 }
 
 export const sdManager = SDManager.getInstance();

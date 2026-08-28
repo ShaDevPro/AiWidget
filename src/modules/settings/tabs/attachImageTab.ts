@@ -87,4 +87,14 @@ export function attachImageTab(host: SettingsHost, panel: HTMLElement): void {
       }
     }
   });
+
+  // Open Models Folder in Windows Explorer
+  const openFolderBtn = panel.querySelector('#sdOpenFolderBtn') as HTMLButtonElement | null;
+  openFolderBtn?.addEventListener('click', async () => {
+    try {
+      await sdManager.openModelsFolder();
+    } catch (err) {
+      console.error('Failed to open SD folder:', err);
+    }
+  });
 }

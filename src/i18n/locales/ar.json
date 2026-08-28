@@ -845,6 +845,7 @@
     "engineNotInstalledTitle": "استوديو الصور المحلي غير مثبت",
     "engineNotInstalledDesc": "لتوليد الصور محلياً وبشكل خاص بالكامل، قم بتحميل محرك Stable Diffusion الخفيف (SD.cpp).",
     "downloadEngineBtn": "تحميل المحرك (بنقرة واحدة)",
+    "openFolderBtn": "مجلد النماذج",
     "downloadingEngine": "جاري تحميل محرك الصور...",
     "engineReady": "محرك Stable Diffusion جاهز للاستخدام!",
     "engineTitle": "محرك SD.cpp المحلي",

@@ -31,3 +31,16 @@ pub async fn generate_image_sd(
     )
     .await
 }
+
+#[tauri::command]
+pub fn open_sd_folder() -> Result<(), String> {
+    let dir = SDEngine::get_sd_dir();
+    if !dir.exists() {
+        let _ = std::fs::create_dir_all(&dir);
+    }
+    #[cfg(target_os = "windows")]
+    {
+        let _ = std::process::Command::new("explorer").arg(&dir).spawn();
+    }
+    Ok(())
+}

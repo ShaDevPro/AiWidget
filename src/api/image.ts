@@ -3,6 +3,7 @@ import type { SDStatus, ImageGenerationResult, SDDownloadProgress, SDGenerationP
 
 export const imageApi = {
   getSDStatus: (): Promise<SDStatus> => call<SDStatus>('get_sd_status'),
+  openSDFolder: (): Promise<void> => call<void>('open_sd_folder'),
 
   downloadSD: (): Promise<void> => call<void>('download_sd'),
 

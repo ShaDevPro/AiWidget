@@ -849,6 +849,7 @@
     "engineNotInstalledTitle": "Local Image Studio Not Installed",
     "engineNotInstalledDesc": "To generate images 100% locally with zero cloud reliance, download the lightweight Stable Diffusion (SD.cpp) engine.",
     "downloadEngineBtn": "Download Engine (1-Click)",
+    "openFolderBtn": "Models Folder",
     "downloadingEngine": "Downloading image engine...",
     "engineReady": "Stable Diffusion engine ready!",
     "engineTitle": "Local SD.cpp Engine",

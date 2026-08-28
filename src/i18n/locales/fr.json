@@ -849,6 +849,7 @@
     "engineNotInstalledTitle": "Studio d'Images Local Non Installé",
     "engineNotInstalledDesc": "Pour générer des images 100% en local et sans cloud, téléchargez le moteur léger Stable Diffusion (SD.cpp).",
     "downloadEngineBtn": "Télécharger le Moteur (1-Clic)",
+    "openFolderBtn": "Dossier des Modèles",
     "downloadingEngine": "Téléchargement du moteur d'images en cours...",
     "engineReady": "Moteur Stable Diffusion prêt !",
     "engineTitle": "Moteur Local SD.cpp",

@@ -26,11 +26,15 @@ export function renderImageTab(host: SettingsHost): string {
             ${t('imageStudio.engineDetails', { defaultValue: 'Moteur C++ haute performance avec modèles quantifiés GGUF.' })}
           </p>
 
-          <!-- 1-Click Download Button -->
-          <div class="sp-actions-row" style="margin-top: 1rem;">
+          <!-- Actions Row -->
+          <div class="sp-actions-row" style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
             <button type="button" class="sp-btn sp-btn-primary" id="sdDownloadBtn" data-install-sd="true">
               <span>📥</span>
               <span id="sdDownloadBtnText">${t('imageStudio.downloadEngineBtn', { defaultValue: 'Télécharger le Moteur (1-Clic)' })}</span>
+            </button>
+            <button type="button" class="sp-btn sp-btn-secondary" id="sdOpenFolderBtn" title="Ouvrir le dossier pour ajouter vos modèles SDXL / Juggernaut XL">
+              <span>📁</span>
+              <span>${t('imageStudio.openFolderBtn', { defaultValue: 'Dossier des Modèles' })}</span>
             </button>
           </div>
 
