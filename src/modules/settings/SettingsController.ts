@@ -7,6 +7,7 @@ import { attachGeneralTab } from './tabs/attachGeneralTab';
 import { attachLicenseTab } from './tabs/attachLicenseTab';
 import { attachModelsTab } from './tabs/attachModelsTab';
 import { attachVoiceTab } from './tabs/attachVoiceTab';
+import { attachImageTab } from './tabs/attachImageTab';
 import { attachKnowledgeTab } from './tabs/attachKnowledgeTab';
 import { attachMemoryTab } from './tabs/attachMemoryTab';
 import { attachAdvancedTab } from './tabs/attachAdvancedTab';
@@ -21,6 +22,7 @@ export class SettingsController {
     attachLicenseTab(host, panel);
     attachModelsTab(host, panel);
     attachVoiceTab(host, panel);
+    attachImageTab(host, panel);
     attachKnowledgeTab(host, panel);
     attachMemoryTab(host, panel);
     attachAdvancedTab(host, panel);

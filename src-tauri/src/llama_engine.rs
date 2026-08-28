@@ -348,7 +348,7 @@ impl LlamaEngine {
         let num_ctx = crate::hardware_detector::HardwareDetector::recommended_num_ctx(&hw);
         let capped_max_tokens = max_tokens
             .min(num_ctx.saturating_sub(512) / 2)
-            .clamp(128, 2048);
+            .clamp(128, 4096);
 
         let body = serde_json::json!({
             "messages": messages,

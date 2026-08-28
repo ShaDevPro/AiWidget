@@ -17,3 +17,4 @@ pub mod profile;
 pub mod quota;
 pub mod policy;
 pub mod license;
+pub mod image;

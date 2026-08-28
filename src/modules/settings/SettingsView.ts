@@ -8,6 +8,7 @@ import { renderGeneralTab } from './tabs/GeneralTab';
 import { renderLicenseTab } from './tabs/LicenseTab';
 import { renderModelsTab } from './tabs/ModelsTab';
 import { renderVoiceTab } from './tabs/VoiceTab';
+import { renderImageTab } from './tabs/ImageTab';
 import { renderKnowledgeTab } from './tabs/KnowledgeTab';
 import { renderMemoryTab } from './tabs/MemoryTab';
 import { renderAdvancedTab } from './tabs/AdvancedTab';
@@ -17,6 +18,7 @@ const TAB_RENDERERS: Record<string, (host: SettingsHost) => string> = {
   license: renderLicenseTab,
   models: renderModelsTab,
   voice: renderVoiceTab,
+  image: renderImageTab,
   knowledge: renderKnowledgeTab,
   memory: renderMemoryTab,
   advanced: renderAdvancedTab,
