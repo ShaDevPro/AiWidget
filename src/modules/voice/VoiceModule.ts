@@ -98,6 +98,7 @@ export class VoiceModule {
   private cleanForTTS(text: string): string {
     return text
       .replace(/```[\s\S]*?```/g, '')
+      .replace(/<[^>]+>/g, '')
       .replace(/`[^`]+`/g, '')
       .replace(/^#{1,6}\s+/gm, '')
       .replace(/\*{1,3}([^*]+)\*{1,3}/g, '$1')
@@ -107,10 +108,7 @@ export class VoiceModule {
       .replace(/^\s*\d+\.\s+/gm, '')
       .replace(/\n{2,}/g, '. ')
       .replace(/\n/g, ' ')
-      .trim()
-      .split(/[.!?]+/)
-      .slice(0, 3)
-      .join('. ')
+      .replace(/\s{2,}/g, ' ')
       .trim();
   }
 
