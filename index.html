@@ -1,14 +1,453 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>AI Widget</title>
-    <link rel="stylesheet" href="/src/styles/index.css" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-  </head>
-  <body data-tauri-drag-region>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Widget — L'Assistant IA de Bureau Ultime & 100% Local</title>
+  <meta name="description" content="AI Widget est un assistant IA de bureau pour Windows. Version LITE 100% gratuite et version PRO Entreprise pour réseau local." />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Toast Notification -->
+  <div class="toast-notification" id="toastNotification">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <span id="toastMessage">Lien copié dans le presse-papiers !</span>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <img src="icon.png" alt="AI Widget Logo" class="brand-logo-img" />
+        <span class="brand-name">AI Widget</span>
+        <span class="brand-badge hide-mobile">v1.0.1</span>
+      </div>
+
+      <!-- Desktop Nav Links -->
+      <nav class="nav-links desktop-only">
+        <a href="#features" data-i18n="nav.features">Fonctionnalités</a>
+        <a href="#preview" data-i18n="nav.preview">Aperçu</a>
+        <a href="#editions" data-i18n="nav.editions">Éditions LITE & PRO</a>
+        <a href="#share" data-i18n="nav.share">Partager</a>
+        <a href="#download" data-i18n="nav.download">Télécharger</a>
+      </nav>
+
+      <!-- Nav Actions (Lang + CTA + Hamburger) -->
+      <div class="nav-actions">
+        <div class="lang-selector">
+          <button class="lang-btn active" data-lang="fr">FR</button>
+          <button class="lang-btn" data-lang="en">EN</button>
+          <button class="lang-btn" data-lang="ar">العربية</button>
+        </div>
+        <a href="#download" class="btn btn-primary desktop-only" data-i18n="nav.getApp">Télécharger LITE</a>
+        
+        <!-- Mobile Hamburger Button -->
+        <button class="mobile-toggle-btn mobile-only" id="mobileMenuBtn" aria-label="Menu">
+          <svg class="icon-menu" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <svg class="icon-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Menu (Hidden on PC) -->
+    <div class="mobile-menu" id="mobileMenu">
+      <nav class="mobile-nav-links">
+        <a href="#features" data-i18n="nav.features">Fonctionnalités</a>
+        <a href="#preview" data-i18n="nav.preview">Aperçu</a>
+        <a href="#editions" data-i18n="nav.editions">Éditions LITE & PRO</a>
+        <a href="#share" data-i18n="nav.share">Partager</a>
+        <a href="#download" data-i18n="nav.download">Télécharger</a>
+      </nav>
+      <div class="mobile-menu-footer">
+        <a href="#download" class="btn btn-primary btn-block" data-i18n="nav.getApp">Télécharger LITE</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-tag">
+        <svg class="mono-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <span data-i18n="hero.tag">Version LITE 100% Gratuite & Données Sécurisées</span>
+      </div>
+
+      <h1 class="hero-title" data-i18n="hero.title">
+        L'Intelligence Artificielle <br />
+        <span class="pure-dark-text">Directement sur votre Bureau</span>
+      </h1>
+
+      <p class="hero-subtitle" data-i18n="hero.subtitle">
+        Un widget discret, ultra-rapide et tout-en-un. Chattez avec vos modèles LLM locaux, analysez vos devis Excel et documents PDF en un clin d'œil, recherchez sur le Web sans hallucination, et pilotez tout à la voix.
+      </p>
+
+      <div class="hero-cta-group">
+        <a href="https://github.com/ShaDevPro/AiWidget/releases/download/v1.0.1/AI-Widget-Setup.exe" class="btn btn-hero btn-hero-primary" id="mainDownloadBtn">
+          <svg class="btn-icon-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <div class="btn-text">
+            <span class="btn-main" data-i18n="hero.downloadExe">Télécharger LITE (Gratuit)</span>
+            <span class="btn-sub" data-i18n="hero.downloadExeSub">Setup.exe · 8.9 Mo · Sans Licence</span>
+          </div>
+        </a>
+        <a href="#editions" class="btn btn-hero btn-hero-secondary">
+          <svg class="btn-icon-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+          <div class="btn-text">
+            <span class="btn-main" data-i18n="hero.seeEditions">Découvrir l'Offre PRO Entreprise</span>
+            <span class="btn-sub" data-i18n="hero.seeEditionsSub">Serveur Réseau & Déploiement IT</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-val">&lt; 80 Mo</span>
+          <span class="stat-lbl" data-i18n="stats.ram">Consommation RAM</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-val">100%</span>
+          <span class="stat-lbl" data-i18n="stats.privacy">Confidentialité locale</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-val">0.0s</span>
+          <span class="stat-lbl" data-i18n="stats.latency">Latence cloud</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Widget Preview -->
+  <section class="preview-section" id="preview">
+    <div class="container">
+      <div class="mockup-window">
+        <div class="mockup-topbar">
+          <div class="mockup-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="mockup-title" data-i18n="mockup.title">AI Widget — Mode Étendu (ChatGPT-Style)</div>
+          <div class="mockup-badge" data-i18n="mockup.badge">✓ Modèle Qwen 2.5 Local Actif</div>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-chat">
+            <div class="chat-msg user">
+              <div class="msg-avatar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </div>
+              <div class="msg-bubble">
+                <div class="msg-chip" data-i18n="mockup.userChip">📎 Devis 40 logts.xlsx (XLSX)</div>
+                <div data-i18n="mockup.userMsg">Peux-tu extraire le montant total HT et TTC de ce devis Excel ?</div>
+              </div>
+            </div>
+            <div class="chat-msg bot">
+              <img src="icon.png" alt="AI Widget Icon" class="msg-avatar-img" />
+              <div class="msg-bubble">
+                <p data-i18n="mockup.botIntro">Voici la synthèse financière extraite du tableau Excel joint :</p>
+                <table class="mockup-table">
+                  <thead>
+                    <tr>
+                      <th data-i18n="mockup.th1">Désignation</th>
+                      <th data-i18n="mockup.th2">Montant HT</th>
+                      <th data-i18n="mockup.th3">Taux TVA</th>
+                      <th data-i18n="mockup.th4">Total TTC</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td data-i18n="mockup.row1_desc">Lot Gros Œuvre</td>
+                      <td>120 450,00 €</td>
+                      <td>20%</td>
+                      <td>144 540,00 €</td>
+                    </tr>
+                    <tr>
+                      <td data-i18n="mockup.row2_desc">Lot Électricité & CVC</td>
+                      <td>45 200,00 €</td>
+                      <td>20%</td>
+                      <td>54 240,00 €</td>
+                    </tr>
+                    <tr class="highlight-row">
+                      <td><strong data-i18n="mockup.total_label">MONTANT GLOBAL</strong></td>
+                      <td><strong>165 650,00 €</strong></td>
+                      <td>-</td>
+                      <td><strong>198 780,00 € TTC</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" data-i18n="features.title">Pourquoi choisir AI Widget ?</h2>
+        <p class="section-desc" data-i18n="features.desc">Une suite d'outils ultra-puissants intégrés dans une interface ergonomique et intuitive.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
+          <h3 class="feature-title" data-i18n="f1.title">100% Local & Zéro Fuite</h3>
+          <p class="feature-desc" data-i18n="f1.desc">Vos documents, données et conversations ne quittent jamais votre machine. Fonctionne sans connexion Internet.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          </div>
+          <h3 class="feature-title" data-i18n="f2.title">Analyse Excel & PDF Universelle</h3>
+          <p class="feature-desc" data-i18n="f2.desc">Glissez vos fichiers .xlsx, .docx, .pdf ou scans OCR. L'IA extrait les tableaux, calcule les sommes et résume vos dossiers.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          </div>
+          <h3 class="feature-title" data-i18n="f3.title">Recherche Web Anti-Hallucination</h3>
+          <p class="feature-desc" data-i18n="f3.desc">Routeur d'intention intelligent qui recherche les faits publics en temps réel avec citation exacte des sources fiables.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+          </div>
+          <h3 class="feature-title" data-i18n="f4.title">Chat Vocal Whisper & TTS</h3>
+          <p class="feature-desc" data-i18n="f4.desc">Parlez naturellement à votre assistant avec Whisper local et écoutez ses réponses avec des voix neuronales ultra-réalistes.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          </div>
+          <h3 class="feature-title" data-i18n="f5.title">Diagrammes Mermaid & LaTeX</h3>
+          <p class="feature-desc" data-i18n="f5.desc">Rendu vectoriel direct de formules mathématiques complexes et de diagrammes de flux interactifs.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          </div>
+          <h3 class="feature-title" data-i18n="f6.title">Multi-Profils & Chiffrement</h3>
+          <p class="feature-desc" data-i18n="f6.desc">Espaces de travail isolés avec mot de passe personnel, chiffrement SQLite local et clé de sécurité master.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          </div>
+          <h3 class="feature-title" data-i18n="f7.title">Studio d'Images IA & Moteur Fooocus</h3>
+          <p class="feature-desc" data-i18n="f7.desc">Génération d'images locale (SD.cpp) avec styles cinématographiques Fooocus, traduction automatique des prompts et filtres négatifs pro.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+          </div>
+          <h3 class="feature-title" data-i18n="f8.title">Générateur de Cours & Pédagogie IA</h3>
+          <p class="feature-desc" data-i18n="f8.desc">Créez des cours complets avec plans structurés, exemples concrets, quiz interactifs et export direct en document Word (.docx) ou Markdown.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Editions Section (2-Columns: LITE vs PRO Entreprise) -->
+  <section class="editions-section" id="editions">
+    <div class="container">
+      <div class="section-header">
+        <div class="hero-tag">
+          <svg class="mono-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+          <span data-i18n="editions.badge">Comparatif des Éditions</span>
+        </div>
+        <h2 class="section-title" data-i18n="editions.title">Choisissez Votre Édition AI Widget</h2>
+        <p class="section-desc" data-i18n="editions.desc">La version LITE est 100% gratuite et autonome. La version PRO Entreprise active l'infrastructure serveur réseau.</p>
+      </div>
+
+      <div class="editions-grid two-cols">
+        <!-- 1. LITE Edition (100% Free & No License Required) -->
+        <div class="edition-card lite-card">
+          <div class="edition-badge" data-i18n="editions.liteBadge">Gratuit à vie</div>
+          <div class="edition-header">
+            <div class="edition-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            </div>
+            <h3 class="edition-name" data-i18n="editions.liteTitle">Édition LITE</h3>
+            <p class="edition-target" data-i18n="editions.liteTarget">Pour particuliers, professionnels indépendants & experts</p>
+            <div class="edition-price">
+              <span class="price-val" data-i18n="editions.litePrice">0 € (Gratuit)</span>
+              <span class="price-type" data-i18n="editions.litePriceType">Aucune licence requise · Utilisation illimitée</span>
+            </div>
+          </div>
+          <ul class="edition-features">
+            <li><span class="check">✓</span> <span data-i18n="editions.f_lite1">LLM 100% local (Llama.cpp, Ollama, Qwen, Mistral)</span></li>
+            <li><span class="check">✓</span> <span data-i18n="editions.f_lite2">Analyse complète Excel (.xlsx multi-feuilles, .csv)</span></li>
+            <li><span class="check">✓</span> <span data-i18n="editions.f_lite3">Extraction Word (.docx), PDF volumineux & OCR</span></li>
+            <li><span class="check">✓</span> <span data-i18n="editions.f_lite4">Recherche Web anti-hallucination avec citations</span></li>
+            <li><span class="check">✓</span> <span data-i18n="editions.f_lite5">Chat Vocal haute définition (Whisper + TTS)</span></li>
+            <li><span class="check">✓</span> <span data-i18n="editions.f_lite6">Studio d'Images Fooocus (Stable Diffusion local 100% privé)</span></li>
+            <li><span class="check">✓</span> <span data-i18n="editions.f_lite7">Générateur de Cours & Pédagogie avec export Word (.docx)</span></li>
+            <li><span class="check">✓</span> <span data-i18n="editions.f_lite8">Multi-profils sécurisés avec mot de passe local</span></li>
+          </ul>
+          <div class="edition-footer">
+            <a href="#download" class="btn btn-secondary btn-block" data-i18n="editions.btnLite">Télécharger Gratuitement</a>
+          </div>
+        </div>
+
+        <!-- 2. PRO ENTREPRISE (Server Edition with License) -->
+        <div class="edition-card pro-card">
+          <div class="edition-badge pro-badge" data-i18n="editions.proBadge">Version Serveur & Réseau</div>
+          <div class="edition-header">
+            <div class="edition-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+            </div>
+            <h3 class="edition-name" data-i18n="editions.proTitle">PRO Entreprise</h3>
+            <p class="edition-target" data-i18n="editions.proTarget">Pour entreprises, équipes, parcs informatiques & serveurs locaux</p>
+            <div class="edition-price">
+              <span class="price-val" data-i18n="editions.proPrice">Licence Entreprise</span>
+              <span class="price-type" data-i18n="editions.proPriceType">Activation par clé de licence sécurisée (HWID)</span>
+            </div>
+          </div>
+          <ul class="edition-features">
+            <li><span class="check">✓</span> <strong data-i18n="editions.f_pro_all">Toutes les fonctionnalités LITE, plus :</strong></li>
+            <li><span class="check">✓</span> <span data-i18n="editions.f_pro1">Serveur IA Centralisé & RAG d'Entreprise partagé en réseau</span></li>
+            <li><span class="check">✓</span> <span data-i18n="editions.f_pro2">Package MSI d'entreprise pour déploiement silencieux (GPO / SCCM)</span></li>
+            <li><span class="check">✓</span> <span data-i18n="editions.f_pro3">Politiques de Groupe IT & Verrouillage de conformité (Lockdown)</span></li>
+            <li><span class="check">✓</span> <span data-i18n="editions.f_pro4">Console d'administration : gestion des comptes & quotas de tokens</span></li>
+            <li><span class="check">✓</span> <span data-i18n="editions.f_pro5">Conformité RGPD On-Premise 100% étanche (Air-Gapped ready)</span></li>
+            <li><span class="check">✓</span> <span data-i18n="editions.f_pro6">Support technique prioritaire & accompagnement à l'intégration</span></li>
+          </ul>
+          <div class="edition-footer">
+            <a href="mailto:s.h.a.dev.pro@gmail.com?subject=Demande%20Licence%20AI%20Widget%20PRO%20Entreprise" class="btn btn-primary btn-block" data-i18n="editions.btnPro">Contacter le Service Entreprise</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QR Code & Instant Share Section -->
+  <section class="share-section" id="share">
+    <div class="container">
+      <div class="share-card">
+        <div class="share-grid">
+          <!-- Left: QR Code Box -->
+          <div class="qr-box-wrapper">
+            <div class="qr-box">
+              <img src="qr-code.png" alt="AI Widget QR Code" class="qr-image" />
+              <div class="qr-badge">
+                <img src="icon.png" alt="Logo" class="qr-logo-overlay" />
+              </div>
+            </div>
+            <span class="qr-scan-label" data-i18n="share.scanLabel">Scannez pour ouvrir le site</span>
+          </div>
+
+          <!-- Right: Share Actions & Info -->
+          <div class="share-content">
+            <div class="hero-tag" style="margin-bottom:12px;">
+              <svg class="mono-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span data-i18n="share.tag">Partage Instantané</span>
+            </div>
+            <h2 class="share-title" data-i18n="share.title">Partagez AI Widget avec Vos Proches & Équipes</h2>
+            <p class="share-desc" data-i18n="share.desc">Faites découvrir la puissance d'une intelligence artificielle 100% locale, sans abonnement et respectueuse de la confidentialité.</p>
+
+            <div class="share-url-box">
+              <input type="text" readonly value="https://shadevpro.github.io/AiWidget-Site/" id="siteShareUrl" class="share-input" />
+              <button class="btn btn-primary" id="copyShareUrlBtn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span data-i18n="share.copyBtn">Copier le Lien</span>
+              </button>
+            </div>
+
+            <div class="share-buttons-row">
+              <a href="https://api.whatsapp.com/send?text=D%C3%A9couvre%20AI%20Widget%20:%20l%27assistant%20IA%20de%20bureau%20100%25%20local%20et%20gratuit%20pour%20Windows%20!%20%F0%9F%9A%80%20https://shadevpro.github.io/AiWidget-Site/" target="_blank" class="share-action-btn whatsapp">
+                <span>💬 WhatsApp</span>
+              </a>
+              <a href="mailto:?subject=D%C3%A9couvre%20AI%20Widget&body=Bonjour,%0A%0AJe%20te%20recommande%20AI%20Widget,%20un%20assistant%20IA%20de%20bureau%20100%25%20local,%20s%C3%A9curis%C3%A9%20et%20gratuit%20pour%20Windows%20:%0Ahttps://shadevpro.github.io/AiWidget-Site/%0A%0A%C3%80%20bient%C3%B4t%20!" class="share-action-btn email">
+                <span>📧 E-mail</span>
+              </a>
+              <a href="https://t.me/share/url?url=https://shadevpro.github.io/AiWidget-Site/&text=AI%20Widget%20-%20Assistant%20IA%20de%20Bureau%20Local" target="_blank" class="share-action-btn telegram">
+                <span>✈️ Telegram</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Download Section -->
+  <section class="download-section" id="download">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" data-i18n="download.title">Télécharger AI Widget pour Windows</h2>
+        <p class="section-desc" data-i18n="download.desc">Compatible Windows 10 & Windows 11 (64-bit). Sans dépendance lourde.</p>
+      </div>
+
+      <div class="download-grid">
+        <!-- Setup NSIS -->
+        <div class="download-card primary">
+          <div class="download-badge" data-i18n="download.recommended">Recommandé</div>
+          <img src="icon.png" alt="Setup" class="download-card-img" />
+          <h3 class="download-card-title" data-i18n="download.setupTitle">Installateur Standard LITE</h3>
+          <p class="download-card-desc" data-i18n="download.setupDesc">Installation automatique avec raccourcis bureau et menu démarrer.</p>
+          <div class="download-file-info">AI-Widget-Setup.exe · 8.9 Mo · Gratuit</div>
+          <a href="https://github.com/ShaDevPro/AiWidget/releases/download/v1.0.1/AI-Widget-Setup.exe" class="btn btn-primary btn-block">
+            <span data-i18n="download.btnExe">Télécharger (.exe)</span>
+          </a>
+        </div>
+
+        <!-- MSI -->
+        <div class="download-card">
+          <div class="download-icon-box">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          </div>
+          <h3 class="download-card-title" data-i18n="download.msiTitle">Pack Entreprise (MSI)</h3>
+          <p class="download-card-desc" data-i18n="download.msiDesc">Package d'installation Windows pour administrateurs réseau (GPO / SCCM).</p>
+          <div class="download-file-info">AI-Widget-Setup.msi · 5.2 Mo</div>
+          <a href="https://github.com/ShaDevPro/AiWidget/releases/download/v1.0.1/AI-Widget-Setup.msi" class="btn btn-secondary btn-block">
+            <span data-i18n="download.btnMsi">Télécharger (.msi)</span>
+          </a>
+        </div>
+
+        <!-- Portable -->
+        <div class="download-card">
+          <div class="download-icon-box">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg>
+          </div>
+          <h3 class="download-card-title" data-i18n="download.portableTitle">Version Portable LITE</h3>
+          <p class="download-card-desc" data-i18n="download.portableDesc">Exécutable autonome sans aucune installation requise. Clé USB ready.</p>
+          <div class="download-file-info">AI-Widget-Portable.exe · 21.7 Mo · Gratuit</div>
+          <a href="https://github.com/ShaDevPro/AiWidget/releases/download/v1.0.1/AI-Widget-Portable.exe" class="btn btn-secondary btn-block">
+            <span data-i18n="download.btnPortable">Télécharger Portable</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <div class="brand">
+          <img src="icon.png" alt="AI Widget Logo" class="brand-logo-img" />
+          <span class="brand-name">AI Widget</span>
+        </div>
+        <p class="footer-tagline" data-i18n="footer.tagline">Conçu avec passion par <strong>S.H.A dev</strong>. Tous droits réservés 2026.</p>
+      </div>
+      <div class="footer-links">
+        <a href="mailto:s.h.a.dev.pro@gmail.com" class="footer-contact-link" data-i18n="footer.contact">Support & Contact : s.h.a.dev.pro@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
 </html>
