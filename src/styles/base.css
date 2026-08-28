@@ -1385,9 +1385,33 @@ body.rtl .chat-input-wrapper {
   box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
 }
 
-.input-web-btn svg {
-  width: 13px;
-  height: 13px;
+.input-attach-btn,
+.input-snip-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.input-attach-btn:hover,
+.input-snip-btn:hover {
+  background: var(--bg-hover);
+  color: var(--accent);
+  border-color: var(--border-accent);
+}
+
+.input-attach-btn svg,
+.input-snip-btn svg {
+  width: 16px;
+  height: 16px;
 }
 
 .send-btn {

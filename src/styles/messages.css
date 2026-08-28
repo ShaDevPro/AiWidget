@@ -28,6 +28,32 @@
   height: 16px;
 }
 
+.input-snip-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.input-snip-btn:hover {
+  background: var(--bg-hover);
+  color: var(--accent);
+  border-color: var(--border-accent);
+}
+
+.input-snip-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 .drag-drop-overlay {
   position: fixed;
   inset: 0;
