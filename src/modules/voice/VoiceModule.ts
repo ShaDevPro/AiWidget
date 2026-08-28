@@ -26,7 +26,6 @@ export class VoiceModule {
   onError?: (msg: string) => void;
 
   init(settings: AppSettings): void {
-    if (!settings.voice_enabled) return;
     this.createVoiceManager(settings);
   }
 
@@ -52,7 +51,10 @@ export class VoiceModule {
     );
   }
 
-  async startRecording(): Promise<void> {
+  async startRecording(settings?: AppSettings): Promise<void> {
+    if (!this.voiceManager && settings) {
+      this.createVoiceManager(settings);
+    }
     if (!this.voiceManager) return;
     await this.voiceManager.startRecording();
   }

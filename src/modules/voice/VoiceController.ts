@@ -3,6 +3,7 @@
  */
 import { t } from '../../i18n';
 import { icons } from '../../ui/icons';
+import { api } from '../../api';
 import type { AppSettings } from '../../types';
 import type { VoiceModule } from './VoiceModule';
 import type { ToastService } from '../../ui/ToastService';
@@ -116,17 +117,17 @@ export class VoiceController {
       }
       const settings = this.deps.getSettings();
       if (!settings.voice_enabled) {
-        this.deps.toggleSettings(true);
-        setTimeout(() => {
-          document.querySelector('.voice-settings-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 200);
-        return;
+        settings.voice_enabled = true;
+        void api.saveSettings(settings);
       }
 
       const vm = this.deps.voiceModule;
       if (!vm.voiceState || vm.voiceState === 'idle') {
         vm.init(settings);
-        void vm.startRecording().catch(() => this.deps.toast.show(t('voice.micPermission'), 'error'));
+        void vm.startRecording(settings).catch((err) => {
+          console.error('[Voice] Start error:', err);
+          this.deps.toast.show(t('voice.micPermission', { defaultValue: "L'accès au microphone est requis." }), 'error');
+        });
       } else if (vm.voiceState === 'speaking') {
         vm.stopSpeaking();
       } else {
@@ -134,14 +135,29 @@ export class VoiceController {
       }
     };
 
-    document.getElementById('voiceMicBtn')?.addEventListener('click', handleMicClick);
-    document.getElementById('compactVoiceMicBtn')?.addEventListener('click', handleMicClick);
-    document.getElementById('voiceStopBtn')?.addEventListener('click', () => this.deps.voiceModule.stopRecording());
-    document.getElementById('voiceStopSpeakBtn')?.addEventListener('click', () => {
-      this.deps.voiceModule.stopSpeaking();
-      if (this.deps.getIsGenerating()) this.deps.setIsGenerating(false);
-      this.updateUI();
-    });
+    const micBtn = document.getElementById('voiceMicBtn');
+    if (micBtn) {
+      micBtn.onclick = handleMicClick;
+    }
+
+    const compactMicBtn = document.getElementById('compactVoiceMicBtn');
+    if (compactMicBtn) {
+      compactMicBtn.onclick = handleMicClick;
+    }
+
+    const stopBtn = document.getElementById('voiceStopBtn');
+    if (stopBtn) {
+      stopBtn.onclick = () => this.deps.voiceModule.stopRecording();
+    }
+
+    const stopSpeakBtn = document.getElementById('voiceStopSpeakBtn');
+    if (stopSpeakBtn) {
+      stopSpeakBtn.onclick = () => {
+        this.deps.voiceModule.stopSpeaking();
+        if (this.deps.getIsGenerating()) this.deps.setIsGenerating(false);
+        this.updateUI();
+      };
+    }
   }
 
   handleVoiceResponse(response: string): void {
