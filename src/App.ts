@@ -48,6 +48,7 @@ import { WidgetShell } from './modules/shell/WidgetShell';
 import type { ShellHost } from './modules/shell/ShellHost';
 import { mandatoryUpdateGate } from './modules/updater/MandatoryUpdateGate';
 import { telemetryService } from './modules/telemetry/TelemetryService';
+import { screenSnipper } from './modules/snipper/ScreenSnipper';
 
 export type { RecommendedModel };
 export { RECOMMENDED_MODELS };
@@ -311,6 +312,27 @@ class App implements SettingsHost, ShellHost {
     void listen<UserQuota>('quota-updated', (event) => {
       this.licenseModule.currentQuota = event.payload;
       this.licenseModule.updateQuotaUI();
+    });
+
+    // ── Screen Snipper (Capture Visuelle en 1 clic & Raccourci Ctrl+Shift+S) ─
+    screenSnipper.init(this.documentManager, this.toastService);
+
+    window.addEventListener('keydown', async (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'S' || e.key === 's')) {
+        e.preventDefault();
+        const ok = await screenSnipper.captureScreen();
+        if (ok) {
+          this.renderAttachmentBar();
+        }
+      }
+    });
+
+    window.addEventListener('paste', async (e) => {
+      const handled = await this.documentManager.handlePaste(e);
+      if (handled) {
+        this.renderAttachmentBar();
+        this.toastService.show(t('chat.snipSuccess', { defaultValue: '📸 Capture d\'écran attachée ! Posez votre question.' }), 'success');
+      }
     });
   }
 

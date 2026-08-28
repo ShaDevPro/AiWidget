@@ -46,6 +46,9 @@
   },
   "chat": {
     "placeholder": "Tapez votre message ici...",
+    "snipScreen": "Capturer l'écran pour analyse IA (Ctrl+Shift+S)",
+    "snipSuccess": "📸 Capture d'écran attachée ! Posez votre question.",
+    "snipPlaceholder": "Ex: Que contient cette image ? Résous cette erreur...",
     "send": "Envoyer",
     "stop": "Arrêter",
     "thinking": "L'IA réfléchit...",

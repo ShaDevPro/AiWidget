@@ -46,6 +46,9 @@
   },
   "chat": {
     "placeholder": "Type your message here...",
+    "snipScreen": "Snip screen for AI analysis (Ctrl+Shift+S)",
+    "snipSuccess": "📸 Screenshot attached! Ask your question.",
+    "snipPlaceholder": "Ex: What does this image show? Fix this error...",
     "send": "Send",
     "stop": "Stop",
     "thinking": "AI is thinking...",

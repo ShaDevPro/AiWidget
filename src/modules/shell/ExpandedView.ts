@@ -146,6 +146,9 @@ export class ExpandedView {
                   <button class="input-attach-btn" id="attachFileBtn" title="${t('rag.addDocBtn')}">
                     ${icons.paperclip}
                   </button>
+                  <button class="input-snip-btn" id="snipScreenBtn" title="${t('chat.snipScreen', { defaultValue: 'Capturer l\'écran pour analyse IA (Ctrl+Shift+S)' })}">
+                    ${icons.camera}
+                  </button>
                   <button class="voice-btn ${host.voiceModule.voiceState === 'recording' ? 'recording' : host.voiceModule.voiceState === 'speaking' ? 'speaking' : ''} ${!host.settings.voice_enabled ? 'not-configured' : ''}" id="voiceMicBtn" title="${host.settings.voice_enabled ? t('voice.micBtn') : t('voice.enableVoice')}">
                     ${host.voiceModule.voiceState === 'speaking' ? icons.speaker : host.voiceModule.voiceState !== 'idle' ? icons.waveform : icons.microphone}
                   </button>

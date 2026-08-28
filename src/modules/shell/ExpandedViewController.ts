@@ -11,6 +11,7 @@ import { handleCopyTableClick } from '../markdown';
 import { decodeMermaidSource, MermaidModal } from '../markdown/MermaidRenderer';
 import { ImageModal } from '../image/ImageModal';
 import { sdManager } from '../image/SDManager';
+import { screenSnipper } from '../snipper/ScreenSnipper';
 import type { ShellHost } from './ShellHost';
 
 export class ExpandedViewController {
@@ -251,6 +252,20 @@ export class ExpandedViewController {
         }
       } catch (err) {
         host.toast(String(err), 'error');
+      }
+    });
+
+    document.getElementById('snipScreenBtn')?.addEventListener('click', async () => {
+      screenSnipper.init(host.documentManager, {
+        show: (msg: string, type: any) => host.toast(msg, type),
+        success: (msg: string) => host.toast(msg, 'success'),
+        error: (msg: string) => host.toast(msg, 'error'),
+        info: (msg: string) => host.toast(msg, 'info'),
+        warning: (msg: string) => host.toast(msg, 'warning'),
+      } as any);
+      const ok = await screenSnipper.captureScreen();
+      if (ok) {
+        host.renderAttachmentBar();
       }
     });
 
