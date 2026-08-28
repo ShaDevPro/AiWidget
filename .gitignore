@@ -25,6 +25,7 @@ server/
 license-dashboard/
 start-server-pro.bat
 start-dashboard.bat
+start-license-dashboard.bat
 scripts/create-private-repo.mjs
 scripts/sync-server-private-repo.mjs
 scripts/upload-github-release.mjs
