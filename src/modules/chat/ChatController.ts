@@ -20,6 +20,8 @@ import { parseUserDisplayContent, resolveUserDisplayText } from './UserMessageRe
 import { WebPermissionGate } from '../web/WebPermissionGate';
 import type { ModalsManager } from '../modals/ModalsManager';
 import { isVisionModel } from '../../utils/visionModels';
+import { sdManager } from '../image/SDManager';
+import { ImageCardRenderer, generateImageCardId } from '../image/ImageCardRenderer';
 
 export interface ChatControllerDeps {
   chatModule: ChatModule;
@@ -33,6 +35,9 @@ export interface ChatControllerDeps {
   isConnected: () => boolean;
   getWebSearchEnabled: () => boolean;
   setWebSearchEnabled: (v: boolean) => void;
+  getCourseStudioEnabled?: () => boolean;
+  setCourseStudioEnabled?: (v: boolean) => void;
+  onTriggerCourseStudio?: (subject: string) => void;
   getWebSearchPrivacyAccepted: () => boolean;
   getCurrentQuota: () => UserQuota | null;
   getChatInput: () => HTMLTextAreaElement | null;
@@ -87,6 +92,12 @@ export class ChatController {
 
     const attachedDoc = this.deps.documentManager.getAttachedDocument();
     if (!text && !attachedDoc) return;
+
+    if (this.deps.getCourseStudioEnabled?.() && this.deps.onTriggerCourseStudio && text) {
+      this.deps.onTriggerCourseStudio(text);
+      return;
+    }
+
     if (!text && attachedDoc) text = t('doc.summarizePrompt');
 
     let conv = this.deps.sidebarModule.currentConversation;
@@ -279,10 +290,31 @@ export class ChatController {
       return;
     }
 
+    const lastUserMsg = [...chat.messages].reverse().find((m) => m.role === 'user');
+    const userPromptText = lastUserMsg ? (lastUserMsg.llmContent ?? lastUserMsg.displayContent ?? lastUserMsg.content) : '';
+
+    // Détection d'intention de génération d'image locale (Stable Diffusion)
+    const { isImage, cleanPrompt } = sdManager.isImagePrompt(userPromptText);
+    if (isImage && cleanPrompt) {
+      await this.handleImageGeneration(cleanPrompt, conv.id);
+      return;
+    }
+
+    const isDiagramRequest =
+      lastUserMsg &&
+      /\b(diagramme|diagram|schéma|schema|flowchart|graphe|graphique|mindmap|مخطط|رسم بياني)\b/i.test(
+        userPromptText,
+      );
+
+    let systemPromptContent = `${t('systemPrompt.default')}\n\n${t('systemPrompt.context')}\n\n${t('systemPrompt.mermaid')}`;
+    if (isDiagramRequest) {
+      systemPromptContent += `\n\n[DIRECTIVE ABSOLUE : L'utilisateur demande expressément un diagramme ou schéma. Tu DOIS OBLIGATOIREMENT et DIRECTEMENT produire un bloc \`\`\`mermaid ... \`\`\` complet, fonctionnel et structuré (flowchart TD/LR ou sequenceDiagram) représentant exactement ce qui est demandé. Ne te présente JAMAIS et commence directement.]`;
+    }
+
     const history = [
       {
         role: 'system' as const,
-        content: `${t('systemPrompt.default')}\n\n${t('systemPrompt.context')}\n\n${t('systemPrompt.mermaid')}`,
+        content: systemPromptContent,
       },
       ...chat.messages
         .filter((m) => !(m.role === 'assistant' && !m.content.trim()))
@@ -515,6 +547,87 @@ export class ChatController {
       this.deps.toast.show(t('chat.copied'), 'success');
     } catch {
       this.deps.toast.show(t('common.error'), 'error');
+    }
+  }
+
+  async handleImageGeneration(prompt: string, convId: string): Promise<void> {
+    const chat = this.deps.chatModule;
+    const isReady = await sdManager.isReady();
+
+    if (!isReady) {
+      const cardHtml = ImageCardRenderer.renderEngineNotReadyCard();
+      const savedMsg = await api.saveMessage({
+        conversation_id: convId,
+        role: 'assistant',
+        content: cardHtml,
+      });
+      chat.messages.push(savedMsg);
+      chat.isGenerating = false;
+      this.deps.updateSendButton();
+      this.renderMessagesView();
+      this.deps.streamModule.scrollSmooth();
+      return;
+    }
+
+    const cardId = generateImageCardId();
+    const generatingHtml = ImageCardRenderer.renderGeneratingCard(prompt, cardId);
+
+    chat.isGenerating = true;
+    this.deps.updateSendButton();
+
+    const pendingMsg: Message = {
+      id: 'pending-' + Date.now(),
+      conversation_id: convId,
+      role: 'assistant',
+      content: generatingHtml,
+      created_at: new Date().toISOString(),
+    };
+    chat.messages.push(pendingMsg);
+    this.renderMessagesView();
+    this.deps.streamModule.scrollSmooth();
+
+    try {
+      const result = await sdManager.generateImage(prompt, undefined, 512, 512, 8, cardId);
+      const readyHtml = ImageCardRenderer.renderImageCard(result, cardId);
+
+      const savedMsg = await api.saveMessage({
+        conversation_id: convId,
+        role: 'assistant',
+        content: readyHtml,
+      });
+
+      const lastIdx = chat.messages.findIndex((m) => m.id === pendingMsg.id);
+      if (lastIdx !== -1) {
+        chat.messages[lastIdx] = savedMsg;
+      }
+    } catch (err: any) {
+      console.error('Image generation failed:', err);
+      const errorMsg = String(err?.message || err || 'Erreur inconnue');
+      const errHtml = `
+        <div class="ai-image-card error" id="${cardId}">
+          <div class="ai-image-setup-box">
+            <div class="ai-image-setup-icon">⚠️</div>
+            <div class="ai-image-setup-info">
+              <h4>${t('imageStudio.generationError', { defaultValue: 'Erreur de génération' })}</h4>
+              <p>${escapeText(errorMsg)}</p>
+            </div>
+          </div>
+        </div>`;
+      const savedMsg = await api.saveMessage({
+        conversation_id: convId,
+        role: 'assistant',
+        content: errHtml,
+      });
+      const lastIdx = chat.messages.findIndex((m) => m.id === pendingMsg.id);
+      if (lastIdx !== -1) {
+        chat.messages[lastIdx] = savedMsg;
+      }
+      this.deps.toast.show(t('imageStudio.generationError', { defaultValue: 'Erreur de génération d\'image' }), 'error');
+    } finally {
+      chat.isGenerating = false;
+      this.deps.updateSendButton();
+      this.renderMessagesView();
+      this.deps.streamModule.scrollSmooth();
     }
   }
 }

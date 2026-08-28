@@ -20,6 +20,7 @@ mod generation_controller;
 mod grounding;
 mod token_emitter;
 mod whisper_engine;
+mod sd_engine;
 mod hardware_detector;
 mod quota_service;
 pub mod enterprise_policy;
@@ -37,6 +38,7 @@ use commands::chat::generate_response;
 use commands::quota::{get_user_quota, set_user_quota_limit};
 use commands::policy::get_enterprise_policy;
 use commands::license::{get_hardware_id, get_license_status, activate_license_key, deactivate_license, generate_license_key_admin};
+use commands::image::{get_sd_status, download_sd, generate_image_sd};
 use commands::conversations::{
     create_conversation, delete_conversation, delete_message, delete_messages_from, get_conversations, get_messages,
     save_message, search_messages, toggle_conversation_pin, update_conversation_title,
@@ -210,6 +212,10 @@ fn main() {
             transcribe_audio,
             get_whisper_status,
             download_whisper,
+            // ── Stable Diffusion Image Studio ─────────────────────
+            get_sd_status,
+            download_sd,
+            generate_image_sd,
             // ── Stats & weather ───────────────────────────────────
             commands::sysinfo::get_system_stats,
             commands::sysinfo::get_weather,

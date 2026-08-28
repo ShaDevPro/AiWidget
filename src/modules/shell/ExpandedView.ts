@@ -140,6 +140,9 @@ export class ExpandedView {
                   <button class="input-web-btn web-toggle-btn ${host.webSearchEnabled ? 'active' : ''}" id="webSearchToggle" title="${t('web.toggleBtn')}">
                     ${icons.globe} <span>Web</span>
                   </button>
+                  <button class="input-course-btn course-toggle-btn ${host.courseStudioEnabled ? 'active' : ''}" id="courseStudioToggle" title="${t('courseStudio.toggleBtn', { defaultValue: 'Mode Cours & Formations' })}">
+                    <span class="course-icon">🎓</span> <span>${t('courseStudio.btnLabel', { defaultValue: 'Cours' })}</span>
+                  </button>
                   <button class="input-attach-btn" id="attachFileBtn" title="${t('rag.addDocBtn')}">
                     ${icons.paperclip}
                   </button>

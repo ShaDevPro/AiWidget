@@ -20,6 +20,7 @@ export function getSettingsNavItems(host: SettingsHost): NavItem[] {
     { id: 'license', icon: '🔑', label: t('license.settingsTab'), proOnly: true },
     { id: 'models', icon: '🤖', label: t('settings.llm'), adminOnly: true },
     { id: 'voice', icon: '🎙️', label: t('voice.voiceSettings') },
+    { id: 'image', icon: '🎨', label: t('imageStudio.tabTitle', { defaultValue: 'Studio Image' }) },
     { id: 'knowledge', icon: '📚', label: t('rag.title') },
     { id: 'memory', icon: '🧠', label: t('memory.title') },
     { id: 'advanced', icon: '⚙️', label: t('settings.parameters') },

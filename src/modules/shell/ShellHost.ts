@@ -23,6 +23,7 @@ export interface ShellHost {
   models: LLMModel[];
   webSearchEnabled: boolean;
   webSearchPrivacyAccepted: boolean;
+  courseStudioEnabled: boolean;
   searchQuery: string;
   messageSearchResults: MessageSearchResult[];
   ragDocuments: RAGDocument[];
@@ -65,6 +66,8 @@ export interface ShellHost {
   renderCompactSuggestions(): string;
   toggleWebSearch(): void;
   syncWebToggleButtons(): void;
+  toggleCourseStudio(): void;
+  syncCourseToggleButtons(): void;
   openExportMenu(anchor?: HTMLElement): void;
   openModelSwitcher(anchorEl: HTMLElement): void;
   setLanguage(lang: string): Promise<void>;

@@ -262,3 +262,37 @@ export interface IntegrityStatus {
   binary_sha256: string;
   channel: string;
 }
+
+export interface SDStatus {
+  installed: boolean;
+  model_installed: boolean;
+  binary_path: string;
+  model_name: string;
+  available_models: string[];
+}
+
+export interface ImageGenerationResult {
+  image_base64: string;
+  file_path: string;
+  prompt: string;
+  width: number;
+  height: number;
+  duration_ms: number;
+}
+
+export interface SDDownloadProgress {
+  step: 'binary' | 'model';
+  percentage: number;
+  status: string;
+  downloaded?: number;
+  total?: number;
+}
+
+export interface SDGenerationProgress {
+  status: string;
+  current_step?: number;
+  total_steps?: number;
+  percentage?: number;
+  message?: string;
+  prompt?: string;
+}

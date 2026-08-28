@@ -77,9 +77,12 @@ export class MessageRenderer {
             `;
           } else {
             const prepared = prepareAssistantMarkdown(rawContent);
+            const isRawHtmlCard = rawContent.trim().startsWith('<div class="course-finished-card') ||
+                                  rawContent.trim().startsWith('<div class="course-live-card') ||
+                                  rawContent.trim().startsWith('<div class=');
             renderedContent = `
-              <div class="message-bubble markdown-body">
-                ${rawContent.startsWith('<div class=') ? rawContent : renderMarkdown(prepared)}
+              <div class="message-bubble ${isRawHtmlCard ? 'course-card-bubble' : 'markdown-body'}">
+                ${isRawHtmlCard ? rawContent.trim() : renderMarkdown(prepared)}
               </div>
             `;
 

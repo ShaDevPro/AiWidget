@@ -26,3 +26,7 @@ export type { WebIntentResult, WebGateDecision } from './web';
 export { handleCopyTableClick, tableElementToTsv } from './markdown';
 export { UpdateManager, updateManager } from './updater';
 export type { UpdateInfo } from './updater';
+export { sdManager, SDManager } from './image/SDManager';
+export { ImageCardRenderer } from './image/ImageCardRenderer';
+export { ImageModal } from './image/ImageModal';
+export { FooocusEngine, FOOOCUS_STYLES } from './image/FooocusEngine';

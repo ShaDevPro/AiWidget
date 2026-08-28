@@ -8,7 +8,9 @@ import { helpModule } from '../help/HelpModule';
 import { aboutModule } from '../about/AboutModule';
 import { footerMenuModule } from '../menu/FooterMenuModule';
 import { handleCopyTableClick } from '../markdown';
-import { decodeMermaidSource } from '../markdown/MermaidRenderer';
+import { decodeMermaidSource, MermaidModal } from '../markdown/MermaidRenderer';
+import { ImageModal } from '../image/ImageModal';
+import { sdManager } from '../image/SDManager';
 import type { ShellHost } from './ShellHost';
 
 export class ExpandedViewController {
@@ -262,6 +264,10 @@ export class ExpandedViewController {
       host.toggleWebSearch();
     });
 
+    document.getElementById('courseStudioToggle')?.addEventListener('click', () => {
+      host.toggleCourseStudio();
+    });
+
     host.getChatContainer()?.addEventListener('click', async (e) => {
       const target = e.target as HTMLElement;
 
@@ -357,6 +363,146 @@ export class ExpandedViewController {
         return;
       }
 
+      const expandMermaidBtn = target.closest('[data-expand-mermaid]') as HTMLElement;
+      if (expandMermaidBtn) {
+        e.stopPropagation();
+        const cardId = expandMermaidBtn.getAttribute('data-expand-mermaid') || '';
+        const card = document.querySelector(`.mermaid-card[data-mermaid-card="${cardId}"]`);
+        const diagramEl = card?.querySelector('.mermaid-diagram');
+        const svgEl = diagramEl?.querySelector('svg');
+        const encoded = diagramEl?.getAttribute('data-mermaid-source') || '';
+        const rawSource = decodeMermaidSource(encoded) || diagramEl?.textContent || '';
+
+        if (svgEl) {
+          MermaidModal.open(svgEl.outerHTML, rawSource);
+        } else if (rawSource) {
+          MermaidModal.open(`<div class="mermaid-diagram" id="${cardId}">${rawSource}</div>`, rawSource);
+        }
+        return;
+      }
+
+      // Image Studio Expand Modal
+      const expandImgBtn = target.closest('[data-expand-image]') as HTMLElement;
+      if (expandImgBtn) {
+        e.stopPropagation();
+        const cardId = expandImgBtn.getAttribute('data-expand-image') || '';
+        const card = document.querySelector(`.ai-image-card[data-image-card="${cardId}"]`);
+        const imgEl = card?.querySelector('.ai-image-preview') as HTMLImageElement | null;
+        const promptEl = card?.querySelector('.ai-image-prompt span:last-child');
+        const prompt = promptEl?.textContent || 'Image IA';
+        if (imgEl?.src) {
+          ImageModal.open(imgEl.src, prompt);
+        }
+        return;
+      }
+
+      // Image Studio Download Image
+      const downloadImgBtn = target.closest('[data-download-image]') as HTMLElement;
+      if (downloadImgBtn) {
+        e.stopPropagation();
+        const cardId = downloadImgBtn.getAttribute('data-download-image') || '';
+        const card = document.querySelector(`.ai-image-card[data-image-card="${cardId}"]`);
+        const imgEl = card?.querySelector('.ai-image-preview') as HTMLImageElement | null;
+        const promptEl = card?.querySelector('.ai-image-prompt span:last-child');
+        const prompt = promptEl?.textContent || 'image';
+        if (imgEl?.src) {
+          const a = document.createElement('a');
+          a.href = imgEl.src;
+          const safeName = prompt.slice(0, 30).replace(/[^a-zA-Z0-9_\-\u0600-\u06FF]/g, '_') || 'image';
+          a.download = `AI_Widget_${safeName}_${Date.now()}.png`;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => document.body.removeChild(a), 200);
+          host.toast(t('imageStudio.downloadSuccess', { defaultValue: 'Image téléchargée !' }), 'success');
+        }
+        return;
+      }
+
+      // Image Studio Copy Image
+      const copyImgBtn = target.closest('[data-copy-image]') as HTMLElement;
+      if (copyImgBtn) {
+        e.stopPropagation();
+        const cardId = copyImgBtn.getAttribute('data-copy-image') || '';
+        const card = document.querySelector(`.ai-image-card[data-image-card="${cardId}"]`);
+        const imgEl = card?.querySelector('.ai-image-preview') as HTMLImageElement | null;
+        if (imgEl?.src) {
+          try {
+            const resp = await fetch(imgEl.src);
+            const blob = await resp.blob();
+            await navigator.clipboard.write([
+              new ClipboardItem({
+                [blob.type]: blob,
+              }),
+            ]);
+            host.toast(t('chat.copied'), 'success');
+          } catch {
+            host.toast(t('common.error'), 'error');
+          }
+        }
+        return;
+      }
+
+      // Image Studio Regenerate
+      const regenImgBtn = target.closest('[data-regen-image]') as HTMLElement;
+      if (regenImgBtn) {
+        e.stopPropagation();
+        const rawPrompt = decodeURIComponent(regenImgBtn.getAttribute('data-regen-image') || '');
+        const chatInput = host.getChatInput();
+        if (chatInput && rawPrompt) {
+          chatInput.value = `Dessine ${rawPrompt}`;
+          host.autoResizeTextarea();
+          const sendBtn = document.getElementById('sendBtn');
+          sendBtn?.click();
+        }
+        return;
+      }
+
+      // Image Studio 1-Click Install Engine
+      const installSdBtn = target.closest('[data-install-sd]') as HTMLElement;
+      if (installSdBtn) {
+        e.stopPropagation();
+        const setupBox = installSdBtn.closest('.ai-image-setup-box') as HTMLElement | null;
+        if (setupBox) {
+          setupBox.innerHTML = `
+            <div class="ai-image-setup-icon">⏳</div>
+            <div class="ai-image-setup-info">
+              <h4>${t('imageStudio.downloadingEngine', { defaultValue: 'Téléchargement du moteur en cours...' })}</h4>
+              <p id="sdInlineStatusText">${t('imageStudio.generatingHint', { defaultValue: 'Connexion aux serveurs de téléchargement...' })}</p>
+            </div>
+            <div class="ai-image-download-progress-wrap">
+              <div class="ai-image-download-progress-bar">
+                <div class="ai-image-download-progress-fill" id="sdInlineFill" style="width: 5%;"></div>
+              </div>
+              <div class="ai-image-download-progress-text">
+                <span id="sdInlineStatusLabel">0%</span>
+                <span id="sdInlineSpeed">Modèle IA 1.5 Go</span>
+              </div>
+            </div>
+          `;
+        }
+
+        try {
+          await sdManager.downloadEngine((p) => {
+            const fill = document.getElementById('sdInlineFill');
+            const label = document.getElementById('sdInlineStatusLabel');
+            const statusText = document.getElementById('sdInlineStatusText');
+            if (fill) fill.style.width = `${Math.max(5, p.percentage)}%`;
+            if (label) label.textContent = `${Math.round(p.percentage)}%`;
+            if (statusText) statusText.textContent = p.status;
+          });
+          host.toast(t('imageStudio.engineReady', { defaultValue: 'Moteur d\'images prêt !' }), 'success');
+          const chatCtrl = (host as any).chatController;
+          if (chatCtrl) chatCtrl.renderMessagesView();
+        } catch (err: any) {
+          console.error('Install SD failed:', err);
+          const msg = typeof err === 'string' ? err : err?.message || t('common.error');
+          host.toast(msg, 'error');
+          const chatCtrl = (host as any).chatController;
+          if (chatCtrl) chatCtrl.renderMessagesView();
+        }
+        return;
+      }
+
       const promptBtn = target.closest('[data-fill-prompt]') as HTMLElement;
       const chatInput = host.getChatInput();
       if (promptBtn && chatInput) {
@@ -393,11 +539,5 @@ export class ExpandedViewController {
         return;
       }
     });
-
-    // Resize handle setup
-    host.setupResizeHandle();
-
-    // Settings panel events
-    host.attachSettingsEvents();
   }
 }

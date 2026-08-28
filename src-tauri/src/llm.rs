@@ -185,7 +185,7 @@ pub async fn chat(
     let hw = crate::hardware_detector::HardwareDetector::detect();
     let num_threads = hw.cpu_cores.max(2).min(16);
     let num_ctx = crate::hardware_detector::HardwareDetector::recommended_num_ctx(&hw).max(4096);
-    let num_predict = max_tokens.clamp(128, 2048);
+    let num_predict = max_tokens.clamp(128, 4096);
 
     let body = json!({
         "model": model,

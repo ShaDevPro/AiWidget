@@ -12,6 +12,7 @@ import {
   formatMessageTime,
   getConversationTitle,
   getDateGroupKey,
+  renderMarkdown,
 } from './utils';
 import { RECOMMENDED_MODELS, type RecommendedModel } from './constants/recommendedModels';
 import { BUBBLE_SIZE, COMPACT_SIZE, COMPACT_SIZE_TALL, DEFAULT_EXPANDED_SIZE } from './constants/widgetSizes';
@@ -28,12 +29,17 @@ import { ModelsModule } from './modules/models/ModelsModule';
 import { VoiceModule, ChatModule, SearchModule, SidebarModule, SettingsModule, StreamModule, StatsModule, ProfileModule, ModalsManager, MessageRenderer } from './modules';
 import { DocumentManager } from './modules/document/DocumentManager';
 import { ExportManager } from './modules/chat/ExportManager';
+import { CourseCardRenderer } from './modules/course/CourseCardRenderer';
+import { CourseStudioEngine } from './modules/course/CourseStudioEngine';
+import { courseStudioModal, type CourseStudioConfig } from './modules/course/CourseStudioModal';
 import type { ProfilePublic } from './modules/profile/ProfileModule';
 import { helpModule } from './modules/help/HelpModule';
 import { aboutModule } from './modules/about/AboutModule';
-import { contactModule } from './modules/contact/ContactModule';
 import { legalModule } from './modules/legal/LegalModule';
 import { footerMenuModule } from './modules/menu/FooterMenuModule';
+import { MermaidModal, decodeMermaidSource } from './modules/markdown/MermaidRenderer';
+import { ImageModal } from './modules/image/ImageModal';
+import { sdManager } from './modules/image/SDManager';
 import { SuggestionsService } from './modules/suggestions/SuggestionsService';
 import { SettingsView } from './modules/settings/SettingsView';
 import { SettingsController } from './modules/settings/SettingsController';
@@ -79,6 +85,8 @@ class App implements SettingsHost, ShellHost {
   isDraggingFile = false;
   webSearchEnabled = false;
   webSearchPrivacyAccepted = localStorage.getItem('aiwidget_web_privacy_accepted') === 'true';
+  courseStudioEnabled = false;
+  private isCourseStudioGenerating = false;
 
   private el: HTMLElement;
   private chatContainer: HTMLElement | null = null;
@@ -130,6 +138,13 @@ class App implements SettingsHost, ShellHost {
       isConnected: () => this.isConnected,
       getWebSearchEnabled: () => this.webSearchEnabled,
       setWebSearchEnabled: (v) => { this.webSearchEnabled = v; },
+      getCourseStudioEnabled: () => this.courseStudioEnabled,
+      setCourseStudioEnabled: (v) => { this.courseStudioEnabled = v; },
+      onTriggerCourseStudio: (subject) => {
+        courseStudioModal.show(subject, (config) => {
+          void this.startCourseStudioPipeline(config);
+        });
+      },
       getWebSearchPrivacyAccepted: () => this.webSearchPrivacyAccepted,
       getCurrentQuota: () => this.licenseModule.currentQuota,
       getChatInput: () => this.chatInput,
@@ -261,6 +276,9 @@ class App implements SettingsHost, ShellHost {
     this.isListenersSetup = true;
 
     void api.onChatToken((content, done) => {
+      if (this.isCourseStudioGenerating) {
+        return;
+      }
       if (done) {
         this.chatModule.isGenerating = false;
         this.chatModule.stopRequested = false;
@@ -522,7 +540,216 @@ class App implements SettingsHost, ShellHost {
         return;
       }
 
-      // 3. Global external link opener via Tauri Shell
+      // 3. Course Studio PDF Export
+      const coursePdfBtn = target.closest('[data-export-course-pdf]') as HTMLElement;
+      if (coursePdfBtn) {
+        e.stopPropagation();
+        const rawTitle = decodeURIComponent(coursePdfBtn.getAttribute('data-export-course-pdf') || 'cours');
+        const rawContent = decodeURIComponent(coursePdfBtn.getAttribute('data-course-content') || '');
+        await CourseCardRenderer.downloadPdf(rawTitle, rawContent, (md) => renderMarkdown(md));
+        this.toast(t('chat.exportSuccess'), 'success');
+        return;
+      }
+
+      // 4. Course Studio DOCX Export
+      const courseDocxBtn = target.closest('[data-export-course-docx]') as HTMLElement;
+      if (courseDocxBtn) {
+        e.stopPropagation();
+        const rawTitle = decodeURIComponent(courseDocxBtn.getAttribute('data-export-course-docx') || 'cours');
+        const rawContent = decodeURIComponent(courseDocxBtn.getAttribute('data-course-content') || '');
+        await CourseCardRenderer.downloadDocx(rawTitle, rawContent, (md) => renderMarkdown(md));
+        this.toast(t('chat.exportSuccess'), 'success');
+        return;
+      }
+
+      // 5. Course Studio Markdown Export
+      const courseMdBtn = target.closest('[data-export-course-md]') as HTMLElement;
+      if (courseMdBtn) {
+        e.stopPropagation();
+        const rawTitle = decodeURIComponent(courseMdBtn.getAttribute('data-export-course-md') || 'cours');
+        const rawContent = decodeURIComponent(courseMdBtn.getAttribute('data-course-content') || '');
+        CourseCardRenderer.downloadMarkdown(rawTitle, rawContent);
+        this.toast(t('chat.exportSuccess'), 'success');
+        return;
+      }
+
+      // 6. Course Studio Copy Course
+      const copyCourseBtn = target.closest('[data-copy-course]') as HTMLElement;
+      if (copyCourseBtn) {
+        e.stopPropagation();
+        const rawContent = decodeURIComponent(copyCourseBtn.getAttribute('data-copy-course') || '');
+        try {
+          await navigator.clipboard.writeText(rawContent);
+          const labelEl = copyCourseBtn.querySelector('.copy-label');
+          if (labelEl) labelEl.textContent = t('chat.copied');
+          copyCourseBtn.classList.add('copied');
+          setTimeout(() => {
+            if (labelEl) labelEl.textContent = t('courseStudio.copyCourse');
+            copyCourseBtn.classList.remove('copied');
+          }, 2000);
+          this.toast(t('courseStudio.copiedCourse', { defaultValue: 'Cours copié dans le presse-papier !' }), 'success');
+        } catch {
+          this.toast(t('common.error'), 'error');
+        }
+        return;
+      }
+
+      // 7. Mermaid Expand Modal
+      const expandMermaidBtn = target.closest('[data-expand-mermaid]') as HTMLElement;
+      if (expandMermaidBtn) {
+        e.stopPropagation();
+        const cardId = expandMermaidBtn.getAttribute('data-expand-mermaid') || '';
+        const card = document.querySelector(`.mermaid-card[data-mermaid-card="${cardId}"]`);
+        const diagramEl = card?.querySelector('.mermaid-diagram');
+        const svgEl = diagramEl?.querySelector('svg');
+        const encoded = diagramEl?.getAttribute('data-mermaid-source') || '';
+        const rawSource = decodeMermaidSource(encoded) || diagramEl?.textContent || '';
+
+        if (svgEl) {
+          MermaidModal.open(svgEl.outerHTML, rawSource);
+        } else if (rawSource) {
+          MermaidModal.open(`<div class="mermaid-diagram" id="${cardId}">${rawSource}</div>`, rawSource);
+        }
+        return;
+      }
+
+      // 8. Mermaid Copy Source
+      const copyMermaidBtn = target.closest('[data-copy-mermaid]') as HTMLElement;
+      if (copyMermaidBtn) {
+        e.stopPropagation();
+        const encoded = copyMermaidBtn.getAttribute('data-copy-mermaid') || '';
+        try {
+          await navigator.clipboard.writeText(decodeMermaidSource(encoded));
+          copyMermaidBtn.classList.add('copied');
+          setTimeout(() => copyMermaidBtn.classList.remove('copied'), 2000);
+          this.toast(t('chat.copied'), 'success');
+        } catch {
+          this.toast(t('common.error'), 'error');
+        }
+        return;
+      }
+
+      // 9. Image Studio Expand Modal
+      const expandImgBtn = target.closest('[data-expand-image]') as HTMLElement;
+      if (expandImgBtn) {
+        e.stopPropagation();
+        const cardId = expandImgBtn.getAttribute('data-expand-image') || '';
+        const card = document.querySelector(`.ai-image-card[data-image-card="${cardId}"]`);
+        const imgEl = card?.querySelector('.ai-image-preview') as HTMLImageElement | null;
+        const promptEl = card?.querySelector('.ai-image-prompt span:last-child');
+        const prompt = promptEl?.textContent || 'Image IA';
+        if (imgEl?.src) {
+          ImageModal.open(imgEl.src, prompt);
+        }
+        return;
+      }
+
+      // 10. Image Studio Download Image
+      const downloadImgBtn = target.closest('[data-download-image]') as HTMLElement;
+      if (downloadImgBtn) {
+        e.stopPropagation();
+        const cardId = downloadImgBtn.getAttribute('data-download-image') || '';
+        const card = document.querySelector(`.ai-image-card[data-image-card="${cardId}"]`);
+        const imgEl = card?.querySelector('.ai-image-preview') as HTMLImageElement | null;
+        const promptEl = card?.querySelector('.ai-image-prompt span:last-child');
+        const prompt = promptEl?.textContent || 'image';
+        if (imgEl?.src) {
+          const a = document.createElement('a');
+          a.href = imgEl.src;
+          const safeName = prompt.slice(0, 30).replace(/[^a-zA-Z0-9_\-\u0600-\u06FF]/g, '_') || 'image';
+          a.download = `AI_Widget_${safeName}_${Date.now()}.png`;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => document.body.removeChild(a), 200);
+          this.toast(t('imageStudio.downloadSuccess', { defaultValue: 'Image téléchargée !' }), 'success');
+        }
+        return;
+      }
+
+      // 11. Image Studio Copy Image
+      const copyImgBtn = target.closest('[data-copy-image]') as HTMLElement;
+      if (copyImgBtn) {
+        e.stopPropagation();
+        const cardId = copyImgBtn.getAttribute('data-copy-image') || '';
+        const card = document.querySelector(`.ai-image-card[data-image-card="${cardId}"]`);
+        const imgEl = card?.querySelector('.ai-image-preview') as HTMLImageElement | null;
+        if (imgEl?.src) {
+          try {
+            const resp = await fetch(imgEl.src);
+            const blob = await resp.blob();
+            await navigator.clipboard.write([
+              new ClipboardItem({
+                [blob.type]: blob,
+              }),
+            ]);
+            this.toast(t('chat.copied'), 'success');
+          } catch {
+            this.toast(t('common.error'), 'error');
+          }
+        }
+        return;
+      }
+
+      // 12. Image Studio Regenerate
+      const regenImgBtn = target.closest('[data-regen-image]') as HTMLElement;
+      if (regenImgBtn) {
+        e.stopPropagation();
+        const rawPrompt = decodeURIComponent(regenImgBtn.getAttribute('data-regen-image') || '');
+        const chatInput = document.getElementById('chatInput') as HTMLTextAreaElement | null;
+        if (chatInput && rawPrompt) {
+          chatInput.value = `Dessine ${rawPrompt}`;
+          this.autoResizeTextarea();
+          const sendBtn = document.getElementById('sendBtn');
+          sendBtn?.click();
+        }
+        return;
+      }
+
+      // 13. Image Studio 1-Click Install Engine
+      const installSdBtn = target.closest('[data-install-sd]') as HTMLElement;
+      if (installSdBtn) {
+        e.stopPropagation();
+        const setupBox = installSdBtn.closest('.ai-image-setup-box') as HTMLElement | null;
+        if (setupBox) {
+          setupBox.innerHTML = `
+            <div class="ai-image-setup-icon">⏳</div>
+            <div class="ai-image-setup-info">
+              <h4>${t('imageStudio.downloadingEngine', { defaultValue: 'Téléchargement du moteur en cours...' })}</h4>
+              <p id="sdInlineStatusText">${t('imageStudio.generatingHint', { defaultValue: 'Connexion aux serveurs de téléchargement...' })}</p>
+            </div>
+            <div class="ai-image-download-progress-wrap">
+              <div class="ai-image-download-progress-bar">
+                <div class="ai-image-download-progress-fill" id="sdInlineFill" style="width: 5%;"></div>
+              </div>
+              <div class="ai-image-download-progress-text">
+                <span id="sdInlineStatusLabel">0%</span>
+                <span id="sdInlineSpeed">Modèle IA 1.5 Go</span>
+              </div>
+            </div>
+          `;
+        }
+
+        try {
+          await sdManager.downloadEngine((p) => {
+            const fill = document.getElementById('sdInlineFill');
+            const label = document.getElementById('sdInlineStatusLabel');
+            const statusText = document.getElementById('sdInlineStatusText');
+            if (fill) fill.style.width = `${Math.max(5, p.percentage)}%`;
+            if (label) label.textContent = `${Math.round(p.percentage)}%`;
+            if (statusText) statusText.textContent = p.status;
+          });
+          this.toast(t('imageStudio.engineReady', { defaultValue: 'Moteur d\'images prêt !' }), 'success');
+          this.chatController.renderMessagesView();
+        } catch (err: any) {
+          console.error('Install SD failed:', err);
+          const msg = typeof err === 'string' ? err : err?.message || t('common.error');
+          this.toast(msg, 'error');
+          this.chatController.renderMessagesView();
+        }
+        return;
+      }
+
+      // 7. Global external link opener via Tauri Shell
       const link = target.closest('a') as HTMLAnchorElement | null;
       if (link) {
         const href = link.getAttribute('href') || link.href;
@@ -843,6 +1070,118 @@ class App implements SettingsHost, ShellHost {
     this.webSearchEnabled = !this.webSearchEnabled;
     this.syncWebToggleButtons();
     this.toast(this.webSearchEnabled ? t('web.active') : t('web.inactive'), 'info');
+  }
+
+  syncCourseToggleButtons(): void {
+    document.querySelectorAll('.course-toggle-btn').forEach((btn) => {
+      btn.classList.toggle('active', this.courseStudioEnabled);
+    });
+  }
+
+  toggleCourseStudio(): void {
+    const chatInput = this.getChatInput();
+    const initialText = chatInput?.value.trim() || '';
+    courseStudioModal.show(initialText, (config) => {
+      void this.startCourseStudioPipeline(config);
+    });
+  }
+
+  async startCourseStudioPipeline(config: CourseStudioConfig): Promise<void> {
+    if (this.chatModule.isGenerating) return;
+
+    let conv = this.sidebarModule.currentConversation;
+    if (!conv) {
+      await this.newConversation();
+      conv = this.sidebarModule.currentConversation;
+      if (!conv) return;
+    }
+
+    const model = conv.model || this.settings.default_model || this.models[0]?.name || '';
+    if (!model) {
+      this.toast(t('chat.noModelSelected'), 'error');
+      return;
+    }
+
+    // 1. Ajouter le message utilisateur dans le chat
+    const userPromptDisplay = `🎓 **[${t('courseStudio.btnLabel', { defaultValue: 'Studio de Cours Universitaire' })}]**\n\n**${this.escapeText(config.subject)}**\n*${config.chaptersCount} ${t('courseStudio.chapters', { defaultValue: 'Chapitres' })} · ${t('courseStudio.level' + config.level.charAt(0).toUpperCase() + config.level.slice(1), { defaultValue: config.level })} · ${config.language.toUpperCase()}*`;
+
+    const userMsg = await api.saveMessage({
+      conversation_id: conv.id,
+      role: 'user',
+      content: userPromptDisplay,
+    });
+    this.chatModule.messages.push(userMsg);
+
+    const chatInput = this.getChatInput();
+    if (chatInput) chatInput.value = '';
+    this.autoResizeTextarea();
+    this.renderMessagesView();
+    this.streamModule.scrollSmooth();
+
+    // 2. Créer le message assistant de progression
+    const pendingMsg: Message = {
+      id: 'course-session-' + Date.now(),
+      conversation_id: conv.id,
+      role: 'assistant',
+      content: CourseCardRenderer.renderLiveProgressCard(
+        { step: 'outline', percent: 10, statusText: t('courseStudio.progressOutline', { defaultValue: 'Élaboration du titre académique et du sommaire structuré...' }) },
+        config.subject,
+      ),
+      created_at: new Date().toISOString(),
+    };
+    this.chatModule.pendingAssistantId = pendingMsg.id;
+    this.chatModule.messages.push(pendingMsg);
+    this.chatModule.isGenerating = true;
+    this.isCourseStudioGenerating = true;
+    this.updateSendButton();
+    this.renderMessagesView();
+    this.streamModule.scrollSmooth();
+
+    try {
+      const result = await CourseStudioEngine.generateCoursePipeline(
+        config,
+        model,
+        this.settings.ollama_base_url,
+        this.settings.temperature,
+        (event) => {
+          pendingMsg.content = CourseCardRenderer.renderLiveProgressCard(event, config.subject);
+          this.renderMessagesView();
+          this.streamModule.scrollSmooth();
+        },
+      );
+
+      // 3. Finalisation : Remplacement par la carte finale épurée et sauvegarde
+      const finalCardHtml = CourseCardRenderer.renderFinalDeliveryCard(result);
+      pendingMsg.content = finalCardHtml;
+
+      const savedMsg = await api.saveMessage({
+        conversation_id: conv.id,
+        role: 'assistant',
+        content: finalCardHtml,
+      });
+      pendingMsg.id = savedMsg.id;
+
+      // Mettre à jour le titre de la conversation
+      if (result.title) {
+        conv.title = result.title;
+        void api.updateConversationTitle(conv.id, result.title);
+        this.updateTitles();
+        this.refreshConvList();
+      }
+
+      this.toast(t('courseStudio.readyMessage', { defaultValue: 'Votre cours est prêt à être téléchargé' }), 'success');
+    } catch (err) {
+      console.error('Course Studio Pipeline Error:', err);
+      pendingMsg.content = `⚠️ **${t('common.error')}** : ${String(err)}`;
+      this.toast(String(err), 'error');
+    } finally {
+      this.isCourseStudioGenerating = false;
+      this.chatModule.isGenerating = false;
+      this.chatModule.pendingAssistantId = null;
+      this.updateSendButton();
+      this.renderMessagesView();
+      this.streamModule.scrollSmooth();
+    }
   }
 
   getRootElement(): HTMLElement {
