@@ -15,7 +15,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows_10_%7C_11-0078D6?logo=windows&style=flat-square)]()
 [![Languages](https://img.shields.io/badge/i18n-FR_%7C_EN_%7C_AR_(RTL)-6366f1?style=flat-square)]()
 
-[**Official Website**](https://shadevpro.github.io/AiWidget-Site/) · [**Download Releases**](https://github.com/ShaDevPro/AiWidget-Site/releases/tag/v1.1.0) · [**Report Bug**](https://github.com/ShaDevPro/AiWidget/issues) · [**Enterprise PRO**](mailto:contact@shadevpro.com)
+[**Official Website**](https://shadevpro.github.io/AiWidget-Site/) · [**Download Releases**](https://github.com/ShaDevPro/AiWidget-Site/releases/tag/v1.1.0) · [**Report Bug**](https://github.com/ShaDevPro/AiWidget/issues) · [**Enterprise PRO**](mailto:sha.dev.pro@gmail.com)
 
 </div>
 
@@ -162,5 +162,5 @@ This project is licensed under the **GNU Affero General Public License v3.0 (AGP
 ### 🏢 Commercial & Enterprise Licensing (Dual-Licensing):
 If you wish to use AI Widget in a proprietary commercial environment without AGPLv3 copyleft obligations, or if your organization requires the **AI Widget Enterprise On-Premise Central Server** (with department quotas, active directory binding, and centralized GPU pools), please contact:
 
-📧 **Commercial Inquiries:** [contact@shadevpro.com](mailto:contact@shadevpro.com)  
+📧 **Commercial Inquiries:** [sha.dev.pro@gmail.com](mailto:sha.dev.pro@gmail.com)  
 🌐 **Website:** [https://shadevpro.github.io/AiWidget-Site/](https://shadevpro.github.io/AiWidget-Site/)
