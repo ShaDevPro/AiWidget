@@ -1,15 +1,27 @@
+# Dependencies
 node_modules
 dist
-src-tauri/target
 .DS_Store
 *.log
 .env
 .env.*
 .vscode
 .idea
+
+# Build outputs
+src-tauri/target
+server/target
+
+# Large AI Models & Temporary Download Files
 *.part
 *.part.json
 *.gguf
 *.bin
 release/*.exe
 release/*.msi
+
+# 🔒 PROPRIETARY ENTERPRISE BACKEND & LICENSING (PRIVATE - NEVER COMMIT)
+server/
+license-dashboard/
+start-server-pro.bat
+start-dashboard.bat

@@ -1,8 +1,0 @@
-{
-  "name": "widgetai-license-dashboard",
-  "version": "1.0.0",
-  "description": "WidgetAI - Console Independante de Gestion des Licences et Clients",
-  "private": true,
-  "type": "commonjs",
-  "main": "server.cjs"
-}
