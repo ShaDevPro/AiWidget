@@ -15,7 +15,7 @@ export interface UpdateInfo {
 
 export class UpdateManager {
   private static instance: UpdateManager | null = null;
-  private currentVersion = '1.0.1';
+  private currentVersion = '1.1.0';
   private isChecking = false;
   private isDownloading = false;
   private updateModal: HTMLElement | null = null;

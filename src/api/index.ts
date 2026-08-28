@@ -21,6 +21,7 @@ export { policyApi } from './policy';
 export { profileApi } from './profile';
 export { licenseApi } from './license';
 export { imageApi } from './image';
+export { updaterApi } from './updater';
 
 // ── Unified `api` object — 100% backward compatible ───────────────────────
 import { conversationsApi } from './conversations';
@@ -39,6 +40,7 @@ import { policyApi } from './policy';
 import { profileApi } from './profile';
 import { licenseApi } from './license';
 import { imageApi } from './image';
+import { updaterApi } from './updater';
 
 export const api = {
   ...conversationsApi,
@@ -57,4 +59,5 @@ export const api = {
   ...profileApi,
   ...licenseApi,
   ...imageApi,
+  ...updaterApi,
 };

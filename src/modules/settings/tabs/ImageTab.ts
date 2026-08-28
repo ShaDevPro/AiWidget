@@ -12,27 +12,72 @@ export function renderImageTab(host: SettingsHost): string {
         <p class="sp-section-desc">${t('imageStudio.tabDesc', { defaultValue: 'Génération et création d\'images 100% en local et hors-ligne, sans abonnement cloud.' })}</p>
       </div>
 
-      <!-- Engine Status Box -->
+      <!-- Models Selection & Download Section -->
       <div class="sp-card" id="sdEngineStatusCard">
         <div class="sp-card-header">
-          <span class="sp-card-icon">🎨</span>
+          <span class="sp-card-icon">🧠</span>
           <div class="sp-card-title-group">
-            <h3>${t('imageStudio.engineTitle', { defaultValue: 'Moteur Local SD.cpp' })}</h3>
+            <h3>${t('imageStudio.modelsSectionTitle', { defaultValue: 'Modèles d\'Images IA Disponibles' })}</h3>
             <span class="sp-status-badge" id="sdStatusBadge">${t('common.checking', { defaultValue: 'Vérification...' })}</span>
           </div>
         </div>
         <div class="sp-card-body">
-          <p id="sdEngineDetails" class="sp-card-text">
-            ${t('imageStudio.engineDetails', { defaultValue: 'Moteur C++ haute performance avec modèles quantifiés GGUF.' })}
+          <p id="sdEngineDetails" class="sp-card-text" style="margin-bottom: 1rem;">
+            ${t('imageStudio.modelsDesc', { defaultValue: 'Sélectionnez le modèle actif ou téléchargez un modèle adapté aux capacités de votre ordinateur.' })}
           </p>
 
+          <!-- Grid of Available Models -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;">
+            
+            <!-- Card 1: Fooocus Juggernaut XL v8 (SDXL - 6.6 Go) -->
+            <div class="sd-model-card" id="cardModelJuggernaut" style="border: 1px solid rgba(120, 120, 120, 0.2); border-radius: 8px; padding: 1rem; background: var(--bg-card-subtle, rgba(255,255,255,0.03)); display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                  <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700;">👑 Fooocus Juggernaut XL</h4>
+                  <span style="background: rgba(99, 102, 241, 0.15); color: #818cf8; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">6.6 Go</span>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted, #94a3b8); margin: 0 0 0.75rem 0;">
+                  ${t('imageStudio.juggernautDesc', { defaultValue: 'Modèle SDXL officiel Fooocus. Photoréalisme extrême, textures de peau HD et qualité cinéma.' })}
+                </p>
+                <div style="font-size: 0.75rem; color: var(--text-secondary, #cbd5e1); margin-bottom: 0.75rem;">
+                  ⚙️ <em>${t('imageStudio.juggernautReq', { defaultValue: 'Recommandé : 8-16 Go RAM ou GPU dédié' })}</em>
+                </div>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                <span id="badgeJuggernaut" class="sp-status-badge neutral" style="font-size: 0.75rem;">...</span>
+                <button type="button" class="sp-btn sp-btn-sm sp-btn-primary" id="btnJuggernaut" style="font-size: 0.8rem; padding: 4px 10px;">
+                  <span id="btnJuggernautText">${t('imageStudio.downloadBtnJuggernaut', { defaultValue: '📥 Télécharger (6.6 Go)' })}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Card 2: SD 1.5 Rapide (GGUF Q4 - 1.5 Go) -->
+            <div class="sd-model-card" id="cardModelSD15" style="border: 1px solid rgba(120, 120, 120, 0.2); border-radius: 8px; padding: 1rem; background: var(--bg-card-subtle, rgba(255,255,255,0.03)); display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                  <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700;">⚡ Stable Diffusion 1.5 Rapide</h4>
+                  <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">1.5 Go</span>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted, #94a3b8); margin: 0 0 0.75rem 0;">
+                  ${t('imageStudio.sd15Desc', { defaultValue: 'Modèle léger quantifié GGUF. Génération ultra-rapide, idéal pour ordinateurs portables et petits processeurs.' })}
+                </p>
+                <div style="font-size: 0.75rem; color: var(--text-secondary, #cbd5e1); margin-bottom: 0.75rem;">
+                  ⚙️ <em>${t('imageStudio.sd15Req', { defaultValue: 'Recommandé : 4-8 Go RAM (Tous PC)' })}</em>
+                </div>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                <span id="badgeSD15" class="sp-status-badge neutral" style="font-size: 0.75rem;">...</span>
+                <button type="button" class="sp-btn sp-btn-sm sp-btn-secondary" id="btnSD15" style="font-size: 0.8rem; padding: 4px 10px;">
+                  <span id="btnSD15Text">${t('imageStudio.downloadBtnSD15', { defaultValue: '📥 Télécharger (1.5 Go)' })}</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
           <!-- Actions Row -->
-          <div class="sp-actions-row" style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <button type="button" class="sp-btn sp-btn-primary" id="sdDownloadBtn" data-install-sd="true">
-              <span>📥</span>
-              <span id="sdDownloadBtnText">${t('imageStudio.downloadEngineBtn', { defaultValue: 'Télécharger le Moteur (1-Clic)' })}</span>
-            </button>
-            <button type="button" class="sp-btn sp-btn-secondary" id="sdOpenFolderBtn" title="Ouvrir le dossier pour ajouter vos modèles SDXL / Juggernaut XL">
+          <div class="sp-actions-row" style="margin-top: 1rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
+            <button type="button" class="sp-btn sp-btn-secondary" id="sdOpenFolderBtn" title="Ouvrir le dossier local des modèles">
               <span>📁</span>
               <span>${t('imageStudio.openFolderBtn', { defaultValue: 'Dossier des Modèles' })}</span>
             </button>
@@ -48,6 +93,7 @@ export function renderImageTab(host: SettingsHost): string {
               <div class="sp-progress-fill" id="sdProgressFill" style="width: 0%;"></div>
             </div>
           </div>
+
         </div>
       </div>
 

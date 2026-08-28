@@ -123,7 +123,23 @@ const KEYWORD_TRANSLATIONS: Array<[RegExp, string]> = [
   [/\b(dragon|cr[eé]ature)\b/gi, 'mythical majestic dragon'],
   [/\b(guerrier|chevalier|samoura[iï])\b/gi, 'legendary warrior knight in armor'],
 
+  // Cybersécurité & Tech
+  [/\b(tests?\s+intrusion|pentest|oscp)\b/gi, 'cybersecurity penetration testing offensive security lab, terminal consoles'],
+  [/\b(hacking\s+[eé]thique|hacker\s+[eé]thique|piratage\s+[eé]thique)\b/gi, 'ethical hacker, cybersecurity operations room, high-tech monitors'],
+  [/\b(serveurs?|data\s*center|salle\s+serveur)\b/gi, 'glowing datacenter server racks with led lights'],
+  [/\b(ordinateurs?|multi-[\s\w]+[eé]crans?|[eé]crans?)\b/gi, 'advanced multi-monitor cybersecurity workstation setup'],
+
+  // Personnages & Réalisme
+  [/\b(personnes?\s+r[eé]elles?|vrais?\s+humains?|vrais?\s+personnes?)\b/gi, 'real authentic human beings, highly detailed photorealistic face, authentic skin pores and texture'],
+  [/\b(pas\s+cartoon|non\s+cartoon|pas\s+de\s+dessin\s+anim[eé]|pas\s+d'animation)\b/gi, 'hyperrealistic photographic quality, non-cartoon, lifelike realism'],
+  [/\b(africain|africaine|ivoirien|ivoirienne|afrique|d'ivoire)\b/gi, 'African Ivorian person, dark skin tone, natural photorealistic lighting'],
+  [/\b(asiatique|caucasien|arabe|m[eé]tis)\b/gi, 'realistic human portrait'],
+
+  // Directives d'exclusion de texte
+  [/\b(sans\s+texte|pas\s+de\s+texte|pas\s+de\s+titre|[eé]viter\s+les\s+textes|aucun\s+texte)\b/gi, 'clean background without text or typography, no watermark'],
+
   // Termes Arabes
+  [/\b(أمن\s+سيبراني|اختراق\s+أخلاقي|هاكر)\b/g, 'ethical cybersecurity hacker in high-tech lab with glowing monitors'],
   [/\b(قطة|قط|هر)\b/g, 'cat'],
   [/\b(كلب)\b/g, 'dog'],
   [/\b(رائد فضاء)\b/g, 'astronaut in space suit'],
@@ -140,6 +156,8 @@ const KEYWORD_TRANSLATIONS: Array<[RegExp, string]> = [
   [/\b(وردة|زهور|حديقة)\b/g, 'colorful flowers garden'],
   [/\b(تنين)\b/g, 'mythical dragon with fire'],
   [/\b(فارس|محارب)\b/g, 'epic fantasy warrior knight'],
+  [/\b(شخص\s+حقيقي|واقعي|بدون\s+كرتون)\b/g, 'real human person, photorealistic portrait'],
+  [/\b(بدون\s+نصوص|بدون\s+كتابة|بدون\s+عنوان)\b/g, 'clean visual without text, no watermark'],
 ];
 
 export class FooocusEngine {

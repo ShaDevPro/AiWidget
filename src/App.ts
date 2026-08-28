@@ -46,6 +46,7 @@ import { SettingsController } from './modules/settings/SettingsController';
 import type { SettingsHost } from './modules/settings/SettingsHost';
 import { WidgetShell } from './modules/shell/WidgetShell';
 import type { ShellHost } from './modules/shell/ShellHost';
+import { mandatoryUpdateGate } from './modules/updater/MandatoryUpdateGate';
 
 export type { RecommendedModel };
 export { RECOMMENDED_MODELS };
@@ -320,6 +321,9 @@ class App implements SettingsHost, ShellHost {
     const detectedLang = detectSystemLanguage();
     await initI18n(detectedLang);
     this.modalsManager.init();
+
+    // ── Mandatory Update Gate: Surveillance et verrouillage strict ─
+    mandatoryUpdateGate.startMonitoring();
     await this.profileModule.init(
       async (profile) => {
         this.activeProfile = profile;

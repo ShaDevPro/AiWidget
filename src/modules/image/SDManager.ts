@@ -41,6 +41,10 @@ export class SDManager {
   }
 
   async downloadEngine(onProgress?: (p: SDDownloadProgress) => void): Promise<void> {
+    return this.downloadModel('juggernaut', onProgress);
+  }
+
+  async downloadModel(modelKey: 'juggernaut' | 'sd15', onProgress?: (p: SDDownloadProgress) => void): Promise<void> {
     if (this.isDownloading) return;
     this.isDownloading = true;
 
@@ -52,7 +56,7 @@ export class SDManager {
     }
 
     try {
-      await imageApi.downloadSD();
+      await imageApi.downloadSDModel(modelKey);
       await this.getStatus(true);
     } finally {
       this.isDownloading = false;
@@ -70,6 +74,7 @@ export class SDManager {
     steps = 8,
     cardId?: string,
     styleId = 'cinematic',
+    modelName?: string,
   ): Promise<ImageGenerationResult> {
     let unlisten: (() => void) | null = null;
     let timerInterval: any = null;
@@ -121,7 +126,7 @@ export class SDManager {
     const effectiveNegative = negativePrompt || finalNegative;
 
     try {
-      const result = await imageApi.generateImage(finalPrompt, effectiveNegative, width, height, steps);
+      const result = await imageApi.generateImage(finalPrompt, effectiveNegative, width, height, steps, undefined, modelName);
       result.prompt = prompt; // Préserve le prompt d'origine pour l'affichage
       return result;
     } finally {
@@ -133,29 +138,72 @@ export class SDManager {
   /**
    * Analyse si le message de l'utilisateur est une demande explicite de génération d'image.
    */
+  /**
+   * Analyse si le message de l'utilisateur est une demande explicite de génération d'image.
+   */
   isImagePrompt(text: string): { isImage: boolean; cleanPrompt: string } {
     const trimmed = text.trim();
     if (!trimmed || trimmed.length < 3) return { isImage: false, cleanPrompt: '' };
 
-    const lower = trimmed.toLowerCase();
+    // 1. Commandes slash (/image, /photo, /draw, /sd)
+    const slashMatch = trimmed.match(/^\/(?:image|img|photo|draw|sd|pic)\s+([\s\S]+)/i);
+    if (slashMatch) {
+      return { isImage: true, cleanPrompt: slashMatch[1].trim() };
+    }
 
-    // Regex patterns multilingues (FR / EN / AR)
-    const patterns = [
-      // Français
-      /^(?:peux-tu\s+)?(?:me\s+)?(?:dessiner|dessine|g[eé]n[eé]rer?\s+une\s+image(?:\s+de)?|cr[eé]er?\s+une\s+image(?:\s+de)?|fais(?:\s+moi)?\s+une\s+image(?:\s+de)?|illustre(?:\s+moi)?|peins(?:\s+moi)?)\s*[:,\-]?\s*(.+)$/i,
-      // Anglais
-      /^(?:please\s+)?(?:draw|generate\s+an?\s+image\s+of|generate\s+a\s+picture\s+of|create\s+an?\s+image\s+of|make\s+an?\s+image\s+of|paint|illustrate)\s*[:,\-]?\s*(.+)$/i,
-      // Arabe
-      /^(?:من\s+فضلك\s+)?(?:ارسم|أنشئ\s+صورة(?:\s+لـ|\s+عن)?|ولّد\s+صورة(?:\s+لـ|\s+عن)?|صمم\s+صورة(?:\s+لـ|\s+عن)?|رسمة\s+لـ)\s*[:,\-]?\s*(.+)$/i,
+    // 2. Normalisation sans accents pour le matching d'intention
+    const firstLine = trimmed.split('\n')[0].trim();
+    const normalizedFirstLine = firstLine
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Supprime les diacritiques pour la regex
+      .toLowerCase();
+
+    const frRegexes = [
+      /^(?:(?:peux|pourrais|pourriez)-tu\s+|(?:peux|pourrais|pourriez)-vous\s+|veuillez\s+|tu\s+|vous\s+)?(?:me\s+|nous\s+)?(?:generes?|generer|crees?|creer|fais?|faites?|faire|dessines?|dessinez|dessiner|illustres?|illustrez|illustrer|peins?|peignez|peindre|produis?|produisez|produire|sors(?:-moi)?)\s+(?:une|un|des)?\s*(?:image|photo|photographie|illustration|visuel|portrait|dessin|tableau|rendu(?:\s+3d)?|art)?\s*(?:de|d'|sur|pour|avec|representant|montrant)?\s*[:,\-]?\s*(.*)$/i,
+      /^(?:je\s+veux|je\s+souhaite|j'aimerais|il\s+me\s+faut)\s+(?:une|un|des)?\s*(?:image|photo|illustration|visuel|dessin|portrait)\s*(?:de|d'|sur|pour|avec|representant|montrant)?\s*[:,\-]?\s*(.*)$/i,
+      /^(?:image|photo|illustration|visuel|dessin|portrait|tableau)\s*(?:de|d'|sur|pour|representant|montrant)\s*[:,\-]?\s*(.*)$/i,
+      /^(?:dessines?|dessinez|illustres?|illustrez|peins?|peignez)\s+(?:moi\s+)?(?:un|une|des)?\s*(.*)$/i,
     ];
 
-    for (const pattern of patterns) {
-      const match = lower.match(pattern);
-      if (match && match[1]) {
-        // Extraire le prompt d'origine en préservant la casse
-        const promptIndex = trimmed.toLowerCase().indexOf(match[1].toLowerCase());
-        const clean = promptIndex !== -1 ? trimmed.slice(promptIndex).trim() : match[1].trim();
-        return { isImage: true, cleanPrompt: clean };
+    const enRegexes = [
+      /^(?:can\s+you\s+|please\s+|could\s+you\s+|you\s+)?(?:generate|create|make|draw|paint|render|illustrate|produce)\s+(?:an?|the|some)?\s*(?:image|photo|picture|photograph|illustration|visual|portrait|artwork|drawing|painting|3d\s+render)?\s*(?:of|about|for|with|depicting|showing)?\s*[:,\-]?\s*(.*)$/i,
+      /^(?:i\s+want|i\s+need|i\s+would\s+like)\s+(?:an?|the|some)?\s*(?:image|photo|picture|illustration|visual|drawing)\s*(?:of|about|for|with|depicting|showing)?\s*[:,\-]?\s*(.*)$/i,
+      /^(?:image|photo|picture|illustration|artwork)\s*(?:of|about|for|showing|depicting)\s*[:,\-]?\s*(.*)$/i,
+      /^(?:draw|paint|illustrate)\s+(?:me\s+)?(?:an?|the|some)?\s*(.*)$/i,
+    ];
+
+    const arRegexes = [
+      /^(?:من\s+فضلك\s+|لو\s+سمحت\s+)?(?:ارسم|أنشئ|انشئ|ولد|ولّد|صمم|اعمل|أنتج|انتج|طلع|هات)\s+(?:لي\s+)?(?:صورة|رسمة|لوحة|تصميم|بوستر|بورتريه|صوره)?\s*(?:لـ|عن|في|توضح|تظهر)?\s*[:,\-]?\s*(.*)$/i,
+      /^(?:أريد|اريد|أحتاج|احتاج|حابب)\s+(?:صورة|رسمة|لوحة|تصميم)\s*(?:لـ|عن|في)?\s*[:,\-]?\s*(.*)$/i,
+      /^(?:صورة|رسمة|لوحة)\s*(?:لـ|عن|في)\s*[:,\-]?\s*(.*)$/i,
+    ];
+
+    for (const regex of [...frRegexes, ...enRegexes]) {
+      const match = normalizedFirstLine.match(regex);
+      if (match && match[1] !== undefined && match[1].trim().length > 0) {
+        const remainingLines = trimmed.split('\n').slice(1).join('\n').trim();
+        const matchedSuffix = match[1].trim();
+        let cleanFirstLine = '';
+        if (matchedSuffix) {
+          const idx = normalizedFirstLine.lastIndexOf(matchedSuffix);
+          cleanFirstLine = idx !== -1 ? firstLine.slice(idx).trim() : matchedSuffix;
+        }
+        const cleanPrompt = remainingLines
+          ? (cleanFirstLine ? cleanFirstLine + '\n' + remainingLines : remainingLines)
+          : cleanFirstLine || trimmed;
+        return { isImage: true, cleanPrompt };
+      }
+    }
+
+    for (const regex of arRegexes) {
+      const match = firstLine.match(regex);
+      if (match && match[1] !== undefined && match[1].trim().length > 0) {
+        const remainingLines = trimmed.split('\n').slice(1).join('\n').trim();
+        const firstClean = match[1].trim();
+        const cleanPrompt = remainingLines
+          ? (firstClean ? firstClean + '\n' + remainingLines : remainingLines)
+          : firstClean || trimmed;
+        return { isImage: true, cleanPrompt };
       }
     }
 

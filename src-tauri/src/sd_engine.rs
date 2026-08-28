@@ -60,18 +60,32 @@ impl SDEngine {
     }
 
     pub fn default_model_path() -> PathBuf {
-        Self::get_sd_dir().join("stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf")
+        Self::get_sd_dir().join("juggernautXL_v8Rundiffusion.safetensors")
     }
 
-    pub fn get_active_model_path() -> Option<PathBuf> {
-        let default_model = Self::default_model_path();
-        if default_model.exists() {
-            return Some(default_model);
+    pub fn get_active_model_path(preferred: Option<&str>) -> Option<PathBuf> {
+        let dir = Self::get_sd_dir();
+        if let Some(pref) = preferred {
+            if !pref.trim().is_empty() {
+                let path = dir.join(pref.trim());
+                if path.exists() {
+                    return Some(path);
+                }
+            }
         }
 
-        let sd_dir = Self::get_sd_dir();
-        if sd_dir.exists() {
-            if let Ok(entries) = fs::read_dir(&sd_dir) {
+        let jugg = dir.join("juggernautXL_v8Rundiffusion.safetensors");
+        if jugg.exists() {
+            return Some(jugg);
+        }
+
+        let sd15 = dir.join("stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf");
+        if sd15.exists() {
+            return Some(sd15);
+        }
+
+        if dir.exists() {
+            if let Ok(entries) = fs::read_dir(&dir) {
                 for entry in entries.flatten() {
                     let path = entry.path();
                     if let Some(ext) = path.extension() {
@@ -127,7 +141,7 @@ impl SDEngine {
         s.installed && s.model_installed
     }
 
-    pub async fn download_all(window: tauri::Window) -> Result<(), String> {
+    pub async fn download_model_by_key(model_key: &str, window: tauri::Window) -> Result<(), String> {
         let dir = Self::get_sd_dir();
         fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
 
@@ -200,57 +214,73 @@ impl SDEngine {
             }));
         }
 
-        // 2. Download default high-speed GGUF model if missing
-        let status = Self::get_status();
-        if !status.model_installed {
-            let model_path = Self::default_model_path();
-            let _ = window.emit("sd-download-progress", serde_json::json!({
-                "step": "model", "percentage": 0, "status": "Téléchargement du modèle IA (SD-1.5 Q4 GGUF - 1.5 Go)..."
-            }));
+        // 2. Download requested model
+        let (model_filename, model_url, model_desc, expected_size) = if model_key == "sd15" {
+            (
+                "stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf",
+                "https://huggingface.co/second-state/stable-diffusion-v1-5-GGUF/resolve/main/stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf",
+                "SD 1.5 Rapide (1.5 Go)",
+                1_566_768_416u64,
+            )
+        } else {
+            (
+                "juggernautXL_v8Rundiffusion.safetensors",
+                "https://huggingface.co/lllyasviel/fav_models/resolve/main/fav/juggernautXL_v8Rundiffusion.safetensors",
+                "Fooocus Juggernaut XL v8 (6.6 Go)",
+                7_105_348_592u64,
+            )
+        };
 
-            let model_url = "https://huggingface.co/second-state/stable-diffusion-v1-5-GGUF/resolve/main/stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf";
-            let client = reqwest::Client::builder()
-                .timeout(std::time::Duration::from_secs(1800))
-                .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AI-Widget/1.0")
-                .build().map_err(|e| e.to_string())?;
+        let model_path = dir.join(model_filename);
+        let _ = window.emit("sd-download-progress", serde_json::json!({
+            "step": "model", "percentage": 0, "status": format!("Téléchargement de {}...", model_desc)
+        }));
 
-            use futures_util::StreamExt;
-            let resp = client.get(model_url).send().await.map_err(|e| e.to_string())?;
-            if !resp.status().is_success() {
-                return Err(format!("Erreur téléchargement modèle GGUF : HTTP {}", resp.status()));
-            }
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(3600))
+            .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AI-Widget/1.0")
+            .build().map_err(|e| e.to_string())?;
 
-            let total = resp.content_length().unwrap_or(1_566_768_416);
-            let mut stream = resp.bytes_stream();
-            let mut downloaded: u64 = 0;
-            let mut file = fs::File::create(&model_path).map_err(|e| e.to_string())?;
-            let mut last_emit = Instant::now();
-
-            use std::io::Write;
-            while let Some(chunk) = stream.next().await {
-                let chunk = chunk.map_err(|e| e.to_string())?;
-                downloaded += chunk.len() as u64;
-                file.write_all(&chunk).map_err(|e| e.to_string())?;
-
-                if last_emit.elapsed().as_millis() > 250 {
-                    let pct = ((downloaded as f64 / total as f64) * 100.0) as f32;
-                    let downloaded_mb = downloaded as f64 / 1_048_576.0;
-                    let total_mb = total as f64 / 1_048_576.0;
-                    let _ = window.emit("sd-download-progress", serde_json::json!({
-                        "step": "model",
-                        "percentage": pct.min(99.0),
-                        "status": format!("Téléchargement du modèle : {:.1} / {:.1} Mo ({:.0}%)", downloaded_mb, total_mb, pct)
-                    }));
-                    last_emit = Instant::now();
-                }
-            }
-
-            let _ = window.emit("sd-download-progress", serde_json::json!({
-                "step": "model", "percentage": 100, "status": "Modèle d'image installé et prêt !"
-            }));
+        use futures_util::StreamExt;
+        let resp = client.get(model_url).send().await.map_err(|e| e.to_string())?;
+        if !resp.status().is_success() {
+            return Err(format!("Erreur téléchargement {} : HTTP {}", model_desc, resp.status()));
         }
 
+        let total = resp.content_length().unwrap_or(expected_size);
+        let mut stream = resp.bytes_stream();
+        let mut downloaded: u64 = 0;
+        let mut file = fs::File::create(&model_path).map_err(|e| e.to_string())?;
+        let mut last_emit = Instant::now();
+
+        use std::io::Write;
+        while let Some(chunk) = stream.next().await {
+            let chunk = chunk.map_err(|e| e.to_string())?;
+            downloaded += chunk.len() as u64;
+            file.write_all(&chunk).map_err(|e| e.to_string())?;
+
+            if last_emit.elapsed().as_millis() > 250 {
+                let pct = ((downloaded as f64 / total as f64) * 100.0) as f32;
+                let downloaded_gb = downloaded as f64 / 1_073_741_824.0;
+                let total_gb = total as f64 / 1_073_741_824.0;
+                let _ = window.emit("sd-download-progress", serde_json::json!({
+                    "step": "model",
+                    "percentage": pct.min(99.0),
+                    "status": format!("Téléchargement {} : {:.2} / {:.2} Go ({:.0}%)", model_desc, downloaded_gb, total_gb, pct)
+                }));
+                last_emit = Instant::now();
+            }
+        }
+
+        let _ = window.emit("sd-download-progress", serde_json::json!({
+            "step": "model", "percentage": 100, "status": format!("{} installé et prêt !", model_desc)
+        }));
+
         Ok(())
+    }
+
+    pub async fn download_all(window: tauri::Window) -> Result<(), String> {
+        Self::download_model_by_key("juggernaut", window).await
     }
 
     pub async fn generate_image(
@@ -260,9 +290,10 @@ impl SDEngine {
         height: u32,
         steps: u32,
         seed: Option<i64>,
+        preferred_model: Option<String>,
         window: tauri::Window,
     ) -> Result<ImageGenerationResult, String> {
-        let model = Self::get_active_model_path().ok_or_else(|| {
+        let model = Self::get_active_model_path(preferred_model.as_deref()).ok_or_else(|| {
             "Le modèle d'image Stable Diffusion n'est pas encore installé. Veuillez le télécharger dans les paramètres.".to_string()
         })?;
 

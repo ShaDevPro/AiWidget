@@ -11,6 +11,11 @@ pub async fn download_sd(window: tauri::Window) -> Result<(), String> {
 }
 
 #[tauri::command]
+pub async fn download_sd_model(model_key: String, window: tauri::Window) -> Result<(), String> {
+    SDEngine::download_model_by_key(&model_key, window).await
+}
+
+#[tauri::command]
 pub async fn generate_image_sd(
     prompt: String,
     negative_prompt: Option<String>,
@@ -18,6 +23,7 @@ pub async fn generate_image_sd(
     height: Option<u32>,
     steps: Option<u32>,
     seed: Option<i64>,
+    model_name: Option<String>,
     window: tauri::Window,
 ) -> Result<ImageGenerationResult, String> {
     SDEngine::generate_image(
@@ -27,6 +33,7 @@ pub async fn generate_image_sd(
         height.unwrap_or(512),
         steps.unwrap_or(15),
         seed,
+        model_name,
         window,
     )
     .await

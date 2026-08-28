@@ -56,6 +56,7 @@ export interface AppSettings {
   execution_mode?: 'lite' | 'pro';
   server_url?: string;
   server_auth_token?: string;
+  sd_active_model?: string;
 }
 
 export interface TTSVoice {

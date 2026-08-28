@@ -6,6 +6,7 @@ export const imageApi = {
   openSDFolder: (): Promise<void> => call<void>('open_sd_folder'),
 
   downloadSD: (): Promise<void> => call<void>('download_sd'),
+  downloadSDModel: (modelKey: string): Promise<void> => call<void>('download_sd_model', { modelKey }),
 
   generateImage: (
     prompt: string,
@@ -14,6 +15,7 @@ export const imageApi = {
     height?: number,
     steps?: number,
     seed?: number,
+    modelName?: string,
   ): Promise<ImageGenerationResult> =>
     call<ImageGenerationResult>('generate_image_sd', {
       prompt,
@@ -22,6 +24,7 @@ export const imageApi = {
       height,
       steps,
       seed,
+      modelName,
     }),
 
   onDownloadProgress: (cb: (progress: SDDownloadProgress) => void): Promise<UnlistenFn> =>

@@ -587,7 +587,8 @@ export class ChatController {
     this.deps.streamModule.scrollSmooth();
 
     try {
-      const result = await sdManager.generateImage(prompt, undefined, 512, 512, 8, cardId);
+      const preferredModel = this.deps.getSettings().sd_active_model;
+      const result = await sdManager.generateImage(prompt, undefined, 512, 512, 8, cardId, undefined, preferredModel);
       const readyHtml = ImageCardRenderer.renderImageCard(result, cardId);
 
       const savedMsg = await api.saveMessage({
