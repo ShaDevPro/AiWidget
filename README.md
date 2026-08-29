@@ -212,9 +212,9 @@ Download the official signed releases from our [Releases Page](https://github.co
 
 | Package | Format | Size | Target Environment |
 | :--- | :---: | :---: | :--- |
-| [**AI-Widget-Setup.exe**](https://github.com/ShaDevPro/AiWidget-Site/releases/download/v1.1.0/AI-Widget-Setup.exe) | Installer | **8.13 MB** | Standard Windows NSIS installer with Start Menu shortcuts & auto-update daemon. |
-| [**AI-Widget-Setup.msi**](https://github.com/ShaDevPro/AiWidget-Site/releases/download/v1.1.0/AI-Widget-Setup.msi) | MSI | **10.20 MB** | Enterprise Windows Installer for automated Active Directory / GPO fleet deployment. |
-| [**AI-Widget-Portable.exe**](https://github.com/ShaDevPro/AiWidget-Site/releases/download/v1.1.0/AI-Widget-Portable.exe) | Portable | **20.75 MB** | Zero-installation standalone executable. Ideal for USB drives and air-gapped computers. |
+| [**AI-Widget-Setup.exe**](https://github.com/ShaDevPro/AiWidget-Site/releases/download/v1.1.0/AI-Widget-Setup.exe) | Installer | **9.03 MB** | Standard Windows NSIS installer with Start Menu shortcuts & auto-update daemon. |
+| [**AI-Widget-Setup.msi**](https://github.com/ShaDevPro/AiWidget-Site/releases/download/v1.1.0/AI-Widget-Setup.msi) | MSI | **11.01 MB** | Enterprise Windows Installer for automated Active Directory / GPO fleet deployment. |
+| [**AI-Widget-Portable.exe**](https://github.com/ShaDevPro/AiWidget-Site/releases/download/v1.1.0/AI-Widget-Portable.exe) | Portable | **21.55 MB** | Zero-installation standalone executable. Ideal for USB drives and air-gapped computers. |
 
 ---
 
