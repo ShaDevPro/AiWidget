@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/logo.png" alt="AiWidget Logo" width="120" style="border-radius: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
+<img src="public/logo.png" alt="AiWidget Logo" width="125" style="border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.16);" />
 
 # AiWidget
 
@@ -20,23 +20,52 @@
 
 <br/>
 
-[**🌐 Official Website**](https://shadevpro.github.io/AiWidget-Site/) • [**📦 Download v1.1.0**](https://github.com/ShaDevPro/AiWidget-Site/releases/tag/v1.1.0) • [**✨ Deep Feature Tour**](#-deep-feature-tour) • [**📊 Market Benchmarks**](#-market-benchmarks) • [**🏗️ Architecture**](#-system-architecture) • [**🏢 Enterprise PRO**](#-enterprise-pro--on-premise-server) • [**🤝 Contributing**](#-contributing)
+[**🌐 Official Website**](https://shadevpro.github.io/AiWidget-Site/) • [**📦 Download v1.1.0**](https://github.com/ShaDevPro/AiWidget-Site/releases/tag/v1.1.0) • [**✨ Feature Tour**](#-deep-feature-tour) • [**📊 Benchmarks**](#-market-benchmarks) • [**🛠️ Developer Guide**](#-developer--contributor-guide) • [**🏢 Enterprise PRO**](#-enterprise-pro--on-premise-server) • [**🤝 Contributing**](#-how-to-contribute)
 
 </div>
 
 ---
 
+## 📖 Repository Scope & Open-Core Model
+
+> **Welcome to the official open-source repository of AiWidget!**
+
+This repository contains the **complete client workspace**:
+* 💻 **100% Frontend Source Code (`src/`)**: High-performance reactive TypeScript 5.4, Vite, Web Audio, $\KaTeX$ math engine, Mermaid.js diagramming, DOM sanitization, and floating widget shells.
+* 🦀 **100% Embedded Native Rust Engine (`src-tauri/`)**: High-speed C++ `sd.cpp` diffusion wrapper, Whisper.cpp speech recognition, neural text-to-speech, in-memory streaming Excel/PDF RAG parsers, encrypted SQLite database, and mutual cryptographic transport.
+
+Anyone in the worldwide developer community can clone this repository, run `npm run tauri:dev`, inspect the code, add new AI engines, translate into new languages, optimize performance, and compile standalone binaries.
+
+```mermaid
+flowchart LR
+    subgraph OpenSource ["🌐 Public Repository (This Repo - GNU AGPLv3)"]
+        UI["TypeScript Frontend (src/)"]
+        RUST["Embedded Native Rust Engine (src-tauri/)"]
+        ENG["Local AI Engines (Ollama, SD.cpp, Whisper, SQLite)"]
+        UI <--> RUST <--> ENG
+    end
+
+    subgraph PrivateHub ["🏢 Private Enterprise Infrastructure"]
+        SERVER["On-Premise Multi-User Server (Central GPU Pool)"]
+        LICENSE["HMAC License & Telemetry Console"]
+    end
+
+    RUST -.->|"Mutual Signed Cryptographic Protocol"| SERVER
+```
+
+---
+
 ## ⚡ The Manifesto: Why We Built AiWidget
 
-In an era dominated by invasive cloud AI and bloated software, professionals and developers are faced with a dilemma:
+Today, developers, professionals, and privacy-conscious users face two frustrating compromises:
 
-1. **Cloud AI Privacy Risks (*Microsoft Copilot, ChatGPT Desktop*)**: Every prompt, proprietary source code line, confidential financial spreadsheet (.xlsx), medical record, and screen snip is transmitted to third-party servers. For regulated industries (lawyers, CPAs, doctors, defense, engineering), this violates **GDPR, HIPAA, and legal client privilege**.
+1. **Cloud AI Privacy Risks (*Microsoft Copilot, ChatGPT Desktop*)**: Every prompt, proprietary source code snippet, financial spreadsheet (.xlsx), medical record, and screen snip is transmitted to third-party cloud servers. For regulated industries (lawyers, CPAs, doctors, defense, engineering), this violates **GDPR, HIPAA, and legal client privilege**.
 2. **Bloated Electron Wrappers**: Traditional open-source desktop clients consume **500 MB to 1 GB of RAM** just to display a chat window, take up hundreds of megabytes on disk, and lack integrated image studios, document parsers, or course generators.
 
 ### 🌟 The AiWidget Breakthrough
-Engineered in **Rust & Tauri**, **AiWidget** delivers a complete multimodal AI suite in a sleek floating widget:
+Engineered natively in **Rust & Tauri**, **AiWidget** delivers a complete multimodal AI workstation in a discreet floating desktop widget:
 * 🪶 **Featherweight Footprint:** **8.13 MB** installer size, **< 80 MB resident RAM** footprint.
-* 🛡️ **Zero-Knowledge Air-Gapped Privacy:** All inference, OCR parsing, and database queries run 100% on your machine.
+* 🛡️ **Zero-Knowledge Air-Gapped Privacy:** All LLM inference, OCR parsing, and database queries run 100% on your machine.
 * 🧩 **True Multimodal Independence:** Local LLMs, **Fooocus SDXL photorealistic rendering**, spreadsheet financial extraction, course generation, screen snipping, and Whisper voice interaction — unified in one lightweight native app.
 
 ---
@@ -48,7 +77,7 @@ Engineered in **Rust & Tauri**, **AiWidget** delivers a complete multimodal AI s
 | **Form Factor** | 🟢 **Floating Widget / Bar / Popup** | 🔴 Full Window | 🔴 Full Window | 🟡 Partial Overlay | 🟢 Edge Sidebar |
 | **Installer Size** | 🟢 **8.13 MB** | 🔴 ~350 MB | 🔴 ~160 MB | 🔴 ~380 MB | 🔴 Heavy Webview |
 | **RAM Consumption** | 🟢 **< 80 MB** | 🟡 ~400 MB | 🔴 ~450 MB | 🔴 ~550 MB | 🔴 Cloud / Webview |
-| **Data Sovereignty** | 🟢 **100% Local (Zero Tracking)** | 🟢 100% Local | 🟢 100% Local | 🟢 100% Local | 🔴 **Cloud Tracking** |
+| **Data Sovereignty** | 🟢 **100% Local (Air-Gapped)** | 🟢 100% Local | 🟢 100% Local | 🟢 100% Local | 🔴 **Cloud Tracking** |
 | **Fooocus SDXL Cinema (6.6 GB)**| 🟢 **Built-in + CPU VAE Tiling** | 🔴 No | 🔴 No | 🔴 No | 🟡 Cloud DALL-E (Paid) |
 | **Fast SD 1.5 Studio (1.5 GB)** | 🟢 **Built-in (15s renders)** | 🔴 No | 🔴 No | 🔴 No | 🔴 No |
 | **Spreadsheet Intelligence (.xlsx)**| 🟢 **Native Extraction & Sums**| 🔴 No | 🔴 No | 🟡 Text only | 🟡 Cloud limited |
@@ -182,59 +211,90 @@ Download the official signed releases from our [Releases Page](https://github.co
 
 ---
 
-### 💻 Build from Source
+## 🛠️ Developer & Contributor Guide
 
-#### Prerequisites
-* [Node.js](https://nodejs.org/) (v18.0 or later)
+### 💻 Prerequisites
+To build and develop AiWidget locally, ensure you have:
+* [Node.js](https://nodejs.org/) (v18.0 or later) & `npm`
 * [Rust & Cargo](https://rustup.rs/) (1.70 or later)
-* [C++ Build Tools for Visual Studio](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
+* [C++ Build Tools for Visual Studio](https://visualstudio.microsoft.com/visual-cpp-build-tools/) (MSVC x64)
+
+---
+
+### 🚀 Quick Start (Live Hot-Reload Development)
 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/ShaDevPro/AiWidget.git
 cd AiWidget
 
-# 2. Install dependencies
+# 2. Install frontend dependencies
 npm install
 
 # 3. Launch live hot-reload development mode
 npm run tauri:dev
-
-# 4. Compile optimized production release
-npm run release:build
 ```
 
 ---
 
-## 🏗️ System Architecture
+### 📦 Production Build Pipeline
 
-```mermaid
-flowchart TD
-    subgraph Client ["AiWidget Desktop Client (Tauri + Rust + TypeScript)"]
-        UI["Modern UI Layer (TypeScript + Vite + KaTeX + Mermaid)"]
-        IPC["Tauri IPC Command Bridge (Async Stream Channels)"]
-        
-        subgraph RustBackend ["Embedded Rust Backend (src-tauri/)"]
-            LLM_ENG["Llama / Ollama IPC Streaming Engine"]
-            SD_ENG["SD.cpp Engine (Fooocus SDXL Juggernaut v8 + CPU VAE)"]
-            VOICE_ENG["Whisper.cpp STT + Neural TTS Engine"]
-            RAG_ENG["In-Memory Streaming Excel (.xlsx) & PDF Parser"]
-            WEB_ENG["Anti-Hallucination Web Query Router"]
-            DB_ENG["Encrypted SQLite Database Engine"]
-            SNIP_ENG["Native Screen Capture & Visual OCR Pipeline"]
-        end
-    end
-
-    subgraph Storage ["Local Storage (%LOCALAPPDATA%\\aiwidget)"]
-        DB_FILE[("aiwidget.db (Encrypted SQLite)")]
-        MODELS_DIR[("AI Models & Weights (GGUF / Safetensors)")]
-    end
-
-    UI <--> IPC
-    IPC <--> RustBackend
-    RustBackend <--> DB_FILE
-    RustBackend <--> MODELS_DIR
+```bash
+# Compile frontend + Tauri binaries (Setup.exe, Setup.msi, Portable.exe)
+npm run release:build
 ```
+
+The resulting optimized binaries will be placed in the [`release/`](release/) directory.
+
+---
+
+### 📁 Project Architecture & Directory Map
+
+```text
+AiWidget/
+├── src/                          # 💻 Full Frontend (TypeScript + Vite)
+│   ├── modules/
+│   │   ├── chat/                 # Streaming LLM chat controller & message renderer
+│   │   ├── image/                # Fooocus SDXL & SD 1.5 Image Studio
+│   │   ├── course/               # Interactive Course & Quiz Studio Engine
+│   │   ├── snipper/              # ScreenSnipper (Ctrl+Shift+S screenshot tool)
+│   │   ├── document/             # In-Memory Streaming Excel (.xlsx) & PDF parser
+│   │   ├── voice/                # Whisper & Neural TTS Controller
+│   │   ├── markdown/             # KaTeX math & Mermaid diagram renderers
+│   │   ├── license/              # Enterprise server connection adapter
+│   │   ├── telemetry/            # Privacy-compliant anonymous metrics pinger
+│   │   └── shell/                # Widget UI Shell (Bubble, Compact, Expanded)
+│   ├── styles/                   # Modular Fluent Design CSS sheets
+│   └── i18n/                     # Multilingual dictionaries (FR, EN, AR RTL)
+│
+├── src-tauri/                    # 🦀 Embedded Native Rust Backend Engine
+│   ├── src/
+│   │   ├── sd_engine.rs          # SD.cpp C++ diffusion wrapper (Fooocus + CPU VAE)
+│   │   ├── tts_engine.rs         # Neural TTS speech synthesizer
+│   │   ├── whisper_engine.rs     # Whisper.cpp speech-to-text pipeline
+│   │   ├── llama_engine.rs       # Embedded Llama.cpp & Ollama IPC bridge
+│   │   ├── web_search.rs         # Anti-hallucination web query router
+│   │   ├── db.rs                 # Local encrypted SQLite database engine
+│   │   ├── security_engine.rs    # Anti-debugger & mutual HMAC signature engine
+│   │   └── commands/             # Tauri IPC Command Bridge (Async Handlers)
+│   ├── Cargo.toml                # Rust dependencies & metadata
+│   └── tauri.conf.json           # Tauri window & bundle configuration
+│
+└── website/                      # 🌐 Public Showcase Website (GitHub Pages)
+```
+
+---
+
+### ⚡ Available NPM Scripts
+
+| Command | Description |
+| :--- | :--- |
+| `npm run tauri:dev` | Starts Vite dev server and launches the native Tauri desktop window with live hot-reload. |
+| `npm run build` | Compiles and type-checks the TypeScript frontend (`tsc && vite build`). |
+| `npm run release:build` | Compiles production frontend, builds Tauri NSIS / MSI / Portable binaries, and copies them to `release/`. |
+| `npm run release:upload` | Automatically uploads compiled binaries to GitHub Releases under tag `v1.1.0`. |
+| `npm run sync:all` | Master synchronization script: syncs client repo, website repo, and enterprise server repo. |
+| `npm run release:all` | Complete pipeline: Build + Upload Releases + Global Ecosystem Sync in 1 command. |
 
 ---
 
@@ -244,6 +304,8 @@ AiWidget natively supports comprehensive bidirectional internationalization:
 * 🇬🇧 **English:** Complete UI, prompt templates, and documentation.
 * 🇫🇷 **Français:** Interface complète, prompts pédagogiques et analyse de documents adaptée.
 * 🇸🇦 **العربية:** Full Right-To-Left (RTL) typography, Arabic fonts, and custom Arabic LLM system directives.
+
+*Want to add a new language? Simply add a new locale file in [`src/i18n/locales/`](src/i18n/locales/) and submit a Pull Request!*
 
 ---
 
@@ -262,9 +324,9 @@ While the **AiWidget Desktop Client** is 100% free and open-source under the **G
 
 ---
 
-## 🤝 Contributing
+## 🤝 How to Contribute
 
-We welcome contributions from developers worldwide! Whether you want to improve performance, add Linux/macOS support, translate the app into new languages, or introduce new document parsers:
+We warmly welcome contributions from developers worldwide! Whether you want to optimize performance, add Linux/macOS support, translate the app into new languages, or introduce new document parsers:
 
 1. **Fork** the repository: [https://github.com/ShaDevPro/AiWidget](https://github.com/ShaDevPro/AiWidget)
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
