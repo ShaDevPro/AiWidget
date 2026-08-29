@@ -872,7 +872,7 @@ impl WebSearchEngine {
 
         block.push_str(
             "</web_content>\n\
-            [Consigne : Utilise les données et la structure de la page ci-dessus pour répondre à la demande. Si l'utilisateur demande une analyse ou un avis sur l'UI/UX et le contenu, rédige un audit structuré (1. Design & UI, 2. Ergonomie & UX, 3. Contenu & Piliers, 4. Axes d'amélioration). Ne recopie jamais de balises HTML ou de code brut.]\n\n",
+            [Consigne d'analyse universelle : Utilise les sources ci-dessus comme référence d'ancrage factuel. Réponds avec une rigueur scientifique, analytique et critique absolue. Structure ton argumentation de manière exhaustive, identifie les points clés, les forces, les faiblesses, limites ou incohérences, et apporte des solutions, démonstrations ou explications approfondies et concrètes. Ne recopie jamais de balises techniques ni de code source brut non sollicité.]\n\n",
         );
         block
     }
