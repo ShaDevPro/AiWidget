@@ -146,7 +146,7 @@ Eliminate hallucinations when fresh factual knowledge is required, while strictl
   * All core intelligence, LLM inference, image generation, voice chat, and document RAG run **100% locally on your device**.
   * Internet access is **never activated silently**.
 * 🤖 **Smart Intent Detection & Explicit Permission Gate**:
-  * When you ask a question requiring live or time-sensitive data (e.g., *"What will the weather be tomorrow in Laghouat?"*, *"Latest stock market indices"*, or *"Recent software releases"*), AiWidget automatically detects the intent.
+  * When you ask a question requiring live or time-sensitive data (e.g., *"What will the weather be tomorrow in New York?"*, *"Latest stock market indices"*, or *"Recent software releases"*), AiWidget automatically detects the intent.
   * Instead of quietly calling the network, AiWidget displays an explicit confirmation gate:  
     `🌐 This question requires live web information. Allow AiWidget to search the web? [Allow] [Deny]`
   * You can also explicitly toggle the **`🌐 Web`** mode button in the chat input bar whenever you want web grounding enabled.
