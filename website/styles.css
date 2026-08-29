@@ -877,6 +877,8 @@ html[dir="rtl"] .mockup-table th, html[dir="rtl"] .mockup-table td {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 .footer-tagline {
   font-size: 13px;
@@ -885,7 +887,29 @@ html[dir="rtl"] .mockup-table th, html[dir="rtl"] .mockup-table td {
 }
 .footer-links {
   display: flex;
+  align-items: center;
   gap: 20px;
+  flex-wrap: wrap;
+}
+.footer-github-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #09090b;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+.footer-github-btn:hover {
+  background: #27272a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  color: #ffffff;
 }
 .footer-contact-link {
   color: var(--text-primary);
@@ -895,6 +919,26 @@ html[dir="rtl"] .mockup-table th, html[dir="rtl"] .mockup-table td {
 }
 .footer-contact-link:hover {
   text-decoration: underline;
+}
+
+.nav-github-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.nav-github-link:hover {
+  background: #09090b;
+  color: #ffffff;
+  border-color: #09090b;
+  transform: translateY(-1px);
 }
 
 /* ── MOBILE RESPONSIVE RULES (Active ONLY under 768px) ── */
