@@ -319,40 +319,37 @@ impl WebSearchEngine {
             }
         }
 
-        // 3. Query DuckDuckGo via POST form (skip if we already have direct URL content and query was only about visiting that URL)
-        let mut clean_q = Self::clean_search_query(query);
-        for url in &direct_urls {
-            clean_q = clean_q.replace(url, "");
-        }
-        clean_q = clean_q.trim().to_string();
+        // 3. Query DuckDuckGo only if no direct URL was provided (or if scraping direct URL failed)
+        let should_search_ddg = direct_urls.is_empty() || results.is_empty();
 
-        let should_search_ddg = if !direct_urls.is_empty() && !results.is_empty() {
-            // Only search DDG if there are meaningful search terms left beyond "visite le site"
-            clean_q.len() > 15
-        } else {
-            true
-        };
-
-        if should_search_ddg && !clean_q.is_empty() {
-            let mut form_params = HashMap::new();
-            form_params.insert("q", clean_q.as_str());
-
-            if let Ok(resp) = client.post("https://html.duckduckgo.com/html/").form(&form_params).send().await {
-                if resp.status().is_success() {
-                    if let Ok(html) = resp.text().await {
-                        let mut parsed = Self::parse_duckduckgo_html(&html, max_results);
-                        results.append(&mut parsed);
-                    }
-                }
+        if should_search_ddg {
+            let mut clean_q = Self::clean_search_query(query);
+            for url in &direct_urls {
+                clean_q = clean_q.replace(url, "");
             }
+            let clean_q = clean_q.trim().to_string();
 
-            // 4. Fallback to DuckDuckGo Lite if needed
-            if results.is_empty() {
-                if let Ok(resp) = client.post("https://lite.duckduckgo.com/lite/").form(&form_params).send().await {
+            if !clean_q.is_empty() {
+                let mut form_params = HashMap::new();
+                form_params.insert("q", clean_q.as_str());
+
+                if let Ok(resp) = client.post("https://html.duckduckgo.com/html/").form(&form_params).send().await {
                     if resp.status().is_success() {
                         if let Ok(html) = resp.text().await {
                             let mut parsed = Self::parse_duckduckgo_html(&html, max_results);
                             results.append(&mut parsed);
+                        }
+                    }
+                }
+
+                // 4. Fallback to DuckDuckGo Lite if needed
+                if results.is_empty() {
+                    if let Ok(resp) = client.post("https://lite.duckduckgo.com/lite/").form(&form_params).send().await {
+                        if resp.status().is_success() {
+                            if let Ok(html) = resp.text().await {
+                                let mut parsed = Self::parse_duckduckgo_html(&html, max_results);
+                                results.append(&mut parsed);
+                            }
                         }
                     }
                 }
@@ -805,15 +802,11 @@ impl WebSearchEngine {
         block.push_str(
             "</search_results>\n\
             <grounding_instructions>\n\
-            1. ANSWER-FIRST: Start IMMEDIATELY with the direct answer. No filler ('Based on search results...').\n\
-            2. TOTAL SYNTHESIS: Extract facts from <search_results> only. Never send the user to external links.\n\
-            3. FACTUAL INTEGRITY: Ground dates, numbers, names, prices, scores strictly in the snippets. Use Markdown tables for comparisons.\n\
-            4. RECENCY: For \"current/live/latest\" topics, today is the `today` attribute above. Snippets mentioning dates BEFORE today are likely stale — do NOT present them as current unless the user asks for history.\n\
-            5. NO PATCHING: If the user corrected you or asked for precision, NEVER repeat a prior reply with swapped dates/figures. Re-read <search_results> from scratch.\n\
-            6. MISSING DATA: If snippets lack the requested detail (exact date, price, score, etc.), say clearly that sources do not provide it — do NOT invent or extrapolate.\n\
-            7. CONTRADICTIONS: If sources disagree, state the disagreement briefly instead of picking one arbitrarily.\n\
-            8. CITATIONS: Attribute key facts with inline links [Source](url) or [1] where relevant.\n\
-            9. NO REFUSAL: You have verified access to <search_results>. Do not claim lack of internet.\n\
+            1. DIRECT WEB ACCESS: The verified webpage or search content is provided above in <search_results>.\n\
+            2. INTELLIGENT SYNTHESIS & ANALYSIS: When asked for an opinion, review, UI/UX evaluation, feedback, or summary of a website/URL: do NOT simply copy-paste or list raw bullet points. Provide a structured, professional, and insightful analysis based strictly on the extracted site structure and features.\n\
+            3. FACTUAL INTEGRITY: Ground all technical features, claims, pricing tiers, and facts in the source snippets above.\n\
+            4. CITATIONS: Include clickable inline markdown source links [Source](url) or cite the source URL.\n\
+            5. NO REFUSAL: You have verified access to the requested URL/data in <search_results>. Answer directly and comprehensively.\n\
             </grounding_instructions>\n\n",
         );
         block
