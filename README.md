@@ -154,7 +154,7 @@ Reduce hallucinations when fresh factual knowledge is required, while strictly p
   * When authorized, AiWidget queries public search engines in the background without transmitting user identities.
   * It strips HTML bloat, extracts relevant factual content, and injects retrieved web context into the LLM prompt.
 * 🔗 **Clickable Source Citations**:
-  * Web-grounded responses include direct, clickable source URLs so you can verify the information yourself directly from the cited sources.
+  * Web-grounded responses include direct, clickable source URLs so you can verify the information directly from the cited sources.
 * 🛡️ **Air-Gapped Capable**:
   * In strictly air-gapped or high-security corporate environments, Web Search can remain permanently disabled with zero impact on local LLM, SDXL, or document analysis features.
 
