@@ -31,6 +31,19 @@ extern "system" {
 pub struct SecurityEngine;
 
 impl SecurityEngine {
+    /// Dynamic seed resolution (supports compile-time environment injection or stack-constructed seed)
+    fn get_signing_seed() -> Vec<u8> {
+        if let Some(secret) = option_env!("AIW_SIGNING_SECRET") {
+            secret.as_bytes().to_vec()
+        } else {
+            let s1 = [0x57, 0x49, 0x44, 0x47, 0x45, 0x54, 0x41, 0x49]; // WIDGETAI
+            let s2 = [0x5F, 0x53, 0x45, 0x43, 0x55, 0x52, 0x45, 0x5F]; // _SECURE_
+            let s3 = [0x4D, 0x41, 0x53, 0x54, 0x45, 0x52, 0x5F, 0x4B]; // MASTER_K
+            let s4 = [0x45, 0x59, 0x5F, 0x32, 0x30, 0x32, 0x36, 0x21]; // EY_2026!
+            [s1.as_slice(), s2.as_slice(), s3.as_slice(), s4.as_slice()].concat()
+        }
+    }
+
     /// Reconstructs the master secret in stack memory, computes HMAC, and returns the hex signature
     pub fn compute_hmac(payload: &str) -> Result<String, String> {
         // Anti-debug check: poison the output if an active cracker/debugger is attached
@@ -39,9 +52,8 @@ impl SecurityEngine {
             return Ok(hex::encode(poison_mac).to_uppercase());
         }
 
-        // Master secret seed for signature verification
-        let raw_salt = b"WIDGETAI_SECURE_MASTER_KEY_2026_PRO_LITE_SECRET_SEED_#8892!";
-        let mut mac = HmacSha256::new_from_slice(raw_salt)
+        let seed = Self::get_signing_seed();
+        let mut mac = HmacSha256::new_from_slice(&seed)
             .map_err(|e| format!("Erreur initialisation crypto: {}", e))?;
         mac.update(payload.as_bytes());
         let result = mac.finalize();

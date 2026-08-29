@@ -275,7 +275,7 @@ AiWidget/
 │   │   ├── llama_engine.rs       # Embedded Llama.cpp & Ollama IPC bridge
 │   │   ├── web_search.rs         # Anti-hallucination web query router
 │   │   ├── db.rs                 # Local encrypted SQLite database engine
-│   │   ├── security_engine.rs    # Anti-debugger & mutual HMAC signature engine
+│   │   ├── security_engine.rs    # Local hardware attestation & anti-tamper security engine
 │   │   └── commands/             # Tauri IPC Command Bridge (Async Handlers)
 │   ├── Cargo.toml                # Rust dependencies & metadata
 │   └── tauri.conf.json           # Tauri window & bundle configuration
@@ -291,10 +291,8 @@ AiWidget/
 | :--- | :--- |
 | `npm run tauri:dev` | Starts Vite dev server and launches the native Tauri desktop window with live hot-reload. |
 | `npm run build` | Compiles and type-checks the TypeScript frontend (`tsc && vite build`). |
-| `npm run release:build` | Compiles production frontend, builds Tauri NSIS / MSI / Portable binaries, and copies them to `release/`. |
-| `npm run release:upload` | Automatically uploads compiled binaries to GitHub Releases under tag `v1.1.0`. |
-| `npm run sync:all` | Master synchronization script: syncs client repo, website repo, and enterprise server repo. |
-| `npm run release:all` | Complete pipeline: Build + Upload Releases + Global Ecosystem Sync in 1 command. |
+| `npm run tauri:build` | Compiles the optimized native Windows Rust desktop executable. |
+| `npm run release:build` | Complete build: bundles frontend + builds Windows NSIS Installer, Enterprise MSI & Portable packages. |
 
 ---
 
