@@ -139,8 +139,8 @@ A dedicated pedagogical engine designed for teachers, corporate instructors, uni
 ---
 
 ### 🌐 3. On-Demand Anti-Hallucination Web Router (Strictly User-Controlled)
- 
-Eliminate hallucinations when fresh factual knowledge is required, while strictly preserving your privacy:
+
+Reduce hallucinations when fresh factual knowledge is required, while strictly preserving your privacy:
 
 * 🔒 **Local-First by Default — Zero Silent Network Requests**:
   * All core intelligence, LLM inference, image generation, voice chat, and document RAG run **100% locally on your device**.
@@ -151,10 +151,10 @@ Eliminate hallucinations when fresh factual knowledge is required, while strictl
     `🌐 This question requires live web information. Allow AiWidget to search the web? [Allow] [Deny]`
   * You can also explicitly toggle the **`🌐 Web`** mode button in the chat input bar whenever you want web grounding enabled.
 * 🔍 **Real-Time Web Scraping & Fact Extraction**:
-  * When authorized, queries public search engines in the background without transmitting user identities.
-  * Strips HTML bloat, extracts core factual paragraphs, and injects verified context into the LLM prompt.
-* 🔗 **Clickable Verified Source Citations**:
-  * Every fact is accompanied by direct, clickable URL source badges so you can verify the truth with zero hallucination.
+  * When authorized, AiWidget queries public search engines in the background without transmitting user identities.
+  * It strips HTML bloat, extracts relevant factual content, and injects retrieved web context into the LLM prompt.
+* 🔗 **Clickable Source Citations**:
+  * Web-grounded responses include direct, clickable source URLs so you can verify the information yourself directly from the cited sources.
 * 🛡️ **Air-Gapped Capable**:
   * In strictly air-gapped or high-security corporate environments, Web Search can remain permanently disabled with zero impact on local LLM, SDXL, or document analysis features.
 
