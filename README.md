@@ -317,7 +317,7 @@ While the **AiWidget Desktop Client** is 100% free and open-source under the **G
 * 🔐 **Active Directory & GPO Policy Lock:** Enforce mandatory server endpoints and compliance rules across enterprise fleets.
 * 🛡️ **Hardware-Locked HMAC Signature Licensing:** Completely air-gapped license management with zero external cloud dependencies.
 
-📧 **Commercial & Enterprise Inquiries:** [sha.dev.pro@gmail.com](mailto:sha.dev.pro@gmail.com)  
+📧 **Commercial & Enterprise Inquiries:** [s.h.a.dev.pro@gmail.com](mailto:s.h.a.dev.pro@gmail.com)  
 🌐 **Website & Portal:** [https://shadevpro.github.io/AiWidget-Site/](https://shadevpro.github.io/AiWidget-Site/)
 
 ---
