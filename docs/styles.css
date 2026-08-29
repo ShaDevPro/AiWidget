@@ -1398,8 +1398,8 @@ nav.desktop-only {
   opacity: 1;
 }
 
-/* ── Mobile Responsive ── */
-@media (max-width: 992px) {
+/* ── Responsive Tablet & Mobile (<= 1080px) ── */
+@media (max-width: 1080px) {
   .desktop-only {
     display: none !important;
   }
@@ -1408,11 +1408,16 @@ nav.desktop-only {
   }
   
   .hero-title {
-    font-size: 34px;
+    font-size: 36px;
+    letter-spacing: -1px;
   }
 
   .hero-subtitle {
     font-size: 15px;
+  }
+
+  .hero-pillars-grid {
+    grid-template-columns: 1fr;
   }
   
   .workflow-grid {
@@ -1447,12 +1452,13 @@ nav.desktop-only {
     color: var(--text-primary);
     width: 38px;
     height: 38px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
+    flex-shrink: 0;
   }
   
   .mobile-toggle-btn:hover {
@@ -1464,14 +1470,16 @@ nav.desktop-only {
     top: 68px;
     left: 0;
     width: 100%;
+    height: calc(100vh - 68px);
     background: #ffffff;
     border-bottom: 1px solid var(--border-color);
     padding: 24px;
     display: none !important;
     flex-direction: column;
-    gap: 16px;
-    box-shadow: var(--shadow-popup);
-    z-index: 999;
+    gap: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    overflow-y: auto;
   }
   
   .mobile-menu.open {
@@ -1481,7 +1489,7 @@ nav.desktop-only {
   .mobile-nav-links {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
   }
   
   .mobile-nav-links a {
@@ -1489,16 +1497,60 @@ nav.desktop-only {
     font-size: 15px;
     font-weight: 700;
     color: var(--text-primary);
-    padding: 10px 0;
+    padding: 12px 8px;
     border-bottom: 1px solid var(--border-color);
     display: block;
+    transition: background 0.15s ease;
   }
 
   .mobile-nav-links a:hover {
-    color: var(--text-muted);
+    background: var(--bg-subtle);
+    color: var(--text-primary);
   }
 
   .mobile-menu-footer {
-    margin-top: 12px;
+    margin-top: 16px;
+    padding-bottom: 24px;
+  }
+}
+
+/* ── Small Mobile Screens (<= 480px) ── */
+@media (max-width: 480px) {
+  .nav-container {
+    padding: 0 14px;
+    gap: 8px;
+  }
+
+  .brand-logo-img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .brand-name {
+    font-size: 16px;
+  }
+
+  .lang-btn {
+    padding: 3px 6px;
+    font-size: 10.5px;
+  }
+
+  .mobile-toggle-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .hero-cta-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-hero {
+    width: 100%;
+    justify-content: center;
   }
 }
