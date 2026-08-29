@@ -61,6 +61,21 @@ export class HttpSseTransport implements TransportAdapter {
         headers['Authorization'] = `Bearer ${this.token}`;
       }
 
+      // Attach Native Cryptographic Protocol Signature (Mutual Handshake & Anti-Tamper)
+      try {
+        const signInfo = await invoke<{ timestamp: number; hwid: string; signature: string }>(
+          'sign_enterprise_request',
+          { route: cmd }
+        );
+        if (signInfo?.signature) {
+          headers['X-AiWidget-HWID'] = signInfo.hwid;
+          headers['X-AiWidget-Timestamp'] = String(signInfo.timestamp);
+          headers['X-AiWidget-Signature'] = signInfo.signature;
+        }
+      } catch {
+        // Fallback gracefully
+      }
+
       const resp = await fetch(`${this.serverUrl}/api/v1/${cmd}`, {
         method: 'POST',
         headers,

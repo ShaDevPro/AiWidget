@@ -37,7 +37,7 @@ mod commands;
 use commands::chat::generate_response;
 use commands::quota::{get_user_quota, set_user_quota_limit};
 use commands::policy::get_enterprise_policy;
-use commands::license::{get_hardware_id, get_license_status, activate_license_key, deactivate_license, generate_license_key_admin};
+use commands::license::{get_hardware_id, get_license_status, activate_license_key, deactivate_license, generate_license_key_admin, sign_enterprise_request};
 use commands::image::{get_sd_status, download_sd, download_sd_model, generate_image_sd, open_sd_folder};
 use commands::updater::{check_app_version, install_app_update};
 use commands::conversations::{
@@ -239,6 +239,7 @@ fn main() {
             activate_license_key,
             deactivate_license,
             generate_license_key_admin,
+            sign_enterprise_request,
             verify_app_integrity,
         ])
         .run(tauri::generate_context!())

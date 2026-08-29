@@ -48,6 +48,22 @@ impl SecurityEngine {
         Ok(hex::encode(result.into_bytes()).to_uppercase())
     }
 
+    /// Signs an outgoing client HTTP request for the Enterprise Server
+    pub fn sign_request(route: &str, timestamp: i64, hwid: &str) -> Result<String, String> {
+        let payload = format!("AIW_REQ::{route}::{timestamp}::{hwid}");
+        Self::compute_hmac(&payload)
+    }
+
+    /// Verifies incoming server response authenticity
+    pub fn verify_server_signature(route: &str, timestamp: i64, server_sig: &str) -> bool {
+        let payload = format!("AIW_RESP::{route}::{timestamp}");
+        if let Ok(expected) = Self::compute_hmac(&payload) {
+            expected.eq_ignore_ascii_case(server_sig)
+        } else {
+            false
+        }
+    }
+
     /// Detects if the process is attached to an interactive debugger (IDA Pro, x64dbg, CheatEngine)
     pub fn is_debugger_detected() -> bool {
         #[cfg(target_os = "windows")]
