@@ -90,6 +90,16 @@ Engineered natively in **Rust & Tauri**, **AiWidget** delivers a complete multim
 
 ---
 
+## 🧠 Local Model Agnosticism & Open-Source Transparency
+
+AiWidget is fundamentally **local-first, privacy-driven, and model-agnostic**:
+
+* 🧩 **Universal Local Model Support**: It natively connects to any local LLM runtime via **Ollama**, **Llama.cpp**, and local **GGUF** models (including **Qwen 2.5**, **Llama 3.3**, **Mistral**, **DeepSeek-R1**, **Gemma**, and **Phi-3**).
+* ⚡ **Hardware-Proportional Intelligence**: The analytical depth, reasoning power, and token speed scale directly with your chosen local model and hardware (from lightweight 3B/7B models on standard laptops to 14B/32B/70B models on high-performance GPU workstations).
+* 🔍 **100% Open-Source & Auditable Integrity**: No mandatory cloud subscriptions, no black-box API dependencies, and no hidden tracking. 100% of the desktop client source code (TypeScript + Rust) is available in this repository under the **GNU AGPLv3** for full community audit and verification.
+
+---
+
 ## ✨ Deep Feature Tour
 
 ```mermaid
