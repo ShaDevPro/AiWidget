@@ -88,6 +88,12 @@ impl WebSearchEngine {
         let last_text = user_msgs.last().unwrap().content.trim();
         let lower = last_text.to_lowercase();
 
+        // If this is a follow-up asking for elaboration, critique, or advice on existing context:
+        // Do NOT trigger an external web search that injects irrelevant junk.
+        if user_msgs.len() >= 2 && Self::is_pure_conversation_elaboration(&lower) {
+            return None;
+        }
+
         // Continuation and confirmation words in FR, EN, AR
         let continuations = [
             "vas-y", "vas y", "vasy", "continue", "oui", "ok", "d'accord", "fais-le", "fais le",
@@ -134,6 +140,63 @@ impl WebSearchEngine {
         }
 
         Some(last_text.to_string())
+    }
+
+    /// Checks if a follow-up query is purely asking the model to reason, detail, or critique existing discussion context
+    fn is_pure_conversation_elaboration(lower: &str) -> bool {
+        // If explicit URLs or live search keywords are present, allow search
+        if lower.contains("http://") || lower.contains("https://") || lower.contains("www.") || lower.contains("cherche") || lower.contains("recherche") || lower.contains("search") || lower.contains("google") {
+            return false;
+        }
+
+        let markers = [
+            "t'as pas évoqué",
+            "t'as pas évoque",
+            "tu n'as pas évoqué",
+            "tu n'as pas évoque",
+            "tu n'as pas parlé",
+            "tu n'as pas parle",
+            "t'as oublié",
+            "tu as oublié",
+            "peux-tu détailler",
+            "peux-tu detailler",
+            "peux tu détailler",
+            "détaille",
+            "detaille",
+            "explique",
+            "développe",
+            "developpe",
+            "donne des exemples",
+            "donne-moi des exemples",
+            "comment faire",
+            "comment corriger",
+            "propose une solution",
+            "propose des améliorations",
+            "propose des ameliorations",
+            "quelles améliorations",
+            "quelles ameliorations",
+            "quelles sont tes propositions",
+            "propositions concrètes",
+            "propositions concretes",
+            "améliorations nécessaires",
+            "ameliorations necessaires",
+            "pourquoi",
+            "que penses-tu",
+            "que penses tu",
+            "donne ton avis",
+            "what do you think",
+            "can you elaborate",
+            "explain more",
+            "give examples",
+            "how to improve",
+            "suggest improvements",
+            "كيف تحسن",
+            "ما هي مقترحاتك",
+            "اشرح بالتفصيل",
+            "اعطني امثلة",
+            "وضح اكثر",
+        ];
+        markers.iter().any(|&m| lower.contains(m))
     }
 
     /// User challenges, asks for precision, or supplies today's date — needs fresh search + prior topic.
