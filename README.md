@@ -5,7 +5,7 @@
 # AiWidget
 
 ### 🚀 The Sovereign, Ultra-Lightweight (<8.6 MB) AI Workstation for Windows
-**Run local LLMs, generate photorealistic Fooocus SDXL art, analyze complex spreadsheets, build interactive courses, snip screens, and chat by voice — 100% Offline with Zero Cloud Leakage.**
+**Run local LLMs, generate photorealistic Cinema SDXL art, analyze complex spreadsheets, build interactive courses, snip screens, and chat by voice — 100% Offline with Zero Cloud Leakage.**
 
 <br/>
 
@@ -66,7 +66,7 @@ Today, developers, professionals, and privacy-conscious users face two frustrati
 Engineered natively in **Rust & Tauri**, **AiWidget** delivers a complete multimodal AI workstation in a discreet floating desktop widget:
 * 🪶 **Featherweight Footprint:** **8.13 MB** installer size, **< 80 MB resident RAM** footprint.
 * 🛡️ **Zero-Knowledge Air-Gapped Privacy:** All LLM inference, OCR parsing, and database queries run 100% on your machine.
-* 🧩 **True Multimodal Independence:** Local LLMs, **Fooocus SDXL photorealistic rendering**, spreadsheet financial extraction, course generation, screen snipping, and Whisper voice interaction — unified in one lightweight native app.
+* 🧩 **True Multimodal Independence:** Local LLMs, **Cinema SDXL photorealistic rendering**, spreadsheet financial extraction, course generation, screen snipping, and Whisper voice interaction — unified in one lightweight native app.
 
 ---
 
@@ -78,7 +78,7 @@ Engineered natively in **Rust & Tauri**, **AiWidget** delivers a complete multim
 | **Installer Size** | 🟢 **8.13 MB** | 🔴 ~350 MB | 🔴 ~160 MB | 🔴 ~380 MB | 🔴 Heavy Webview |
 | **RAM Consumption** | 🟢 **< 80 MB** | 🟡 ~400 MB | 🔴 ~450 MB | 🔴 ~550 MB | 🔴 Cloud / Webview |
 | **Data Sovereignty** | 🟢 **100% Local (Air-Gapped)** | 🟢 100% Local | 🟢 100% Local | 🟢 100% Local | 🔴 **Cloud Tracking** |
-| **Fooocus SDXL Cinema (6.6 GB)**| 🟢 **Built-in + CPU VAE Tiling** | 🔴 No | 🔴 No | 🔴 No | 🟡 Cloud DALL-E (Paid) |
+| **Cinema SDXL Studio (6.6 GB)**| 🟢 **Built-in + CPU VAE Tiling** | 🔴 No | 🔴 No | 🔴 No | 🟡 Cloud DALL-E (Paid) |
 | **Fast SD 1.5 Studio (1.5 GB)** | 🟢 **Built-in (15s renders)** | 🔴 No | 🔴 No | 🔴 No | 🔴 No |
 | **Spreadsheet Intelligence (.xlsx)**| 🟢 **Native Extraction & Sums**| 🔴 No | 🔴 No | 🟡 Text only | 🟡 Cloud limited |
 | **Course & Training Studio** | 🟢 **Curriculum, Quiz, Word (.docx)**| 🔴 No | 🔴 No | 🔴 No | 🔴 No |
@@ -96,7 +96,7 @@ Engineered natively in **Rust & Tauri**, **AiWidget** delivers a complete multim
 flowchart TD
     subgraph Core ["AiWidget All-In-One Local Hub"]
         LLM["🧠 Local LLMs (Ollama / Llama.cpp)"]
-        SD["🎨 Fooocus SDXL + SD 1.5 Image Studio"]
+        SD["🎨 Cinema SDXL + SD 1.5 Image Studio"]
         RAG["📊 Excel & PDF Financial Analyzer"]
         CRS["🎓 Interactive Course & Quiz Studio"]
         SNP["📸 1-Click Screen Snipper (Ctrl+Shift+S)"]
@@ -108,13 +108,13 @@ flowchart TD
 
 ---
 
-### 🎨 1. Dual-Engine Local Image Studio (Fooocus SDXL & SD 1.5)
+### 🎨 1. Dual-Engine Local Image Studio (Cinema SDXL & Fast SD 1.5)
 
 Forget setting up complex 30 GB Python environments or paying monthly cloud subscriptions. AiWidget embeds a high-performance **C++ (`sd.cpp`) diffusion pipeline** directly in Rust:
 
-* 🎬 **Fooocus SDXL — Juggernaut XL v8 (6.6 GB)**:
+* 🎬 **Cinema SDXL — Juggernaut XL v8 (6.6 GB)**:
   * Generates hyper-photorealistic **1024x1024** cinema-quality artwork, character portraits, product concepts, and architectural visualizations.
-  * **Automated Prompt Translation & Expansion**: Type prompts in French or Arabic; AiWidget automatically translates and optimizes them into specialized Stable Diffusion positive and negative conditioning tokens.
+  * **Automated Prompt Translation & Expansion**: Type prompts in French or Arabic; AiWidget automatically translates and optimizes them into specialized Stable Diffusion positive and negative conditioning tokens (inspired by Fooocus-style cinematic presets).
   * **Built-in Cinematic Styles**: Photorealistic 8K, Masterpiece, Cinematic Lighting, Hyper-Detailed Skin Texture, and Anime/Digital Art presets.
 * ⚡ **Rapid SD 1.5 (1.5 GB)**:
   * Ultra-fast generation (15–20 seconds) engineered for standard consumer laptops, older GPUs, and quick ideation.
@@ -255,7 +255,7 @@ AiWidget/
 ├── src/                          # 💻 Full Frontend (TypeScript + Vite)
 │   ├── modules/
 │   │   ├── chat/                 # Streaming LLM chat controller & message renderer
-│   │   ├── image/                # Fooocus SDXL & SD 1.5 Image Studio
+│   │   ├── image/                # Cinema SDXL & Fast SD 1.5 Image Studio
 │   │   ├── course/               # Interactive Course & Quiz Studio Engine
 │   │   ├── snipper/              # ScreenSnipper (Ctrl+Shift+S screenshot tool)
 │   │   ├── document/             # In-Memory Streaming Excel (.xlsx) & PDF parser
@@ -269,7 +269,7 @@ AiWidget/
 │
 ├── src-tauri/                    # 🦀 Embedded Native Rust Backend Engine
 │   ├── src/
-│   │   ├── sd_engine.rs          # SD.cpp C++ diffusion wrapper (Fooocus + CPU VAE)
+│   │   ├── sd_engine.rs          # SD.cpp C++ diffusion wrapper (SDXL + CPU VAE)
 │   │   ├── tts_engine.rs         # Neural TTS speech synthesizer
 │   │   ├── whisper_engine.rs     # Whisper.cpp speech-to-text pipeline
 │   │   ├── llama_engine.rs       # Embedded Llama.cpp & Ollama IPC bridge
