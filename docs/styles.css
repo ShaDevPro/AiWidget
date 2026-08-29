@@ -107,7 +107,7 @@ body {
   line-height: 1.6;
 }
 
-/* ── Visibility Utilities ── */
+/* ── Visibility Utilities (Desktop Default) ── */
 .mobile-only {
   display: none !important;
 }
@@ -117,11 +117,11 @@ body {
 }
 
 .desktop-only {
-  display: inline-flex !important;
+  display: inline-flex;
 }
 
 nav.desktop-only {
-  display: flex !important;
+  display: flex;
 }
 
 /* ── Navbar ── */
@@ -1400,7 +1400,10 @@ nav.desktop-only {
 
 /* ── Responsive Tablet & Mobile (<= 1080px) ── */
 @media (max-width: 1080px) {
-  .desktop-only {
+  .desktop-only,
+  nav.desktop-only,
+  a.desktop-only,
+  div.desktop-only {
     display: none !important;
   }
   .mobile-only {
