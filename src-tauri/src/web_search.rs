@@ -425,9 +425,9 @@ impl WebSearchEngine {
     fn extract_readable_page_text(html: &str) -> String {
         let mut clean = html.to_string();
 
-        // 1. Strip script, style, svg, noscript blocks
-        let tags_to_remove = ["<script", "<style", "<svg", "<noscript", "<iframe"];
-        for tag in tags_to_remove {
+        // 1. Strip head, script, style, svg, noscript, iframe blocks completely
+        let block_tags_to_remove = ["<head", "<script", "<style", "<svg", "<noscript", "<iframe", "<template"];
+        for tag in block_tags_to_remove {
             while let Some(start) = clean.to_lowercase().find(tag) {
                 let rest = &clean[start..];
                 let close_tag = format!("</{}", &tag[1..]);
@@ -436,38 +436,47 @@ impl WebSearchEngine {
                         let total_len = end_rel + tag_end + 1;
                         clean.replace_range(start..start + total_len, " ");
                     } else {
+                        clean.replace_range(start.., " ");
                         break;
                     }
                 } else if let Some(tag_end) = rest.find('>') {
                     clean.replace_range(start..start + tag_end + 1, " ");
                 } else {
+                    clean.replace_range(start.., " ");
                     break;
                 }
             }
         }
 
-        // 2. Add linebreaks before block elements
-        let block_tags = ["<p", "<h1", "<h2", "<h3", "<h4", "<h5", "<h6", "<li", "<div", "<tr", "<br", "<article", "<section"];
-        for b in block_tags {
-            clean = clean.replace(b, &format!("\n{}", b));
-        }
+        // 2. Format headings and list items before tag stripping
+        clean = clean
+            .replace("<h1", "\n\n# ")
+            .replace("<h2", "\n\n## ")
+            .replace("<h3", "\n\n### ")
+            .replace("<h4", "\n\n#### ")
+            .replace("<li", "\n- ")
+            .replace("<p", "\n\n")
+            .replace("<br", "\n")
+            .replace("<section", "\n\n")
+            .replace("<article", "\n\n");
 
-        // 3. Strip HTML tags
+        // 3. Strip all remaining HTML tags
         let stripped = Self::strip_html_tags(&clean);
 
         // 4. Normalize lines and remove empty fluff
         let mut lines = Vec::new();
         for line in stripped.lines() {
             let t = line.trim();
-            if !t.is_empty() && t.len() > 1 {
+            // Ignore repetitive noise lines
+            if !t.is_empty() && t.len() > 1 && !t.starts_with('<') && !t.starts_with('{') {
                 lines.push(t);
             }
         }
 
         let full_text = lines.join("\n");
-        // Limit to max 4000 chars for LLM context budget
-        if full_text.len() > 4000 {
-            let truncated = &full_text[..4000];
+        // Limit to max 3500 chars for LLM context budget
+        if full_text.len() > 3500 {
+            let truncated = &full_text[..3500];
             if let Some(last_space) = truncated.rfind(' ') {
                 format!("{}...", &truncated[..last_space])
             } else {
@@ -783,15 +792,14 @@ impl WebSearchEngine {
         }
 
         let fetched_at = chrono::Local::now().format("%Y-%m-%d %H:%M").to_string();
-        let today_iso = chrono::Local::now().format("%Y-%m-%d").to_string();
 
         let mut block = format!(
-            "\n\n<search_results fetched_at=\"{fetched_at}\" today=\"{today_iso}\">\n"
+            "\n\n<web_content fetched_at=\"{fetched_at}\">\n"
         );
 
         for (i, item) in results.iter().enumerate() {
             block.push_str(&format!(
-                "  <source id=\"{}\">\n    <title>{}</title>\n    <url>{}</url>\n    <content>{}</content>\n  </source>\n",
+                "  <source id=\"{}\">\n    <title>{}</title>\n    <url>{}</url>\n    <content>\n{}\n    </content>\n  </source>\n",
                 i + 1,
                 item.title,
                 if item.url.is_empty() { "N/A" } else { &item.url },
@@ -800,14 +808,8 @@ impl WebSearchEngine {
         }
 
         block.push_str(
-            "</search_results>\n\
-            <grounding_instructions>\n\
-            1. DIRECT WEB ACCESS: The verified webpage or search content is provided above in <search_results>.\n\
-            2. INTELLIGENT SYNTHESIS & ANALYSIS: When asked for an opinion, review, UI/UX evaluation, feedback, or summary of a website/URL: do NOT simply copy-paste or list raw bullet points. Provide a structured, professional, and insightful analysis based strictly on the extracted site structure and features.\n\
-            3. FACTUAL INTEGRITY: Ground all technical features, claims, pricing tiers, and facts in the source snippets above.\n\
-            4. CITATIONS: Include clickable inline markdown source links [Source](url) or cite the source URL.\n\
-            5. NO REFUSAL: You have verified access to the requested URL/data in <search_results>. Answer directly and comprehensively.\n\
-            </grounding_instructions>\n\n",
+            "</web_content>\n\
+            [Consigne : Utilise les données et la structure de la page ci-dessus pour répondre à la demande. Si l'utilisateur demande une analyse ou un avis sur l'UI/UX et le contenu, rédige un audit structuré (1. Design & UI, 2. Ergonomie & UX, 3. Contenu & Piliers, 4. Axes d'amélioration). Ne recopie jamais de balises HTML ou de code brut.]\n\n",
         );
         block
     }
