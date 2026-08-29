@@ -4,7 +4,7 @@
 
 # AiWidget
 
-### 🚀 The Sovereign, Ultra-Lightweight (<8.6 MB) AI Workstation for Windows
+### 🚀 The Sovereign, Ultra-Lightweight (~9 MB) AI Workstation for Windows
 **Run local LLMs, generate photorealistic Cinema SDXL art, analyze complex spreadsheets, build interactive courses, snip screens, and chat by voice — Local-First by default, Air-Gapped capable, with Zero silent network calls.**
 
 <br/>
@@ -64,7 +64,7 @@ Today, developers, professionals, and privacy-conscious users face two frustrati
 
 ### 🌟 The AiWidget Breakthrough
 Engineered natively in **Rust & Tauri**, **AiWidget** delivers a complete multimodal AI workstation in a discreet floating desktop widget:
-* 🪶 **Featherweight Footprint:** **8.13 MB** installer size, **< 80 MB resident RAM** footprint.
+* 🪶 **Featherweight Footprint:** **9.03 MB** installer size, **< 80 MB resident RAM** footprint.
 * 🛡️ **Zero-Knowledge Air-Gapped Privacy:** All LLM inference, OCR parsing, and database queries run 100% on your machine.
 * 🧩 **True Multimodal Independence:** Local LLMs, **Cinema SDXL photorealistic rendering**, spreadsheet financial extraction, course generation, screen snipping, and Whisper voice interaction — unified in one lightweight native app.
 
@@ -75,7 +75,7 @@ Engineered natively in **Rust & Tauri**, **AiWidget** delivers a complete multim
 | Capability | **AiWidget** | **LM Studio** | **Jan.ai** | **AnythingLLM** | **Microsoft Copilot** |
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **Form Factor** | 🟢 **Floating Widget / Bar / Popup** | 🔴 Full Window | 🔴 Full Window | 🟡 Partial Overlay | 🟢 Edge Sidebar |
-| **Installer Size** | 🟢 **8.13 MB** | 🔴 ~350 MB | 🔴 ~160 MB | 🔴 ~380 MB | 🔴 Heavy Webview |
+| **Installer Size** | 🟢 **9.03 MB** | 🔴 ~350 MB | 🔴 ~160 MB | 🔴 ~380 MB | 🔴 Heavy Webview |
 | **RAM Consumption** | 🟢 **< 80 MB** | 🟡 ~400 MB | 🔴 ~450 MB | 🔴 ~550 MB | 🔴 Cloud / Webview |
 | **Data Sovereignty** | 🟢 **100% Local (Air-Gapped)** | 🟢 100% Local | 🟢 100% Local | 🟢 100% Local | 🔴 **Cloud Tracking** |
 | **Cinema SDXL Studio (6.6 GB)**| 🟢 **Built-in + CPU VAE Tiling** | 🔴 No | 🔴 No | 🔴 No | 🟡 Cloud DALL-E (Paid) |
