@@ -284,11 +284,19 @@ impl WebSearchEngine {
         }
 
         let client = reqwest::Client::builder()
-            .timeout(Duration::from_secs(6))
+            .timeout(Duration::from_secs(8))
             .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
             .build()?;
 
         let mut results = Vec::new();
+
+        // 0. Direct URL Scraping: If user provided explicit URLs (e.g. https://shadevpro.github.io/AiWidget-Site/), fetch page content directly!
+        let direct_urls = Self::extract_urls(query);
+        for url in &direct_urls {
+            if let Ok(Some(page_result)) = Self::fetch_url_content(&client, url).await {
+                results.push(page_result);
+            }
+        }
 
         // 1. Check if query is about currency / exchange rates (e.g. EUR DZD, USD DZD, etc.)
         let lower = query.to_lowercase();
@@ -307,23 +315,25 @@ impl WebSearchEngine {
             }
         }
 
-        // 3. Query DuckDuckGo via POST form
-        let clean_q = Self::clean_search_query(query);
-        let mut form_params = HashMap::new();
-        form_params.insert("q", clean_q.as_str());
-
-        if let Ok(resp) = client.post("https://html.duckduckgo.com/html/").form(&form_params).send().await {
-            if resp.status().is_success() {
-                if let Ok(html) = resp.text().await {
-                    let mut parsed = Self::parse_duckduckgo_html(&html, max_results);
-                    results.append(&mut parsed);
-                }
-            }
+        // 3. Query DuckDuckGo via POST form (skip if we already have direct URL content and query was only about visiting that URL)
+        let mut clean_q = Self::clean_search_query(query);
+        for url in &direct_urls {
+            clean_q = clean_q.replace(url, "");
         }
+        clean_q = clean_q.trim().to_string();
 
-        // 4. Fallback to DuckDuckGo Lite if needed
-        if results.is_empty() {
-            if let Ok(resp) = client.post("https://lite.duckduckgo.com/lite/").form(&form_params).send().await {
+        let should_search_ddg = if !direct_urls.is_empty() && !results.is_empty() {
+            // Only search DDG if there are meaningful search terms left beyond "visite le site"
+            clean_q.len() > 15
+        } else {
+            true
+        };
+
+        if should_search_ddg && !clean_q.is_empty() {
+            let mut form_params = HashMap::new();
+            form_params.insert("q", clean_q.as_str());
+
+            if let Ok(resp) = client.post("https://html.duckduckgo.com/html/").form(&form_params).send().await {
                 if resp.status().is_success() {
                     if let Ok(html) = resp.text().await {
                         let mut parsed = Self::parse_duckduckgo_html(&html, max_results);
@@ -331,9 +341,140 @@ impl WebSearchEngine {
                     }
                 }
             }
+
+            // 4. Fallback to DuckDuckGo Lite if needed
+            if results.is_empty() {
+                if let Ok(resp) = client.post("https://lite.duckduckgo.com/lite/").form(&form_params).send().await {
+                    if resp.status().is_success() {
+                        if let Ok(html) = resp.text().await {
+                            let mut parsed = Self::parse_duckduckgo_html(&html, max_results);
+                            results.append(&mut parsed);
+                        }
+                    }
+                }
+            }
         }
 
         Ok(results)
+    }
+
+    /// Extracts direct URLs from query string
+    pub fn extract_urls(query: &str) -> Vec<String> {
+        let mut urls = Vec::new();
+        for word in query.split_whitespace() {
+            let clean = word.trim_matches(|c: char| {
+                c == '"' || c == '\'' || c == '(' || c == ')' || c == '<' || c == '>' || c == '[' || c == ']' || c == ',' || c == ';'
+            });
+            if clean.starts_with("http://") || clean.starts_with("https://") {
+                urls.push(clean.to_string());
+            }
+        }
+        urls
+    }
+
+    /// Fetches full readable content directly from a URL
+    pub async fn fetch_url_content(client: &reqwest::Client, url: &str) -> Result<Option<WebSearchResult>> {
+        let resp = match client.get(url).send().await {
+            Ok(r) => r,
+            Err(e) => {
+                eprintln!("[web_search] Error fetching URL {}: {:?}", url, e);
+                return Ok(None);
+            }
+        };
+
+        if !resp.status().is_success() {
+            return Ok(None);
+        }
+
+        let html = match resp.text().await {
+            Ok(h) => h,
+            Err(_) => return Ok(None),
+        };
+
+        let title = Self::extract_html_title(&html).unwrap_or_else(|| url.to_string());
+        let content_text = Self::extract_readable_page_text(&html);
+
+        if content_text.trim().is_empty() {
+            return Ok(None);
+        }
+
+        Ok(Some(WebSearchResult {
+            title: format!("Site Web : {}", title),
+            snippet: format!("Contenu réel extrait du site ({}) :\n{}", url, content_text),
+            url: url.to_string(),
+        }))
+    }
+
+    /// Extracts <title> tag from HTML
+    fn extract_html_title(html: &str) -> Option<String> {
+        let lower = html.to_lowercase();
+        if let Some(start) = lower.find("<title>") {
+            let rest = &html[start + 7..];
+            if let Some(end) = rest.to_lowercase().find("</title>") {
+                let t = Self::strip_html_tags(&rest[..end]).trim().to_string();
+                if !t.is_empty() {
+                    return Some(t);
+                }
+            }
+        }
+        None
+    }
+
+    /// Converts full HTML document into clean, readable text for the LLM
+    fn extract_readable_page_text(html: &str) -> String {
+        let mut clean = html.to_string();
+
+        // 1. Strip script, style, svg, noscript blocks
+        let tags_to_remove = ["<script", "<style", "<svg", "<noscript", "<iframe"];
+        for tag in tags_to_remove {
+            while let Some(start) = clean.to_lowercase().find(tag) {
+                let rest = &clean[start..];
+                let close_tag = format!("</{}", &tag[1..]);
+                if let Some(end_rel) = rest.to_lowercase().find(&close_tag) {
+                    if let Some(tag_end) = rest[end_rel..].find('>') {
+                        let total_len = end_rel + tag_end + 1;
+                        clean.replace_range(start..start + total_len, " ");
+                    } else {
+                        break;
+                    }
+                } else if let Some(tag_end) = rest.find('>') {
+                    clean.replace_range(start..start + tag_end + 1, " ");
+                } else {
+                    break;
+                }
+            }
+        }
+
+        // 2. Add linebreaks before block elements
+        let block_tags = ["<p", "<h1", "<h2", "<h3", "<h4", "<h5", "<h6", "<li", "<div", "<tr", "<br", "<article", "<section"];
+        for b in block_tags {
+            clean = clean.replace(b, &format!("\n{}", b));
+        }
+
+        // 3. Strip HTML tags
+        let stripped = Self::strip_html_tags(&clean);
+
+        // 4. Normalize lines and remove empty fluff
+        let mut lines = Vec::new();
+        for line in stripped.lines() {
+            let t = line.trim();
+            if !t.is_empty() && t.len() > 1 {
+                lines.push(t);
+            }
+        }
+
+        let full_text = lines.join("\n");
+        // Limit to max 4000 chars for LLM context budget
+        if full_text.len() > 4000 {
+            let truncated = &full_text[..4000];
+            if let Some(last_space) = truncated.rfind(' ') {
+                format!("{}...", &truncated[..last_space])
+            } else {
+                format!("{}...", truncated)
+            }
+        } else {
+            full_text
+        }
     }
 
     /// Fetches live real-time weather forecasts via Open-Meteo API
