@@ -12,7 +12,7 @@ dist
 src-tauri/target
 server/target
 
-# Large AI Models & Temporary Download Files
+# Large AI Models & Binaries
 *.part
 *.part.json
 *.gguf
@@ -20,14 +20,13 @@ server/target
 release/*.exe
 release/*.msi
 
-# 🔒 PROPRIETARY ENTERPRISE BACKEND & LICENSING (PRIVATE - NEVER COMMIT)
+# Local tooling, server & scripts
 server/
 license-dashboard/
-start-server-pro.bat
-start-dashboard.bat
-start-license-dashboard.bat
+*.bat
 scripts/create-*.mjs
 scripts/sync-*.mjs
 scripts/upload-*.mjs
 scripts/*.ps1
+
 
