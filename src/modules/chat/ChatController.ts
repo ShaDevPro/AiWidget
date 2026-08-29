@@ -169,11 +169,6 @@ export class ChatController {
     this.deps.streamModule.scrollSmooth();
     this.deps.refreshConvList();
 
-    if (chat.isExplicitWebSearchCommand(text)) {
-      this.deps.setWebSearchEnabled(true);
-      this.deps.syncWebToggleButtons();
-    }
-
     if (!this.deps.getWebSearchEnabled() && model) {
       const decision = await this.webGate.evaluateBeforeGenerate({
         query: text,

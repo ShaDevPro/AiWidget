@@ -9,6 +9,10 @@ impl WebSearchEngine {
     /// Checks if the query is asking about the assistant's own identity or capabilities (no web search needed)
     pub fn is_self_identity_query(query: &str) -> bool {
         let l = query.to_lowercase();
+        // Direct URLs and website inspection queries must NEVER be blocked as self-identity
+        if l.contains("http://") || l.contains("https://") || l.contains("www.") {
+            return false;
+        }
         let identity_keywords = [
             "qui es-tu",
             "qui es tu",
