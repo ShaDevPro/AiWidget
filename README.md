@@ -5,7 +5,7 @@
 # AiWidget
 
 ### 🚀 The Sovereign, Ultra-Lightweight (<8.6 MB) AI Workstation for Windows
-**Run local LLMs, generate photorealistic Cinema SDXL art, analyze complex spreadsheets, build interactive courses, snip screens, and chat by voice — 100% Offline with Zero Cloud Leakage.**
+**Run local LLMs, generate photorealistic Cinema SDXL art, analyze complex spreadsheets, build interactive courses, snip screens, and chat by voice — Local-First by default, Air-Gapped capable, with Zero silent network calls.**
 
 <br/>
 
@@ -14,7 +14,7 @@
 [![Rust](https://img.shields.io/badge/Rust-1.70%2B-DEA584?logo=rust&logoColor=fff&style=flat-square)](https://www.rust-lang.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178C6?logo=typescript&logoColor=fff&style=flat-square)](https://www.typescriptlang.org)
 [![RAM Usage](https://img.shields.io/badge/RAM_Resident-%3C_80_MB-success?style=flat-square)]()
-[![Privacy](https://img.shields.io/badge/Privacy-100%25_Air--Gapped-9cf?style=flat-square)]()
+[![Privacy](https://img.shields.io/badge/Privacy-Local--First_%7C_Air--Gapped_Capable-9cf?style=flat-square)]()
 [![Platform](https://img.shields.io/badge/OS-Windows_10_%7C_11_(x64)-0078D6?logo=windows&style=flat-square)]()
 [![i18n](https://img.shields.io/badge/i18n-FR_%7C_EN_%7C_AR_(RTL)-6366f1?style=flat-square)]()
 
@@ -138,18 +138,25 @@ A dedicated pedagogical engine designed for teachers, corporate instructors, uni
 
 ---
 
-### 🌐 3. On-Demand Anti-Hallucination Web Router
+### 🌐 3. On-Demand Anti-Hallucination Web Router (Strictly User-Controlled)
+ 
+Eliminate hallucinations when fresh factual knowledge is required, while strictly preserving your privacy:
 
-Eliminate hallucinations when fresh factual knowledge is required:
-
-* 🤖 **Smart Intent Detection & Auto-Trigger**:
-  * When a user asks about recent world events, market prices, technical documentation, public figures, or weather forecasts, the router automatically detects the need for live data.
-  * Users can also explicitly toggle the **`🌐 Web`** mode button in the chat input bar.
+* 🔒 **Local-First by Default — Zero Silent Network Requests**:
+  * All core intelligence, LLM inference, image generation, voice chat, and document RAG run **100% locally on your device**.
+  * Internet access is **never activated silently**.
+* 🤖 **Smart Intent Detection & Explicit Permission Gate**:
+  * When you ask a question requiring live or time-sensitive data (e.g., *"What will the weather be tomorrow in Laghouat?"*, *"Latest stock market indices"*, or *"Recent software releases"*), AiWidget automatically detects the intent.
+  * Instead of quietly calling the network, AiWidget displays an explicit confirmation gate:  
+    `🌐 This question requires live web information. Allow AiWidget to search the web? [Allow] [Deny]`
+  * You can also explicitly toggle the **`🌐 Web`** mode button in the chat input bar whenever you want web grounding enabled.
 * 🔍 **Real-Time Web Scraping & Fact Extraction**:
-  * Queries public search engines in the background without transmitting user identities.
+  * When authorized, queries public search engines in the background without transmitting user identities.
   * Strips HTML bloat, extracts core factual paragraphs, and injects verified context into the LLM prompt.
 * 🔗 **Clickable Verified Source Citations**:
   * Every fact is accompanied by direct, clickable URL source badges so you can verify the truth with zero hallucination.
+* 🛡️ **Air-Gapped Capable**:
+  * In strictly air-gapped or high-security corporate environments, Web Search can remain permanently disabled with zero impact on local LLM, SDXL, or document analysis features.
 
 ---
 
