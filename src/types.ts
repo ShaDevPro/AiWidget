@@ -264,12 +264,21 @@ export interface IntegrityStatus {
   channel: string;
 }
 
+export interface HardwareProfile {
+  gpu_name: string;
+  vram_mb: number;
+  has_dedicated_gpu: boolean;
+  recommended_model: string;
+  recommendation_reason: string;
+}
+
 export interface SDStatus {
   installed: boolean;
   model_installed: boolean;
   binary_path: string;
   model_name: string;
   available_models: string[];
+  hardware?: HardwareProfile;
 }
 
 export interface ImageGenerationResult {

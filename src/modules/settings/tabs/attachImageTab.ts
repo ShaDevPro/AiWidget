@@ -13,6 +13,11 @@ export function attachImageTab(host: SettingsHost, panel: HTMLElement): void {
   const progressPct = panel.querySelector('#sdProgressPct') as HTMLElement | null;
   const progressFill = panel.querySelector('#sdProgressFill') as HTMLElement | null;
 
+  // Hardware and Badges
+  const hardwareBanner = panel.querySelector('#sdHardwareBanner') as HTMLElement | null;
+  const recBadgeJuggernaut = panel.querySelector('#recBadgeJuggernaut') as HTMLElement | null;
+  const recBadgeSD15 = panel.querySelector('#recBadgeSD15') as HTMLElement | null;
+
   // Juggernaut Elements
   const badgeJuggernaut = panel.querySelector('#badgeJuggernaut') as HTMLElement | null;
   const btnJuggernaut = panel.querySelector('#btnJuggernaut') as HTMLButtonElement | null;
@@ -29,14 +34,45 @@ export function attachImageTab(host: SettingsHost, panel: HTMLElement): void {
     const available = status.available_models || [];
 
     const hasJuggernaut = available.some((m) => m.toLowerCase().includes('juggernaut'));
-    const hasSD15 = available.some((m) => m.toLowerCase().includes('stable-diffusion-v1-5') || m.toLowerCase().includes('sd-v1-5'));
+    const hasSD15 = available.some((m) => m.toLowerCase().includes('stable-diffusion-v1-5') || m.toLowerCase().includes('sd-v1-5') || m.toLowerCase().includes('sd15'));
+
+    // Hardware Banner & Recommendation Badges
+    if (status.hardware) {
+      if (hardwareBanner) {
+        hardwareBanner.style.display = 'flex';
+        if (status.hardware.has_dedicated_gpu) {
+          hardwareBanner.style.background = 'rgba(99, 102, 241, 0.12)';
+          hardwareBanner.style.border = '1px solid rgba(99, 102, 241, 0.3)';
+          hardwareBanner.style.color = '#c7d2fe';
+          hardwareBanner.innerHTML = `🎮 <strong>${status.hardware.gpu_name}</strong> (${Math.round(status.hardware.vram_mb / 1024)} Go VRAM) &bull; ${status.hardware.recommendation_reason}`;
+        } else {
+          hardwareBanner.style.background = 'rgba(245, 158, 11, 0.12)';
+          hardwareBanner.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+          hardwareBanner.style.color = '#fde68a';
+          hardwareBanner.innerHTML = `💻 <strong>${status.hardware.gpu_name}</strong> &bull; ${status.hardware.recommendation_reason}`;
+        }
+      }
+
+      if (recBadgeJuggernaut) {
+        recBadgeJuggernaut.style.display = status.hardware.recommended_model === 'juggernaut' ? 'inline-block' : 'none';
+      }
+      if (recBadgeSD15) {
+        recBadgeSD15.style.display = status.hardware.recommended_model === 'sd15' ? 'inline-block' : 'none';
+      }
+    }
 
     // Determine current active model
     let activeModel = host.settings.sd_active_model;
     if (!activeModel || (!available.includes(activeModel) && available.length > 0)) {
-      activeModel = hasJuggernaut
-        ? 'juggernautXL_v8Rundiffusion.safetensors'
-        : (available[0] || 'juggernautXL_v8Rundiffusion.safetensors');
+      if (status.hardware?.recommended_model === 'sd15' && hasSD15) {
+        activeModel = 'stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf';
+      } else if (hasJuggernaut) {
+        activeModel = 'juggernautXL_v8Rundiffusion.safetensors';
+      } else if (hasSD15) {
+        activeModel = 'stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf';
+      } else {
+        activeModel = available[0] || (status.hardware?.recommended_model === 'sd15' ? 'stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf' : 'juggernautXL_v8Rundiffusion.safetensors');
+      }
       host.settings.sd_active_model = activeModel;
       void host.saveSettings();
     }
@@ -76,7 +112,7 @@ export function attachImageTab(host: SettingsHost, panel: HTMLElement): void {
     // SD 1.5 Card State
     if (badgeSD15 && btnSD15 && btnSD15Text) {
       if (hasSD15) {
-        const isSelected = activeModel.toLowerCase().includes('stable-diffusion') || activeModel.toLowerCase().includes('sd-v1-5');
+        const isSelected = activeModel.toLowerCase().includes('stable-diffusion') || activeModel.toLowerCase().includes('sd-v1-5') || activeModel.toLowerCase().includes('sd15');
         badgeSD15.textContent = isSelected ? '✓ Actif' : '✓ Installé';
         badgeSD15.className = isSelected ? 'sp-status-badge success' : 'sp-status-badge info';
         btnSD15Text.textContent = isSelected ? '✓ Modèle Actif' : 'Activer ce modèle';

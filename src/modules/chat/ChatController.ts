@@ -586,9 +586,9 @@ export class ChatController {
 
     try {
       const preferredModel = this.deps.getSettings().sd_active_model;
-      const isSD15 = Boolean(preferredModel && preferredModel.includes('1.5'));
+      const isSD15 = Boolean(preferredModel && (preferredModel.includes('1.5') || preferredModel.toLowerCase() === 'sd15' || preferredModel.includes('gguf')));
       const dim = isSD15 ? 512 : 1024;
-      const steps = 15;
+      const steps = isSD15 ? 12 : 15;
       const result = await sdManager.generateImage(prompt, undefined, dim, dim, steps, cardId, 'cinematic', preferredModel);
       const readyHtml = ImageCardRenderer.renderImageCard(result, cardId);
 

@@ -4,12 +4,22 @@ use std::path::PathBuf;
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HardwareProfile {
+    pub gpu_name: String,
+    pub vram_mb: u64,
+    pub has_dedicated_gpu: bool,
+    pub recommended_model: String,
+    pub recommendation_reason: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SDStatus {
     pub installed: bool,
     pub model_installed: bool,
     pub binary_path: String,
     pub model_name: String,
     pub available_models: Vec<String>,
+    pub hardware: HardwareProfile,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -62,30 +72,138 @@ impl SDEngine {
     }
 
     pub fn default_model_path() -> PathBuf {
-        Self::get_sd_dir().join("juggernautXL_v8Rundiffusion.safetensors")
+        Self::get_sd_dir().join("stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf")
+    }
+
+    pub fn detect_hardware() -> HardwareProfile {
+        #[cfg(target_os = "windows")]
+        {
+            use std::process::Command;
+            let mut gpu_name = "Processeur CPU standard".to_string();
+            let mut vram_mb = 0u64;
+            let mut has_dedicated_gpu = false;
+
+            #[cfg(target_os = "windows")]
+            use std::os::windows::process::CommandExt;
+            const CREATE_NO_WINDOW: u32 = 0x08000000;
+
+            let mut cmd = Command::new("powershell");
+            cmd.args(["-NoProfile", "-Command", "Get-CimInstance Win32_VideoController | ForEach-Object { \"$($_.Name)|$($_.AdapterRAM)\" }"]);
+            cmd.creation_flags(CREATE_NO_WINDOW);
+
+            if let Ok(out) = cmd.output() {
+                let text = String::from_utf8_lossy(&out.stdout);
+                for line in text.lines() {
+                    let parts: Vec<&str> = line.split('|').collect();
+                    if parts.len() >= 2 {
+                        let name = parts[0].trim();
+                        let ram_bytes: u64 = parts[1].trim().parse().unwrap_or(0);
+                        let ram_mb = ram_bytes / (1024 * 1024);
+
+                        let name_lower = name.to_lowercase();
+                        let is_dedicated = (name_lower.contains("nvidia")
+                            || name_lower.contains("geforce")
+                            || name_lower.contains("rtx")
+                            || name_lower.contains("gtx")
+                            || name_lower.contains("radeon rx")
+                            || name_lower.contains("intel arc"))
+                            && !name_lower.contains("uhd")
+                            && !name_lower.contains("hd graphics");
+
+                        if is_dedicated && ram_mb >= 4000 {
+                            gpu_name = name.to_string();
+                            vram_mb = ram_mb;
+                            has_dedicated_gpu = true;
+                            break;
+                        } else if !name.is_empty() && (gpu_name.contains("CPU") || gpu_name.contains("standard")) {
+                            gpu_name = name.to_string();
+                            vram_mb = ram_mb;
+                        }
+                    }
+                }
+            }
+
+            let (recommended_model, recommendation_reason) = if has_dedicated_gpu && vram_mb >= 6000 {
+                (
+                    "juggernaut".to_string(),
+                    format!("GPU Dédié détecté ({}) : SDXL Juggernaut recommandé", gpu_name),
+                )
+            } else {
+                (
+                    "sd15".to_string(),
+                    format!("GPU intégré ou CPU ({}) : SD 1.5 Rapide (15-20s) recommandé", gpu_name),
+                )
+            };
+
+            HardwareProfile {
+                gpu_name,
+                vram_mb,
+                has_dedicated_gpu,
+                recommended_model,
+                recommendation_reason,
+            }
+        }
+        #[cfg(not(target_os = "windows"))]
+        {
+            HardwareProfile {
+                gpu_name: "Processeur CPU standard".to_string(),
+                vram_mb: 0,
+                has_dedicated_gpu: false,
+                recommended_model: "sd15".to_string(),
+                recommendation_reason: "SD 1.5 Rapide recommandé".to_string(),
+            }
+        }
     }
 
     pub fn get_active_model_path(preferred: Option<&str>) -> Option<PathBuf> {
         let dir = Self::get_sd_dir();
+
+        // 1. Si une préférence explicite est passée par l'utilisateur
         if let Some(pref) = preferred {
-            if !pref.trim().is_empty() {
-                let path = dir.join(pref.trim());
-                if path.exists() {
-                    return Some(path);
+            let p = pref.trim().to_lowercase();
+            if !p.is_empty() {
+                if p == "sd15" || p.contains("1.5") || p.contains("gguf") {
+                    let sd15 = dir.join("stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf");
+                    if sd15.exists() {
+                        return Some(sd15);
+                    }
+                } else if p == "juggernaut" || p == "sdxl" || p.contains("juggernaut") || p.contains("safetensors") {
+                    let jugg = dir.join("juggernautXL_v8Rundiffusion.safetensors");
+                    if jugg.exists() {
+                        return Some(jugg);
+                    }
+                } else {
+                    let custom = dir.join(pref.trim());
+                    if custom.exists() {
+                        return Some(custom);
+                    }
                 }
             }
         }
 
-        let jugg = dir.join("juggernautXL_v8Rundiffusion.safetensors");
-        if jugg.exists() {
-            return Some(jugg);
+        // 2. Détection intelligente selon le matériel (priorité au modèle le plus adapté disponible)
+        let hw = Self::detect_hardware();
+        if hw.has_dedicated_gpu {
+            let jugg = dir.join("juggernautXL_v8Rundiffusion.safetensors");
+            if jugg.exists() {
+                return Some(jugg);
+            }
+            let sd15 = dir.join("stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf");
+            if sd15.exists() {
+                return Some(sd15);
+            }
+        } else {
+            let sd15 = dir.join("stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf");
+            if sd15.exists() {
+                return Some(sd15);
+            }
+            let jugg = dir.join("juggernautXL_v8Rundiffusion.safetensors");
+            if jugg.exists() {
+                return Some(jugg);
+            }
         }
 
-        let sd15 = dir.join("stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf");
-        if sd15.exists() {
-            return Some(sd15);
-        }
-
+        // 3. Tout autre modèle présent dans le répertoire
         if dir.exists() {
             if let Ok(entries) = fs::read_dir(&dir) {
                 for entry in entries.flatten() {
@@ -128,6 +246,7 @@ impl SDEngine {
         }
 
         let model_installed = !model_name.is_empty();
+        let hardware = Self::detect_hardware();
 
         SDStatus {
             installed: binary.exists(),
@@ -135,6 +254,7 @@ impl SDEngine {
             binary_path: binary.to_string_lossy().to_string(),
             model_name,
             available_models,
+            hardware,
         }
     }
 

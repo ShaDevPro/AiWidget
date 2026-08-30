@@ -123,10 +123,10 @@ export class SDManager {
     }
 
     // Détermination de la résolution et des étapes selon le modèle actif
-    const isSD15 = Boolean(modelName && modelName.includes('1.5'));
-    const effectiveWidth = width <= 512 && !isSD15 ? 1024 : width;
-    const effectiveHeight = height <= 512 && !isSD15 ? 1024 : height;
-    const effectiveSteps = steps < 12 ? 15 : steps;
+    const isSD15 = Boolean(modelName && (modelName.includes('1.5') || modelName.toLowerCase() === 'sd15' || modelName.includes('gguf')));
+    const effectiveWidth = isSD15 ? (width > 0 && width <= 768 ? width : 512) : (width <= 512 ? 1024 : width);
+    const effectiveHeight = isSD15 ? (height > 0 && height <= 768 ? height : 512) : (height <= 512 ? 1024 : height);
+    const effectiveSteps = isSD15 ? 12 : (steps < 12 ? 15 : steps);
 
     // Fooocus Engine : Traduction CLIP, Template de style et Negative Prompt
     const { finalPrompt, finalNegative } = FooocusEngine.expandPrompt(prompt, styleId);
