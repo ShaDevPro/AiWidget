@@ -307,9 +307,22 @@ impl SDEngine {
         let images_dir = Self::get_images_dir();
         let output_file = images_dir.join(format!("aiwidget_img_{}.png", ts));
 
-        let w = if width == 0 { 512 } else { (width / 64) * 64 };
-        let h = if height == 0 { 512 } else { (height / 64) * 64 };
-        let st = if steps == 0 { 8 } else { steps.clamp(3, 30) };
+        let model_name_lower = model.to_string_lossy().to_lowercase();
+        let is_sdxl = model_name_lower.contains("xl") || model_name_lower.contains("juggernaut") || model_name_lower.contains("safetensors");
+
+        let (w, h, cfg_scale, default_steps) = if is_sdxl {
+            // SDXL (Juggernaut XL) must be generated at 1024x1024 to prevent latent space collapse and dark artifacts
+            let target_w = if width == 0 || width < 768 { 1024 } else { (width / 64) * 64 };
+            let target_h = if height == 0 || height < 768 { 1024 } else { (height / 64) * 64 };
+            (target_w, target_h, 4.0f32, 15u32)
+        } else {
+            // SD 1.5 standard resolution
+            let target_w = if width == 0 { 512 } else { (width / 64) * 64 };
+            let target_h = if height == 0 { 512 } else { (height / 64) * 64 };
+            (target_w, target_h, 7.0f32, 15u32)
+        };
+
+        let st = if steps == 0 { default_steps } else { steps.clamp(4, 40) };
         let s = seed.unwrap_or(-1);
         let threads = std::thread::available_parallelism()
             .map(|n| n.get())
@@ -320,7 +333,7 @@ impl SDEngine {
             "status": "starting",
             "prompt": prompt,
             "percentage": 5,
-            "message": "Initialisation du modèle neuronal..."
+            "message": if is_sdxl { "Initialisation Fooocus SDXL Juggernaut (1024x1024)..." } else { "Initialisation SD 1.5 Rapide..." }
         }));
 
         let mut cmd = std::process::Command::new(&binary);
@@ -329,6 +342,8 @@ impl SDEngine {
             .arg("-W").arg(w.to_string())
             .arg("-H").arg(h.to_string())
             .arg("--steps").arg(st.to_string())
+            .arg("--cfg-scale").arg(format!("{:.1}", cfg_scale))
+            .arg("--sampling-method").arg("euler_a")
             .arg("-t").arg(threads.to_string())
             .arg("-s").arg(s.to_string())
             .arg("--vae-tiling")

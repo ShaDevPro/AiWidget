@@ -122,14 +122,20 @@ export class SDManager {
       }
     }
 
+    // Détermination de la résolution et des étapes selon le modèle actif
+    const isSD15 = Boolean(modelName && modelName.includes('1.5'));
+    const effectiveWidth = width <= 512 && !isSD15 ? 1024 : width;
+    const effectiveHeight = height <= 512 && !isSD15 ? 1024 : height;
+    const effectiveSteps = steps < 12 ? 15 : steps;
+
     // Fooocus Engine : Traduction CLIP, Template de style et Negative Prompt
     const { finalPrompt, finalNegative } = FooocusEngine.expandPrompt(prompt, styleId);
     const effectiveNegative = negativePrompt || finalNegative;
 
     try {
-      const result = await imageApi.generateImage(finalPrompt, effectiveNegative, width, height, steps, undefined, modelName);
+      const result = await imageApi.generateImage(finalPrompt, effectiveNegative, effectiveWidth, effectiveHeight, effectiveSteps, undefined, modelName);
       result.prompt = prompt; // Préserve le prompt d'origine pour l'affichage
-      telemetryService.trackEvent(modelName?.includes('1.5') ? 'image_sd15' : 'image_sdxl');
+      telemetryService.trackEvent(isSD15 ? 'image_sd15' : 'image_sdxl');
       return result;
     } finally {
       if (timerInterval) clearInterval(timerInterval);

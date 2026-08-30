@@ -586,7 +586,10 @@ export class ChatController {
 
     try {
       const preferredModel = this.deps.getSettings().sd_active_model;
-      const result = await sdManager.generateImage(prompt, undefined, 512, 512, 8, cardId, undefined, preferredModel);
+      const isSD15 = Boolean(preferredModel && preferredModel.includes('1.5'));
+      const dim = isSD15 ? 512 : 1024;
+      const steps = 15;
+      const result = await sdManager.generateImage(prompt, undefined, dim, dim, steps, cardId, 'cinematic', preferredModel);
       const readyHtml = ImageCardRenderer.renderImageCard(result, cardId);
 
       const savedMsg = await api.saveMessage({
