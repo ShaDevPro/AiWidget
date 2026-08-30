@@ -22,6 +22,8 @@ pub struct ImageGenerationResult {
     pub duration_ms: u64,
 }
 
+static SD_GENERATION_LOCK: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
+
 pub struct SDEngine;
 
 impl SDEngine {
@@ -293,6 +295,9 @@ impl SDEngine {
         preferred_model: Option<String>,
         window: tauri::Window,
     ) -> Result<ImageGenerationResult, String> {
+        // Verrouillage strict : une seule génération d'image à la fois pour protéger la mémoire RAM
+        let _guard = SD_GENERATION_LOCK.lock().await;
+
         let model = Self::get_active_model_path(preferred_model.as_deref()).ok_or_else(|| {
             "Le modèle d'image Stable Diffusion n'est pas encore installé. Veuillez le télécharger dans les paramètres.".to_string()
         })?;
@@ -367,59 +372,66 @@ impl SDEngine {
         cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
 
         let mut child = cmd.spawn().map_err(|e| format!("Erreur lancement sd-cli.exe : {}", e))?;
+        let stdout = child.stdout.take();
         let stderr = child.stderr.take();
         let window_clone = window.clone();
+        let window_clone2 = window.clone();
 
-        let stderr_handle = std::thread::spawn(move || {
-            let mut captured = String::new();
-            if let Some(err) = stderr {
-                use std::io::Read;
-                let mut reader = std::io::BufReader::new(err);
-                let mut current_line = String::new();
-                let mut byte = [0u8; 1];
+        fn process_stream<R: std::io::Read + Send + 'static>(stream: Option<R>, win: tauri::Window) -> std::thread::JoinHandle<String> {
+            std::thread::spawn(move || {
+                let mut captured = String::new();
+                if let Some(r) = stream {
+                    use std::io::Read;
+                    let mut reader = std::io::BufReader::new(r);
+                    let mut current_line = String::new();
+                    let mut byte = [0u8; 1];
 
-                while let Ok(1) = reader.read(&mut byte) {
-                    let ch = byte[0] as char;
-                    if ch == '\r' || ch == '\n' {
-                        if !current_line.is_empty() {
-                            captured.push_str(&current_line);
-                            captured.push('\n');
+                    while let Ok(1) = reader.read(&mut byte) {
+                        let ch = byte[0] as char;
+                        if ch == '\r' || ch == '\n' {
+                            if !current_line.is_empty() {
+                                captured.push_str(&current_line);
+                                captured.push('\n');
 
-                            // Detect step format "1/8" or " 3/10 "
-                            if let Some(slash_idx) = current_line.find('/') {
-                                let before = current_line[..slash_idx].split_whitespace().last().unwrap_or("");
-                                let after = current_line[slash_idx + 1..].split_whitespace().next().unwrap_or("");
-                                if let (Ok(cur), Ok(tot)) = (before.parse::<u32>(), after.parse::<u32>()) {
-                                    if tot > 0 && cur <= tot {
-                                        let pct = 10.0 + ((cur as f32 / tot as f32) * 75.0);
-                                        let _ = window_clone.emit("sd-generation-progress", serde_json::json!({
-                                            "status": "sampling",
-                                            "current_step": cur,
-                                            "total_steps": tot,
-                                            "percentage": pct,
-                                            "message": format!("Échantillonnage : Étape {} / {}", cur, tot)
-                                        }));
+                                if let Some(slash_idx) = current_line.find('/') {
+                                    let before = current_line[..slash_idx].split_whitespace().last().unwrap_or("");
+                                    let after = current_line[slash_idx + 1..].split_whitespace().next().unwrap_or("");
+                                    if let (Ok(cur), Ok(tot)) = (before.parse::<u32>(), after.parse::<u32>()) {
+                                        if tot > 0 && cur <= tot {
+                                            let pct = 10.0 + ((cur as f32 / tot as f32) * 75.0);
+                                            let _ = win.emit("sd-generation-progress", serde_json::json!({
+                                                "status": "sampling",
+                                                "current_step": cur,
+                                                "total_steps": tot,
+                                                "percentage": pct,
+                                                "message": format!("Échantillonnage : Étape {} / {}", cur, tot)
+                                            }));
+                                        }
                                     }
+                                } else if current_line.contains("decoding") || current_line.contains("decode_first_stage") {
+                                    let _ = win.emit("sd-generation-progress", serde_json::json!({
+                                        "status": "decoding",
+                                        "percentage": 92.0,
+                                        "message": "Décodage haute fidélité..."
+                                    }));
                                 }
-                            } else if current_line.contains("decoding") || current_line.contains("decode_first_stage") {
-                                let _ = window_clone.emit("sd-generation-progress", serde_json::json!({
-                                    "status": "decoding",
-                                    "percentage": 92.0,
-                                    "message": "Décodage haute fidélité..."
-                                }));
-                            }
 
-                            current_line.clear();
+                                current_line.clear();
+                            }
+                        } else {
+                            current_line.push(ch);
                         }
-                    } else {
-                        current_line.push(ch);
                     }
                 }
-            }
-            captured
-        });
+                captured
+            })
+        }
+
+        let stdout_handle = process_stream(stdout, window_clone);
+        let stderr_handle = process_stream(stderr, window_clone2);
 
         let status = child.wait().map_err(|e| format!("Erreur exécution sd.exe : {}", e))?;
+        let _captured_stdout = stdout_handle.join().unwrap_or_default();
         let captured_stderr = stderr_handle.join().unwrap_or_default();
 
         if !output_file.exists() || !status.success() {
