@@ -15,6 +15,11 @@ export function attachImageTab(host: SettingsHost, panel: HTMLElement): void {
 
   // Hardware and Badges
   const hardwareBanner = panel.querySelector('#sdHardwareBanner') as HTMLElement | null;
+  const sdHwIconWrapper = panel.querySelector('#sdHwIconWrapper') as HTMLElement | null;
+  const sdHwName = panel.querySelector('#sdHwName') as HTMLElement | null;
+  const sdHwTypeBadge = panel.querySelector('#sdHwTypeBadge') as HTMLElement | null;
+  const sdHwReason = panel.querySelector('#sdHwReason') as HTMLElement | null;
+  const sdHwRecBadge = panel.querySelector('#sdHwRecBadge') as HTMLElement | null;
   const recBadgeJuggernaut = panel.querySelector('#recBadgeJuggernaut') as HTMLElement | null;
   const recBadgeSD15 = panel.querySelector('#recBadgeSD15') as HTMLElement | null;
 
@@ -38,18 +43,36 @@ export function attachImageTab(host: SettingsHost, panel: HTMLElement): void {
 
     // Hardware Banner & Recommendation Badges
     if (status.hardware) {
-      if (hardwareBanner) {
-        hardwareBanner.style.display = 'flex';
+      if (hardwareBanner && sdHwName && sdHwTypeBadge && sdHwReason && sdHwRecBadge) {
+        hardwareBanner.style.display = 'block';
+        sdHwName.textContent = status.hardware.gpu_name;
+
         if (status.hardware.has_dedicated_gpu) {
-          hardwareBanner.style.background = 'rgba(99, 102, 241, 0.12)';
-          hardwareBanner.style.border = '1px solid rgba(99, 102, 241, 0.3)';
-          hardwareBanner.style.color = '#c7d2fe';
-          hardwareBanner.innerHTML = `🎮 <strong>${status.hardware.gpu_name}</strong> (${Math.round(status.hardware.vram_mb / 1024)} Go VRAM) &bull; ${status.hardware.recommendation_reason}`;
+          if (sdHwIconWrapper) {
+            sdHwIconWrapper.textContent = '🎮';
+            sdHwIconWrapper.style.background = 'rgba(99, 102, 241, 0.12)';
+            sdHwIconWrapper.style.color = '#6366f1';
+          }
+          sdHwTypeBadge.textContent = `GPU Dédié (${Math.round(status.hardware.vram_mb / 1024)} Go VRAM)`;
+          sdHwTypeBadge.className = 'sp-status-badge success';
+          sdHwReason.textContent = 'Carte graphique dédiée détectée. Modèle Cinema SDXL Fooocus recommandé.';
+          sdHwRecBadge.textContent = '👑 SDXL Recommandé';
+          sdHwRecBadge.style.color = '#4f46e5';
+          sdHwRecBadge.style.background = 'rgba(99, 102, 241, 0.12)';
+          sdHwRecBadge.style.borderColor = 'rgba(99, 102, 241, 0.25)';
         } else {
-          hardwareBanner.style.background = 'rgba(245, 158, 11, 0.12)';
-          hardwareBanner.style.border = '1px solid rgba(245, 158, 11, 0.3)';
-          hardwareBanner.style.color = '#fde68a';
-          hardwareBanner.innerHTML = `💻 <strong>${status.hardware.gpu_name}</strong> &bull; ${status.hardware.recommendation_reason}`;
+          if (sdHwIconWrapper) {
+            sdHwIconWrapper.textContent = '💻';
+            sdHwIconWrapper.style.background = 'rgba(16, 185, 129, 0.12)';
+            sdHwIconWrapper.style.color = '#10b981';
+          }
+          sdHwTypeBadge.textContent = 'Processeur / GPU Intégré';
+          sdHwTypeBadge.className = 'sp-status-badge info';
+          sdHwReason.textContent = 'SD 1.5 Rapide (15–20s) recommandé pour une fluidité optimale sans temps d\'attente.';
+          sdHwRecBadge.textContent = '⚡ SD 1.5 Recommandé (15-20s)';
+          sdHwRecBadge.style.color = '#059669';
+          sdHwRecBadge.style.background = 'rgba(16, 185, 129, 0.12)';
+          sdHwRecBadge.style.borderColor = 'rgba(16, 185, 129, 0.25)';
         }
       }
 
@@ -61,18 +84,18 @@ export function attachImageTab(host: SettingsHost, panel: HTMLElement): void {
       }
     }
 
-    // Determine current active model
+    const hasDedicatedGpu = Boolean(status.hardware?.has_dedicated_gpu);
+
+    // Determine current active model (Forcé à SD 1.5 si pas de GPU dédié)
     let activeModel = host.settings.sd_active_model;
-    if (!activeModel || (!available.includes(activeModel) && available.length > 0)) {
-      if (status.hardware?.recommended_model === 'sd15' && hasSD15) {
-        activeModel = 'stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf';
-      } else if (hasJuggernaut) {
-        activeModel = 'juggernautXL_v8Rundiffusion.safetensors';
-      } else if (hasSD15) {
-        activeModel = 'stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf';
-      } else {
-        activeModel = available[0] || (status.hardware?.recommended_model === 'sd15' ? 'stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf' : 'juggernautXL_v8Rundiffusion.safetensors');
-      }
+    if (!hasDedicatedGpu) {
+      activeModel = 'stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf';
+      host.settings.sd_active_model = activeModel;
+      void host.saveSettings();
+    } else if (!activeModel || (!available.includes(activeModel) && available.length > 0)) {
+      activeModel = hasJuggernaut
+        ? 'juggernautXL_v8Rundiffusion.safetensors'
+        : (available[0] || 'juggernautXL_v8Rundiffusion.safetensors');
       host.settings.sd_active_model = activeModel;
       void host.saveSettings();
     }
@@ -80,10 +103,13 @@ export function attachImageTab(host: SettingsHost, panel: HTMLElement): void {
     // Top Engine Badge
     if (badge) {
       if (status.installed && status.model_installed) {
-        badge.textContent = t('imageStudio.ready', { defaultValue: 'Prêt (Installé)' });
+        badge.textContent = t('imageStudio.ready', { defaultValue: 'Prêt' });
         badge.className = 'sp-status-badge success';
         if (details) {
-          details.textContent = `${t('imageStudio.modelLoaded', { defaultValue: 'Modèle actif :' })} ${activeModel}`;
+          const modelDisplayName = activeModel.toLowerCase().includes('1.5')
+            ? 'Stable Diffusion 1.5 Rapide (1.5 Go)'
+            : (activeModel.toLowerCase().includes('juggernaut') ? 'Fooocus Juggernaut XL (6.6 Go)' : activeModel);
+          details.innerHTML = `<span style="font-size: 0.85rem; color: var(--text-secondary, #475569);"><strong>${t('imageStudio.modelLoaded', { defaultValue: 'Modèle actif :' })}</strong> <span class="sp-status-badge info" style="font-size: 0.76rem; font-weight: 600; margin-left: 4px;">${modelDisplayName}</span></span>`;
         }
       } else {
         badge.textContent = t('imageStudio.notInstalled', { defaultValue: 'Non Installé' });
@@ -93,7 +119,15 @@ export function attachImageTab(host: SettingsHost, panel: HTMLElement): void {
 
     // Juggernaut Card State
     if (badgeJuggernaut && btnJuggernaut && btnJuggernautText) {
-      if (hasJuggernaut) {
+      if (!hasDedicatedGpu) {
+        // Verrouillage de sécurité : GPU Dédié obligatoire
+        badgeJuggernaut.textContent = hasJuggernaut ? '🔒 Désactivé (GPU Requis)' : '🔒 Non disponible';
+        badgeJuggernaut.className = 'sp-status-badge neutral';
+        btnJuggernautText.textContent = '🔒 GPU 6 Go VRAM Requis';
+        btnJuggernaut.disabled = true;
+        btnJuggernaut.className = 'sp-btn sp-btn-sm sp-btn-secondary';
+        btnJuggernaut.title = 'Ce modèle cinéma de 6.6 Go nécessite une carte graphique dédiée (Nvidia RTX / AMD 6 Go+ VRAM) pour ne pas saturer ou ralentir votre PC.';
+      } else if (hasJuggernaut) {
         const isSelected = activeModel.toLowerCase().includes('juggernaut');
         badgeJuggernaut.textContent = isSelected ? '✓ Actif' : '✓ Installé';
         badgeJuggernaut.className = isSelected ? 'sp-status-badge success' : 'sp-status-badge info';
@@ -178,6 +212,11 @@ export function attachImageTab(host: SettingsHost, panel: HTMLElement): void {
   // Juggernaut Button Click
   btnJuggernaut?.addEventListener('click', async () => {
     const status = await sdManager.getStatus();
+    if (!status.hardware?.has_dedicated_gpu) {
+      host.toast('Un GPU dédié (6 Go VRAM minimum) est requis pour activer Juggernaut XL.', 'warning');
+      return;
+    }
+
     const available = status.available_models || [];
     const hasJuggernaut = available.some((m) => m.toLowerCase().includes('juggernaut'));
 
@@ -198,7 +237,7 @@ export function attachImageTab(host: SettingsHost, panel: HTMLElement): void {
   btnSD15?.addEventListener('click', async () => {
     const status = await sdManager.getStatus();
     const available = status.available_models || [];
-    const hasSD15 = available.some((m) => m.toLowerCase().includes('stable-diffusion-v1-5') || m.toLowerCase().includes('sd-v1-5'));
+    const hasSD15 = available.some((m) => m.toLowerCase().includes('stable-diffusion-v1-5') || m.toLowerCase().includes('sd-v1-5') || m.toLowerCase().includes('sd15'));
 
     if (hasSD15) {
       // Switch active model to SD 1.5

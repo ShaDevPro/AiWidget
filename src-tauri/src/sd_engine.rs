@@ -157,8 +157,36 @@ impl SDEngine {
 
     pub fn get_active_model_path(preferred: Option<&str>) -> Option<PathBuf> {
         let dir = Self::get_sd_dir();
+        let hw = Self::detect_hardware();
 
-        // 1. Si une préférence explicite est passée par l'utilisateur
+        // 1. Si la machine n'a PAS de GPU dédié (ex: Intel UHD / CPU standard), on impose STRICTEMENT SD 1.5 Rapide
+        if !hw.has_dedicated_gpu {
+            let sd15 = dir.join("stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf");
+            if sd15.exists() {
+                return Some(sd15);
+            }
+            // Si SD 1.5 n'est pas encore téléchargé, on cherche un autre modèle GGUF léger
+            if dir.exists() {
+                if let Ok(entries) = fs::read_dir(&dir) {
+                    for entry in entries.flatten() {
+                        let path = entry.path();
+                        if let Some(ext) = path.extension() {
+                            if ext == "gguf" {
+                                return Some(path);
+                            }
+                        }
+                    }
+                }
+            }
+            // Fallback uniquement si rien d'autre n'est disponible
+            let jugg = dir.join("juggernautXL_v8Rundiffusion.safetensors");
+            if jugg.exists() {
+                return Some(jugg);
+            }
+            return None;
+        }
+
+        // 2. Si la machine dispose d'un GPU dédié puissant (>= 6 Go VRAM), on applique le choix explicite de l'utilisateur
         if let Some(pref) = preferred {
             let p = pref.trim().to_lowercase();
             if !p.is_empty() {
@@ -181,41 +209,16 @@ impl SDEngine {
             }
         }
 
-        // 2. Détection intelligente selon le matériel (priorité au modèle le plus adapté disponible)
-        let hw = Self::detect_hardware();
-        if hw.has_dedicated_gpu {
-            let jugg = dir.join("juggernautXL_v8Rundiffusion.safetensors");
-            if jugg.exists() {
-                return Some(jugg);
-            }
-            let sd15 = dir.join("stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf");
-            if sd15.exists() {
-                return Some(sd15);
-            }
-        } else {
-            let sd15 = dir.join("stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf");
-            if sd15.exists() {
-                return Some(sd15);
-            }
-            let jugg = dir.join("juggernautXL_v8Rundiffusion.safetensors");
-            if jugg.exists() {
-                return Some(jugg);
-            }
+        // 3. Fallback GPU dédié par défaut : Juggernaut XL
+        let jugg = dir.join("juggernautXL_v8Rundiffusion.safetensors");
+        if jugg.exists() {
+            return Some(jugg);
+        }
+        let sd15 = dir.join("stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf");
+        if sd15.exists() {
+            return Some(sd15);
         }
 
-        // 3. Tout autre modèle présent dans le répertoire
-        if dir.exists() {
-            if let Ok(entries) = fs::read_dir(&dir) {
-                for entry in entries.flatten() {
-                    let path = entry.path();
-                    if let Some(ext) = path.extension() {
-                        if ext == "gguf" || ext == "safetensors" || ext == "ckpt" {
-                            return Some(path);
-                        }
-                    }
-                }
-            }
-        }
         None
     }
 
@@ -427,6 +430,21 @@ impl SDEngine {
             return Err("L'exécutable sd.exe n'est pas installé. Veuillez télécharger le moteur dans les paramètres.".to_string());
         }
 
+        let hw = Self::detect_hardware();
+        let sd_dir = Self::get_sd_dir();
+        let vulkan_dll = sd_dir.join("ggml-vulkan.dll");
+        let vulkan_disabled = sd_dir.join("ggml-vulkan.dll.disabled");
+
+        // Si AUCUN GPU dédié (ex: Intel UHD Graphics / CPU), on désactive Vulkan pour forcer
+        // l'exécution directe sur les cœurs CPU AVX2 (ggml-cpu-haswell.dll) en 15-20s
+        if !hw.has_dedicated_gpu {
+            if vulkan_dll.exists() {
+                let _ = fs::rename(&vulkan_dll, &vulkan_disabled);
+            }
+        } else if vulkan_disabled.exists() {
+            let _ = fs::rename(&vulkan_disabled, &vulkan_dll);
+        }
+
         let start_time = Instant::now();
         let ts = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default().as_millis();
         let images_dir = Self::get_images_dir();
@@ -441,10 +459,10 @@ impl SDEngine {
             let target_h = if height == 0 || height < 768 { 1024 } else { (height / 64) * 64 };
             (target_w, target_h, 4.0f32, 15u32)
         } else {
-            // SD 1.5 standard resolution
+            // SD 1.5 Rapide GGUF : 512x512, 8 étapes Euler (15 secondes sur CPU AVX2)
             let target_w = if width == 0 { 512 } else { (width / 64) * 64 };
             let target_h = if height == 0 { 512 } else { (height / 64) * 64 };
-            (target_w, target_h, 7.0f32, 15u32)
+            (target_w, target_h, 7.0f32, 8u32)
         };
 
         let st = if steps == 0 { default_steps } else { steps.clamp(4, 40) };
@@ -458,7 +476,7 @@ impl SDEngine {
             "status": "starting",
             "prompt": prompt,
             "percentage": 5,
-            "message": if is_sdxl { "Initialisation Fooocus SDXL Juggernaut (1024x1024)..." } else { "Initialisation SD 1.5 Rapide..." }
+            "message": if is_sdxl { "Initialisation Fooocus SDXL Juggernaut (1024x1024)..." } else { "Initialisation SD 1.5 Rapide (CPU AVX2)..." }
         }));
 
         let mut cmd = std::process::Command::new(&binary);
@@ -468,12 +486,16 @@ impl SDEngine {
             .arg("-H").arg(h.to_string())
             .arg("--steps").arg(st.to_string())
             .arg("--cfg-scale").arg(format!("{:.1}", cfg_scale))
-            .arg("--sampling-method").arg("euler_a")
+            .arg("--sampling-method").arg(if is_sdxl { "euler_a" } else { "euler" })
             .arg("-t").arg(threads.to_string())
-            .arg("-s").arg(s.to_string())
-            .arg("--vae-tiling")
-            .arg("--vae-on-cpu")
-            .arg("-o").arg(&output_file);
+            .arg("-s").arg(s.to_string());
+
+        if is_sdxl {
+            cmd.arg("--vae-tiling");
+            cmd.arg("--vae-on-cpu");
+        }
+
+        cmd.arg("-o").arg(&output_file);
 
         if let Some(ref neg) = negative_prompt {
             if !neg.trim().is_empty() {
@@ -517,7 +539,8 @@ impl SDEngine {
                                     let before = current_line[..slash_idx].split_whitespace().last().unwrap_or("");
                                     let after = current_line[slash_idx + 1..].split_whitespace().next().unwrap_or("");
                                     if let (Ok(cur), Ok(tot)) = (before.parse::<u32>(), after.parse::<u32>()) {
-                                        if tot > 0 && cur <= tot {
+                                        // Filtre : uniquement les étapes réelles d'échantillonnage (<= 50) pour ignorer les tenseurs (686/686)
+                                        if tot > 0 && tot <= 50 && cur <= tot {
                                             let pct = 10.0 + ((cur as f32 / tot as f32) * 75.0);
                                             let _ = win.emit("sd-generation-progress", serde_json::json!({
                                                 "status": "sampling",

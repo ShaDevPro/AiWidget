@@ -101,108 +101,120 @@ export const FOOOCUS_STYLES: Record<string, FooocusStyle> = {
   },
 };
 
-/** Dictionnaire de traduction rapide des mots-clés fréquents FR/AR -> EN pour CLIP */
+/** Dictionnaire de traduction sémantique universelle FR/AR/EN pour CLIP & Fooocus */
 const KEYWORD_TRANSLATIONS: Array<[RegExp, string]> = [
-  // Nettoyage des ordres conversationnels
-  [/\b(tu\s+g[eé]n[eè]res?|g[eé]n[eè]re|peux-tu\s+g[eé]n[eè]rer|fais(-moi)?|cr[eé][eé]|dessine(-moi)?|affiche)\s+(une?\s+)?(photo|image|dessin|illustration|visuel|rendu)?\s*(d['’]|de\s+l['’]|de\s+la|du|des|d['’]un|d['’]une)?\b/gi, ''],
-  [/\b(generate|create|draw|make|show\s+me)\s+(a\s+|an\s+)?(photo|image|picture|rendering|illustration)?\s*(of)?\b/gi, ''],
-  [/\b(قم\s+بتوليد|أنشئ|ارسم|اعمل|أريد)\s+(صورة|رسمة|منظر)?\s*(لـ|ل)?\b/g, ''],
+  // Nettoyage des ordres conversationnels et formules de politesse
+  [/\b(tu\s+g[eé]n[eè]res?|g[eé]n[eè]re(s)?|peux-tu\s+g[eé]n[eè]rer|fais(-moi)?|cr[eé][eé](s)?|dessine(-moi)?|affiche|donne(-moi)?|cr[eé]ation\s+d['’]|g[eé]n[eé]ration\s+d['’])\s+(une?\s+)?(photo|image|dessin|illustration|visuel|rendu|tableau)?\s*(d['’]|de\s+l['’]|de\s+la|du|des|d['’]un|d['’]une)?\b/gi, ''],
+  [/\b(generate|create|draw|make|show\s+me|paint|render)\s+(a\s+|an\s+)?(photo|image|picture|rendering|illustration|painting)?\s*(of)?\b/gi, ''],
+  [/\b(قم\s+بتوليد|أنشئ|ارسم|اعمل|أريد|صور\s+لي|اعطني)\s+(صورة|رسمة|منظر)?\s*(لـ|ل)?\b/g, ''],
+
+  // Angles, Perspectives & Vues spatiales (Extérieur / Intérieur / Drone)
+  [/\(?\b(vue\s+(de\s+l['’]|d['’])ext[eé]rieur[e]?|vue\s+ext[eé]rieur[e]?|(de\s+l['’]|d['’])ext[eé]rieur[e]?|en\s+ext[eé]rieur|de\s+dehors|outside\s+view|exterior\s+view|exterior|outdoors?)\b\)?/gi, 'exterior wide angle shot from outside on street level, outdoor view of the outer building facade under sunny daylight, clear blue sky'],
+  [/\(?\b(vue\s+(de\s+l['’]|d['’])int[eé]rieur[e]?|vue\s+int[eé]rieur[e]?|(de\s+l['’]|d['’])int[eé]rieur[e]?|en\s+int[eé]rieur|de\s+dedans|inside\s+view|interior\s+view|interior|indoors?)\b\)?/gi, 'interior architectural perspective shot from inside the hall, indoor space with ambient indoor lighting'],
+  [/\(?\b(vue\s+a[eé]rienne|vue\s+du\s+ciel|par\s+drone|vue\s+d['’]en\s+haut|drone\s+shot|aerial\s+view|bird['’]s?\s+eye\s+view)\b\)?/gi, 'aerial drone photography from high above, breathtaking bird-eye view'],
+  [/\(?\b(gros\s+plan|plan\s+rapproch[eé]|portrait\s+serr[eé]|close[-\s]?up|macro)\b\)?/gi, 'macro close-up highly detailed shot, sharp focal point'],
+  [/\(?\b(contre[-\s]?plong[eé]e|low\s+angle)\b\)?/gi, 'dramatic low-angle shot looking up, majestic heroic perspective'],
 
   // Architecture, Monuments & Bâtiments
-  [/\b(amphi\s*th[eé][aâ]tre|amphith[eé][aâ]tre|colis[eé]e)\b/gi, 'ancient classical stone amphitheater with open-air arena seating'],
-  [/\b(vue\s+de\s+l['’]ext[eé]rieur|vue\s+ext[eé]rieure|de\s+l['’]ext[eé]rieur)\b/gi, 'exterior panoramic wide angle view, bright daylight, clear sky'],
-  [/\b(vue\s+de\s+l['’]int[eé]rieur|vue\s+int[eé]rieure|de\s+l['’]int[eé]rieur)\b/gi, 'interior architectural perspective view'],
-  [/\b(monument|temple|ruines?)\b/gi, 'ancient classical stone monument ruins'],
-  [/\b(pyramide|pyramides)\b/gi, 'ancient majestic pyramids in desert under blue sky'],
-  [/\b(tour\s+eiffel)\b/gi, 'Eiffel tower in Paris, sunny clear day'],
-  [/\b(ch[aâ]teau|palais|forteresse)\b/gi, 'magnificent medieval stone castle fortress'],
-  [/\b(stade|ar[eè]ne)\b/gi, 'modern illuminated sports arena stadium'],
-  [/\b(mus[eé]e|th[eé][aâ]tre)\b/gi, 'grand classical museum theatre building'],
-  [/\b(mosqu[eé]e)\b/gi, 'magnificent classical mosque with minarets'],
-  [/\b(cath[eé]drale|[eé]glise)\b/gi, 'grand gothic cathedral facade'],
+  [/\b(amphi\s*th[eé][aâ]tre|amphith[eé][aâ]tre|th[eé][aâ]tre\s+antique|colis[eé]e|ar[eè]nes?)\b/gi, 'ancient Roman stone amphitheatre, classical antique architecture, majestic outdoor facade, colonnades and arches'],
+  [/\b(monument|temple|ruines?)\b/gi, 'ancient classical stone monument, magnificent ruins under clear sky'],
+  [/\b(pyramide|pyramides)\b/gi, 'ancient majestic stone pyramids in desert under sunny blue sky'],
+  [/\b(tour\s+eiffel)\b/gi, 'Eiffel tower in Paris, sunny clear daylight'],
+  [/\b(ch[aâ]teau|palais|forteresse)\b/gi, 'grand medieval stone castle palace fortress, magnificent exterior architecture'],
+  [/\b(stade|ar[eè]ne)\b/gi, 'modern illuminated architectural sports arena stadium'],
+  [/\b(mus[eé]e|th[eé][aâ]tre)\b/gi, 'grand classical museum theatre building facade'],
+  [/\b(mosqu[eé]e)\b/gi, 'magnificent classical mosque with domes and minarets'],
+  [/\b(cath[eé]drale|[eé]glise)\b/gi, 'grand gothic stone cathedral exterior facade'],
+  [/\b(gratte[-\s]?ciel|building|tour|tours)\b/gi, 'soaring modern glass skyscrapers, futuristic architecture'],
 
-  // Sujets / Animaux
-  [/\b(chat|chaton|chats)\b/gi, 'cute cat'],
-  [/\b(chien|chiot|chiens)\b/gi, 'happy dog'],
-  [/\b(astronaute|cosmonaute)\b/gi, 'astronaut in space suit'],
-  [/\b(lune)\b/gi, 'moon surface with stars'],
-  [/\b(soleil|coucher de soleil)\b/gi, 'gorgeous golden sunset'],
-  [/\b(mer|oc[eé]an|plage)\b/gi, 'ocean beach with turquoise waves and sunlight'],
-  [/\b(for[eê]t|arbres|nature)\b/gi, 'enchanted lush green forest'],
-  [/\b(montagne|montagnes)\b/gi, 'majestic snowy mountains peak under blue sky'],
-  [/\b(ville|cit[eé]|immeubles)\b/gi, 'futuristic cityscape with modern architecture'],
-  [/\b(voiture|automobile|v[eé]hicule)\b/gi, 'sleek luxury sports car vehicle'],
-  [/\b(robot|cyborg|andro[iï]de)\b/gi, 'high-tech humanoid robot with polished metal'],
-  [/\b(galaxie|espace|univers|cosmos)\b/gi, 'deep space colorful nebula galaxy with glowing stars'],
-  [/\b(fleur|fleurs|rose|jardin)\b/gi, 'vibrant blooming flowers garden'],
-  [/\b(femme|fille|dame)\b/gi, 'beautiful woman portrait with natural lighting'],
-  [/\b(homme|gar[çc]on)\b/gi, 'handsome man portrait with natural lighting'],
+  // Sujets, Personnages & Réalisme
+  [/\b(femme|fille|dame)\b/gi, 'beautiful woman, highly detailed photorealistic face, natural authentic skin texture'],
+  [/\b(homme|gar[çc]on|monsieur)\b/gi, 'handsome man, highly detailed photorealistic portrait, natural skin texture'],
+  [/\b(personnes?\s+r[eé]elles?|vrais?\s+humains?|vrais?\s+personnes?)\b/gi, 'real authentic human beings, highly detailed photorealistic face, authentic skin pores and texture'],
+  [/\b(pas\s+cartoon|non\s+cartoon|pas\s+de\s+dessin\s+anim[eé]|pas\s+d'animation|pas\s+3d)\b/gi, 'hyperrealistic photographic quality, authentic photography, lifelike realism, 35mm film photo'],
+  [/\b(astronaute|cosmonaute)\b/gi, 'astronaut in detailed space suit, helmet reflection'],
+  [/\b(lune)\b/gi, 'moon surface with cosmic stars'],
+  [/\b(coucher\s+de\s+soleil|golden\s+hour)\b/gi, 'dramatic golden hour sunset with warm glowing light'],
+  [/\b(lever\s+de\s+soleil)\b/gi, 'peaceful sunrise with morning golden light'],
+  [/\b(plein\s+jour|jour\s+ensoleill[eé]|soleil)\b/gi, 'bright sunny daylight, clear blue sky, natural sun illumination'],
+  [/\b(nuit|nocturne)\b/gi, 'atmospheric nighttime scene, dramatic night lighting, stars and ambient city lights'],
+  [/\b(mer|oc[eé]an|plage)\b/gi, 'ocean coastline beach with turquoise waves and sunlight'],
+  [/\b(for[eê]t|arbres|nature)\b/gi, 'lush enchanted green nature forest'],
+  [/\b(montagne|montagnes)\b/gi, 'majestic snowy mountain peaks under blue sky'],
+  [/\b(voiture|automobile|v[eé]hicule)\b/gi, 'sleek luxury sports car vehicle, automotive photography'],
+  [/\b(robot|cyborg|andro[iï]de)\b/gi, 'high-tech humanoid robot with polished metal and glowing fiber optics'],
+  [/\b(galaxie|espace|univers|cosmos)\b/gi, 'deep space colorful nebula galaxy with glowing cosmic stars'],
+  [/\b(chat|chaton|chats)\b/gi, 'cute domestic cat, detailed fur, sharp eyes'],
+  [/\b(chien|chiot|chiens)\b/gi, 'playful happy dog, detailed fur, natural daylight'],
   [/\b(dragon|cr[eé]ature)\b/gi, 'mythical majestic dragon with detailed scales'],
   [/\b(guerrier|chevalier|samoura[iï])\b/gi, 'legendary warrior knight in armor'],
 
   // Cybersécurité & Tech
-  [/\b(tests?\s+intrusion|pentest|oscp)\b/gi, 'cybersecurity penetration testing offensive security lab, terminal consoles'],
-  [/\b(hacking\s+[eé]thique|hacker\s+[eé]thique|piratage\s+[eé]thique)\b/gi, 'ethical hacker, cybersecurity operations room, high-tech monitors'],
-  [/\b(serveurs?|data\s*center|salle\s+serveur)\b/gi, 'glowing datacenter server racks with led lights'],
-  [/\b(ordinateurs?|multi-[\s\w]+[eé]crans?|[eé]crans?)\b/gi, 'advanced multi-monitor cybersecurity workstation setup'],
+  [/\b(tests?\s+intrusion|pentest|oscp|hacking\s+[eé]thique|hacker\s+[eé]thique|piratage\s+[eé]thique)\b/gi, 'ethical cybersecurity engineer in high-tech security operations room, multi-monitor consoles with terminal data'],
+  [/\b(serveurs?|data\s*center|salle\s+serveur)\b/gi, 'modern illuminated enterprise datacenter server racks with glowing blue LED lights'],
 
-  // Personnages & Réalisme
-  [/\b(personnes?\s+r[eé]elles?|vrais?\s+humains?|vrais?\s+personnes?)\b/gi, 'real authentic human beings, highly detailed photorealistic face, authentic skin pores and texture'],
-  [/\b(pas\s+cartoon|non\s+cartoon|pas\s+de\s+dessin\s+anim[eé]|pas\s+d'animation)\b/gi, 'hyperrealistic photographic quality, non-cartoon, lifelike realism'],
-  [/\b(africain|africaine|ivoirien|ivoirienne|afrique|d'ivoire)\b/gi, 'African person, natural photorealistic lighting'],
-  [/\b(asiatique|caucasien|arabe|m[eé]tis)\b/gi, 'realistic human portrait'],
-
-  // Directives d'exclusion de texte
+  // Directives d'exclusion
   [/\b(sans\s+texte|pas\s+de\s+texte|pas\s+de\s+titre|[eé]viter\s+les\s+textes|aucun\s+texte)\b/gi, 'clean background without text or typography, no watermark'],
 
   // Termes Arabes
-  [/\b(مسرح\s+مدرج|مدرج\s+روماني|كولوسيوم)\b/g, 'ancient classical stone amphitheater exterior view with arena seating'],
-  [/\b(منظر\s+خارجي|من\s+الخارج)\b/g, 'exterior wide angle view, bright daylight'],
+  [/\b(مسرح\s+مدرج|مدرج\s+روماني|كولوسيوم|مدرج)\b/g, 'ancient Roman stone amphitheatre, classical antique architecture, majestic outdoor facade, colonnades and arches'],
+  [/\b(منظر\s+خارجي|من\s+الخارج|في\s+الخارج)\b/g, 'exterior wide angle shot from outside on street level, outdoor view of the outer building facade under sunny daylight, clear blue sky'],
+  [/\b(منظر\s+داخلي|من\s+الداخل|في\s+الداخل)\b/g, 'interior architectural perspective shot from inside the hall, indoor space with ambient indoor lighting'],
   [/\b(أمن\s+سيبراني|اختراق\s+أخلاقي|هاكر)\b/g, 'ethical cybersecurity hacker in high-tech lab with glowing monitors'],
-  [/\b(قطة|قط|هر)\b/g, 'cute cat'],
-  [/\b(كلب)\b/g, 'happy dog'],
-  [/\b(رائد فضاء)\b/g, 'astronaut in space suit'],
-  [/\b(القمر|قمر)\b/g, 'moon surface with stars'],
-  [/\b(غروب|شمس)\b/g, 'golden hour sunset'],
-  [/\b(بحر|محيط|شاطئ)\b/g, 'ocean beach with turquoise waves'],
+  [/\b(قطة|قط|هر)\b/g, 'cute cat with detailed fur'],
+  [/\b(كلب)\b/g, 'happy dog with detailed fur'],
+  [/\b(غروب|شمس)\b/g, 'golden hour sunset with warm light'],
+  [/\b(بحر|محيط|شاطئ)\b/g, 'ocean beach with turquoise waves and sunlight'],
   [/\b(غابة|طبيعة|أشجار)\b/g, 'lush enchanted green forest'],
   [/\b(جبل|جبال)\b/g, 'majestic snowy mountain peaks under blue sky'],
   [/\b(مدينة|عمارة|مباني)\b/g, 'futuristic modern city architecture'],
-  [/\b(سيارة|مركبة)\b/g, 'sleek sports car vehicle'],
-  [/\b(روبوت|آلي)\b/g, 'humanoid cyborg robot'],
-  [/\b(قلعة|قصر)\b/g, 'grand majestic stone castle'],
+  [/\b(سيارة|مركبة)\b/g, 'sleek luxury sports car'],
+  [/\b(روبوت|آلي)\b/g, 'humanoid cyborg robot with polished metal'],
+  [/\b(قلعة|قصر)\b/g, 'grand majestic medieval stone castle palace'],
   [/\b(فضاء|مجرة|نجوم)\b/g, 'deep space nebula galaxy with glowing stars'],
-  [/\b(وردة|زهور|حديقة)\b/g, 'vibrant colorful flowers garden'],
-  [/\b(تنين)\b/g, 'mythical majestic dragon'],
-  [/\b(فارس|محارب)\b/g, 'epic fantasy warrior knight'],
-  [/\b(شخص\s+حقيقي|واقعي|بدون\s+كرتون)\b/g, 'real human person, photorealistic portrait'],
+  [/\b(شخص\s+حقيقي|واقعي|بدون\s+كرتون)\b/g, 'real human person, highly detailed photorealistic portrait, authentic skin texture'],
   [/\b(بدون\s+نصوص|بدون\s+كتابة|بدون\s+عنوان)\b/g, 'clean visual without text, no watermark'],
 ];
 
 export class FooocusEngine {
   /**
-   * Traduit, nettoie et enrichit le prompt pour le modèle CLIP
+   * Traduit, nettoie et enrichit le prompt pour le modèle CLIP avec injection négative dynamique
    */
   static expandPrompt(prompt: string, styleId = 'cinematic'): { finalPrompt: string; finalNegative: string } {
     let clean = prompt.trim();
 
-    // 1. Détection et remplacement des mots-clés FR/AR vers EN
+    // 1. Détection spatiale préalable pour l'injection négative dynamique
+    const lowerPrompt = clean.toLowerCase();
+    const isExterior = /ext[eé]rieur|outside|outdoor|outdoors|fa[çc]ade|street|dehors|open[-\s]air|خارجي|من\s*الخارج/.test(lowerPrompt);
+    const isInterior = /int[eé]rieur|inside|indoor|indoors|hall|room|dedans|داخلي|من\s*الداخل/.test(lowerPrompt);
+
+    // 2. Nettoyage des parenthèses superflues
+    clean = clean.replace(/[()]/g, ' ');
+
+    // 3. Détection et remplacement des mots-clés FR/AR vers EN
     for (const [pattern, replacement] of KEYWORD_TRANSLATIONS) {
       clean = clean.replace(pattern, replacement);
     }
 
-    // 2. Nettoyage des espaces superflus et ponctuation résiduelle
+    // 4. Nettoyage des espaces superflus et ponctuation résiduelle
     clean = clean.replace(/\s+/g, ' ').replace(/^[\s,;.-]+|[\s,;.-]+$/g, '').trim();
     if (!clean) {
-      clean = 'beautiful scenic landscape, crystal clear daylight, high quality';
+      clean = 'beautiful scenic landscape, crystal clear daylight, high quality, 8k';
     }
 
-    // 3. Récupération du style Fooocus
+    // 5. Récupération du style Fooocus
     const style = FOOOCUS_STYLES[styleId] ?? FOOOCUS_STYLES.cinematic;
 
-    // 4. Application du template de style Fooocus
+    // 6. Application du template de style Fooocus
     const finalPrompt = style.promptTemplate.replace('{prompt}', clean);
-    const finalNegative = style.negativePrompt;
+
+    // 7. Injection Négative Dynamique Contextuelle (Anti-Hallucination Extérieur/Intérieur)
+    let finalNegative = style.negativePrompt;
+    if (isExterior) {
+      finalNegative = `indoors, interior, inside view, indoor room, enclosed space, indoor arena, indoor seating, auditorium, ceiling, ${finalNegative}`;
+    } else if (isInterior) {
+      finalNegative = `outdoors, exterior, outside view, street, open sky, clouds, landscape, ${finalNegative}`;
+    }
 
     return {
       finalPrompt,

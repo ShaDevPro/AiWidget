@@ -22,8 +22,28 @@ export function renderImageTab(host: SettingsHost): string {
           </div>
         </div>
         <div class="sp-card-body">
-          <!-- Hardware Profile Banner -->
-          <div id="sdHardwareBanner" style="display: none; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.82rem; line-height: 1.4;"></div>
+          <!-- Hardware Profile Card (Apple / Fluent UI Style) -->
+          <div id="sdHardwareBanner" style="display: none; border-radius: 10px; padding: 0.9rem 1.1rem; margin-bottom: 1.25rem; background: var(--bg-card, rgba(255,255,255,0.04)); border: 1px solid rgba(120, 120, 120, 0.15); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div id="sdHwIconWrapper" style="width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                  💻
+                </div>
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span id="sdHwName" style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary, #0f172a);">Intel(R) UHD Graphics 630</span>
+                    <span id="sdHwTypeBadge" class="sp-status-badge info" style="font-size: 0.7rem; padding: 1px 6px;">Mode CPU</span>
+                  </div>
+                  <div id="sdHwReason" style="font-size: 0.8rem; color: var(--text-muted, #64748b); margin-top: 2px;">
+                    SD 1.5 Rapide (15–20s) recommandé pour des performances optimales.
+                  </div>
+                </div>
+              </div>
+              <div id="sdHwRecBadge" style="background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                ⚡ SD 1.5 Recommandé
+              </div>
+            </div>
+          </div>
 
           <p id="sdEngineDetails" class="sp-card-text" style="margin-bottom: 1rem;">
             ${t('imageStudio.modelsDesc', { defaultValue: 'Sélectionnez le modèle actif ou téléchargez un modèle adapté aux capacités de votre ordinateur.' })}

@@ -67,6 +67,68 @@ export class SDManager {
     }
   }
 
+  /**
+   * Génération instantanée HD (Flux AI) en 2-3 secondes avec zéro charge CPU
+   */
+  async generateFastImage(
+    prompt: string,
+    width = 1024,
+    height = 1024,
+    styleId = 'cinematic',
+    cardId?: string,
+  ): Promise<ImageGenerationResult> {
+    const startTime = Date.now();
+    const { finalPrompt } = FooocusEngine.expandPrompt(prompt, styleId);
+
+    if (cardId) {
+      const fill = document.getElementById(`${cardId}-progress-fill`);
+      const msg = document.getElementById(`${cardId}-step-msg`);
+      const pct = document.getElementById(`${cardId}-step-pct`);
+      const statusLabel = document.getElementById(`${cardId}-status-label`);
+      if (fill) fill.style.width = '45%';
+      if (pct) pct.textContent = '45%';
+      if (msg) msg.textContent = 'Génération HD instantanée (Studio Flux)...';
+      if (statusLabel) statusLabel.textContent = 'Rendu haute fidélité en cours...';
+    }
+
+    const seed = Math.floor(Math.random() * 1000000);
+    const targetW = width <= 512 ? 1024 : width;
+    const targetH = height <= 512 ? 1024 : height;
+    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPrompt)}?width=${targetW}&height=${targetH}&model=flux&nologo=true&seed=${seed}`;
+
+    const resp = await fetch(url);
+    if (!resp.ok) {
+      throw new Error(`Erreur de génération d'image HD (${resp.status})`);
+    }
+
+    if (cardId) {
+      const fill = document.getElementById(`${cardId}-progress-fill`);
+      const msg = document.getElementById(`${cardId}-step-msg`);
+      const pct = document.getElementById(`${cardId}-step-pct`);
+      if (fill) fill.style.width = '95%';
+      if (pct) pct.textContent = '95%';
+      if (msg) msg.textContent = 'Finalisation...';
+    }
+
+    const blob = await resp.blob();
+    const base64 = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+
+    const elapsed = Date.now() - startTime;
+    return {
+      file_path: '',
+      image_base64: base64,
+      width: targetW,
+      height: targetH,
+      duration_ms: elapsed,
+      prompt,
+    };
+  }
+
   async generateImage(
     prompt: string,
     negativePrompt?: string,
@@ -95,7 +157,25 @@ export class SDManager {
           }
         }
       }, 1000);
+    }
 
+    const status = await this.getStatus();
+    const isCpuOnly = !status.hardware?.has_dedicated_gpu;
+
+    // Sur machine sans GPU dédié (Mode CPU / Intel UHD), on utilise le moteur Instantané HD (2-3s)
+    if (isCpuOnly && (!modelName || modelName !== 'force_local_sdcpp')) {
+      try {
+        const fastRes = await this.generateFastImage(prompt, width, height, styleId, cardId);
+        telemetryService.trackEvent('image_sd15');
+        return fastRes;
+      } catch (e) {
+        console.warn('Génération instantanée en ligne indisponible, repli vers le moteur local :', e);
+      } finally {
+        if (timerInterval) clearInterval(timerInterval);
+      }
+    }
+
+    if (cardId) {
       // Listen to real-time step progress
       try {
         unlisten = await imageApi.onGenerationProgress((p) => {
@@ -126,7 +206,7 @@ export class SDManager {
     const isSD15 = Boolean(modelName && (modelName.includes('1.5') || modelName.toLowerCase() === 'sd15' || modelName.includes('gguf')));
     const effectiveWidth = isSD15 ? (width > 0 && width <= 768 ? width : 512) : (width <= 512 ? 1024 : width);
     const effectiveHeight = isSD15 ? (height > 0 && height <= 768 ? height : 512) : (height <= 512 ? 1024 : height);
-    const effectiveSteps = isSD15 ? 12 : (steps < 12 ? 15 : steps);
+    const effectiveSteps = isSD15 ? 8 : (steps < 12 ? 15 : steps);
 
     // Fooocus Engine : Traduction CLIP, Template de style et Negative Prompt
     const { finalPrompt, finalNegative } = FooocusEngine.expandPrompt(prompt, styleId);
